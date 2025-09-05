@@ -33,7 +33,8 @@ if ( $action === 'clean_user' && isset( $_GET['user_id'] ) && check_admin_refere
 			unset( $_SESSION['webauthn_challenge'] );
 		}
 		
-		$message = sprintf( __( 'Cleaned %d passkey(s) and cleared challenges for user ID %d', 'byebyepw' ), $deleted, $user_id );
+		// translators: %1$d is the number of deleted passkeys, %2$d is the user ID
+		$message = sprintf( __( 'Cleaned %1$d passkey(s) and cleared challenges for user ID %2$d', 'byebyepw' ), $deleted, $user_id );
 		$message_type = 'success';
 	} else {
 		$message = __( 'You do not have permission to clean this user\'s passkeys.', 'byebyepw' );
@@ -135,7 +136,7 @@ if ( ! session_id() ) {
 					<?php if ( isset( $_SESSION['webauthn_challenge'] ) ) : ?>
 						<span class="dashicons dashicons-yes-alt" style="color: green;"></span>
 						<?php esc_html_e( 'Present', 'byebyepw' ); ?>
-						(<?php echo strlen( $_SESSION['webauthn_challenge'] ); ?> bytes)
+						(<?php echo esc_html( strlen( $_SESSION['webauthn_challenge'] ) ); ?> bytes)
 					<?php else : ?>
 						<span class="dashicons dashicons-dismiss" style="color: orange;"></span>
 						<?php esc_html_e( 'Not set', 'byebyepw' ); ?>
@@ -150,12 +151,12 @@ if ( ! session_id() ) {
 					if ( $reg_challenge ) : ?>
 						<span class="dashicons dashicons-yes-alt" style="color: green;"></span>
 						<?php esc_html_e( 'Present', 'byebyepw' ); ?>
-						(<?php echo strlen( $reg_challenge ); ?> bytes base64)
-						<br><small>Key: byebyepw_reg_challenge_<?php echo get_current_user_id(); ?></small>
+						(<?php echo esc_html( strlen( $reg_challenge ) ); ?> bytes base64)
+						<br><small>Key: byebyepw_reg_challenge_<?php echo esc_html( get_current_user_id() ); ?></small>
 					<?php else : ?>
 						<span class="dashicons dashicons-dismiss" style="color: orange;"></span>
 						<?php esc_html_e( 'Not set', 'byebyepw' ); ?>
-						<br><small>Key: byebyepw_reg_challenge_<?php echo get_current_user_id(); ?></small>
+						<br><small>Key: byebyepw_reg_challenge_<?php echo esc_html( get_current_user_id() ); ?></small>
 					<?php endif; ?>
 				</td>
 			</tr>
@@ -221,14 +222,14 @@ if ( ! session_id() ) {
 							<td><?php echo esc_html( $passkey->last_used ?: __( 'Never', 'byebyepw' ) ); ?></td>
 							<td>
 								<?php if ( $passkey->user_id == get_current_user_id() || is_super_admin() ) : ?>
-									<a href="<?php echo wp_nonce_url( 
+									<a href="<?php echo esc_url( wp_nonce_url( 
 										add_query_arg( array(
 											'page' => 'byebyepw-debug',
 											'action' => 'clean_user',
 											'user_id' => $passkey->user_id
 										), admin_url( 'admin.php' ) ),
 										'byebyepw_clean_user'
-									); ?>" 
+									) ); ?>" 
 									class="button button-small"
 									onclick="return confirm('<?php esc_attr_e( 'Delete all passkeys for this user?', 'byebyepw' ); ?>');">
 										<?php esc_html_e( 'Clean User', 'byebyepw' ); ?>
@@ -256,14 +257,14 @@ if ( ! session_id() ) {
 		<h2><?php esc_html_e( 'Quick Actions', 'byebyepw' ); ?></h2>
 		
 		<p>
-			<a href="<?php echo wp_nonce_url( 
+			<a href="<?php echo esc_url( wp_nonce_url( 
 				add_query_arg( array(
 					'page' => 'byebyepw-debug',
 					'action' => 'clean_user',
 					'user_id' => get_current_user_id()
 				), admin_url( 'admin.php' ) ),
 				'byebyepw_clean_user'
-			); ?>" 
+			) ); ?>" 
 			class="button button-primary"
 			onclick="return confirm('<?php esc_attr_e( 'This will delete all your passkeys and clear all challenges. Continue?', 'byebyepw' ); ?>');">
 				<?php esc_html_e( 'Clean My Passkeys & Challenges', 'byebyepw' ); ?>
@@ -330,10 +331,15 @@ if ( ! session_id() ) {
 						$log = str_replace( 'ByeByePW:', '<strong style="color: #0073aa;">ByeByePW:</strong>', $log );
 						$log = str_replace( 'ERROR', '<span style="color: red;">ERROR</span>', $log );
 						$log = str_replace( 'SUCCESS', '<span style="color: green;">SUCCESS</span>', $log );
-						echo $log . "\n";
+						$allowed_html = array(
+							'strong' => array( 'style' => array() ),
+							'span' => array( 'style' => array() )
+						);
+						echo wp_kses( $log, $allowed_html ) . "\n";
 					}
 					echo '</pre>';
-					echo '<p class="description">' . sprintf( __( 'Showing last %d ByeByePW log entries', 'byebyepw' ), count( $recent_logs ) ) . '</p>';
+					// translators: %d is the number of log entries being displayed
+					echo '<p class="description">' . sprintf( esc_html__( 'Showing last %d ByeByePW log entries', 'byebyepw' ), count( $recent_logs ) ) . '</p>';
 				} else {
 					echo '<p>' . esc_html__( 'No ByeByePW debug logs found in the log file.', 'byebyepw' ) . '</p>';
 					echo '<p class="description">' . esc_html__( 'Try triggering an action (like registering a passkey) and refresh this page.', 'byebyepw' ) . '</p>';

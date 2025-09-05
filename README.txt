@@ -1,9 +1,9 @@
 === Bye Bye Passwords ===
 Contributors: claytonlz
 Donate link: https://claytonlz.com/
-Tags: passwordless, webauthn, passkeys, authentication, security, login, fido2, biometric
+Tags: passwordless, webauthn, passkeys, authentication, security
 Requires at least: 5.0
-Tested up to: 6.4
+Tested up to: 6.8
 Stable tag: 1.1.2
 Requires PHP: 7.2
 License: GPLv2 or later

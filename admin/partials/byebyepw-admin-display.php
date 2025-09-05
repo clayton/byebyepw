@@ -87,7 +87,9 @@ $has_recovery_codes = $wpdb->get_var( $wpdb->prepare(
 			
 			<?php if ( $has_recovery_codes ) : ?>
 				<p><?php esc_html_e( 'You have active recovery codes. Keep them safe!', 'byebyepw' ); ?></p>
-				<p><?php echo sprintf( esc_html__( 'Active codes remaining: %d', 'byebyepw' ), $has_recovery_codes ); ?></p>
+				<p><?php
+					// translators: %d is the number of remaining recovery codes
+					echo sprintf( esc_html__( 'Active codes remaining: %d', 'byebyepw' ), intval( $has_recovery_codes ) ); ?></p>
 			<?php else : ?>
 				<p><?php esc_html_e( 'You have no active recovery codes.', 'byebyepw' ); ?></p>
 			<?php endif; ?>

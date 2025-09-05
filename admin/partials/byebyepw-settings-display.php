@@ -22,17 +22,17 @@
     </form>
     
     <div class="card">
-        <h2><?php _e( 'Important Security Notice', 'byebyepw' ); ?></h2>
+        <h2><?php esc_html_e( 'Important Security Notice', 'byebyepw' ); ?></h2>
         <p class="notice notice-warning">
-            <?php _e( 'Before disabling password login, make sure you have:', 'byebyepw' ); ?>
+            <?php esc_html_e( 'Before disabling password login, make sure you have:', 'byebyepw' ); ?>
         </p>
         <ul style="list-style-type: disc; margin-left: 20px;">
-            <li><?php _e( 'At least one passkey registered', 'byebyepw' ); ?></li>
-            <li><?php _e( 'Recovery codes generated and saved in a secure location', 'byebyepw' ); ?></li>
-            <li><?php _e( 'Tested passkey login successfully', 'byebyepw' ); ?></li>
+            <li><?php esc_html_e( 'At least one passkey registered', 'byebyepw' ); ?></li>
+            <li><?php esc_html_e( 'Recovery codes generated and saved in a secure location', 'byebyepw' ); ?></li>
+            <li><?php esc_html_e( 'Tested passkey login successfully', 'byebyepw' ); ?></li>
         </ul>
         <p>
-            <strong><?php _e( 'Disabling password login without proper passkey setup will lock you out of your site!', 'byebyepw' ); ?></strong>
+            <strong><?php esc_html_e( 'Disabling password login without proper passkey setup will lock you out of your site!', 'byebyepw' ); ?></strong>
         </p>
     </div>
 </div>

@@ -8,9 +8,20 @@ use lbuchs\WebAuthn\WebAuthnException;
  * Modified version of https://github.com/madwizard-thomas/webauthn-server/blob/master/src/Format/ByteBuffer.php
  * Copyright © 2018 Thomas Bleeker - MIT licensed
  * Modified by Lukas Buchs
+ * WordPress.org compliance fixes by Clayton
  * Thanks Thomas for your work!
  */
 class ByteBuffer implements \JsonSerializable, \Serializable {
+
+    /**
+     * WordPress.org compliance: escape output for security
+     */
+    private static function esc_output($text) {
+        if (function_exists('esc_html')) {
+            return esc_html($text);
+        }
+        return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+    }
     /**
      * @var bool
      */
@@ -100,7 +111,7 @@ class ByteBuffer implements \JsonSerializable, \Serializable {
     public function getJson($jsonFlags=0) {
         $data = \json_decode($this->getBinaryString(), null, 512, $jsonFlags);
         if (\json_last_error() !== JSON_ERROR_NONE) {
-            throw new WebAuthnException(\json_last_error_msg(), WebAuthnException::BYTEBUFFER);
+            throw new WebAuthnException(self::esc_output(\json_last_error_msg()), WebAuthnException::BYTEBUFFER);
         }
         return $data;
     }

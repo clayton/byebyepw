@@ -40,9 +40,10 @@ class Byebyepw_Ajax {
 	 * @param string $message The message to log
 	 */
 	private function debug_log( $message ) {
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-			error_log( 'ByeByePW: ' . $message );
-		}
+		// Debug logging disabled for WordPress.org compliance
+		// if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
+		//     error_log( 'ByeByePW: ' . $message );
+		// }
 	}
 	
 	/**

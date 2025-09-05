@@ -50,9 +50,10 @@ class Byebyepw_WebAuthn {
 	 * @param string $message The message to log
 	 */
 	private function debug_log( $message ) {
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-			error_log( 'ByeByePW: ' . $message );
-		}
+		// Debug logging disabled for WordPress.org compliance
+		// if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
+		//     error_log( 'ByeByePW: ' . $message );
+		// }
 	}
 
 	/**
@@ -60,7 +61,7 @@ class Byebyepw_WebAuthn {
 	 */
 	public function __construct() {
 		$rp_name = get_bloginfo( 'name' );
-		$rp_id = parse_url( home_url(), PHP_URL_HOST );
+		$rp_id = wp_parse_url( home_url(), PHP_URL_HOST );
 		
 		// Initialize WebAuthn with none attestation (simplest option)
 		$this->webauthn = new \lbuchs\WebAuthn\WebAuthn( $rp_name, $rp_id, ['none'] );
@@ -501,8 +502,8 @@ class Byebyepw_WebAuthn {
 		global $wpdb;
 		$table = $wpdb->prefix . 'byebyepw_passkeys';
 
-		// Log the data structure for debugging
-		$this->debug_log( 'Saving credential data structure: ' . print_r( $data, true ) );
+		// Log the data structure for debugging (disabled for production)
+		// $this->debug_log( 'Saving credential data structure: ' . print_r( $data, true ) );
 
 		// Handle sign_count - it might be null or not set
 		$sign_count = 0;

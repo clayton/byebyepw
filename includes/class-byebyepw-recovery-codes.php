@@ -110,7 +110,7 @@ class Byebyepw_Recovery_Codes {
 		}
 		
 		// Add small artificial delay to normalize timing
-		usleep( mt_rand( 10000, 50000 ) ); // 10-50ms random delay
+		usleep( wp_rand( 10000, 50000 ) ); // 10-50ms random delay
 
 		return $found_match;
 	}

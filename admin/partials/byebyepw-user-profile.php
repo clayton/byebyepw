@@ -10,14 +10,14 @@
  */
 ?>
 
-<h2><?php _e( 'Passkey Authentication', 'byebyepw' ); ?></h2>
+<h2><?php esc_html_e( 'Passkey Authentication', 'byebyepw' ); ?></h2>
 
 <table class="form-table">
     <tr>
-        <th><?php _e( 'Registered Passkeys', 'byebyepw' ); ?></th>
+        <th><?php esc_html_e( 'Registered Passkeys', 'byebyepw' ); ?></th>
         <td>
             <?php if ( empty( $credentials ) ) : ?>
-                <p><?php _e( 'No passkeys registered.', 'byebyepw' ); ?></p>
+                <p><?php esc_html_e( 'No passkeys registered.', 'byebyepw' ); ?></p>
             <?php else : ?>
                 <ul>
                     <?php foreach ( $credentials as $credential ) : ?>
@@ -32,19 +32,21 @@
     </tr>
     
     <tr>
-        <th><?php _e( 'Recovery Codes', 'byebyepw' ); ?></th>
+        <th><?php esc_html_e( 'Recovery Codes', 'byebyepw' ); ?></th>
         <td>
             <?php if ( $has_recovery_codes ) : ?>
-                <p><?php printf( __( '%d recovery codes remaining.', 'byebyepw' ), $remaining_codes ); ?></p>
+                <p><?php 
+                    // translators: %d is the number of remaining recovery codes
+                    printf( esc_html__( '%d recovery codes remaining.', 'byebyepw' ), intval( $remaining_codes ) ); ?></p>
             <?php else : ?>
-                <p><?php _e( 'No recovery codes generated.', 'byebyepw' ); ?></p>
+                <p><?php esc_html_e( 'No recovery codes generated.', 'byebyepw' ); ?></p>
             <?php endif; ?>
         </td>
     </tr>
 </table>
 
 <p>
-    <a href="<?php echo admin_url( 'admin.php?page=byebyepw' ); ?>" class="button">
-        <?php _e( 'Manage Passkeys', 'byebyepw' ); ?>
+    <a href="<?php echo esc_url( admin_url( 'admin.php?page=byebyepw' ) ); ?>" class="button">
+        <?php esc_html_e( 'Manage Passkeys', 'byebyepw' ); ?>
     </a>
 </p>

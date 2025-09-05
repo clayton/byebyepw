@@ -105,15 +105,15 @@ class Byebyepw_Admin {
 			array( $this, 'display_settings_page' )
 		);
 		
-		// Add submenu for debug tools
-		add_submenu_page(
-			'byebyepw',
-			__( 'Debug Tools', 'byebyepw' ),
-			__( 'Debug Tools', 'byebyepw' ),
-			'manage_options',
-			'byebyepw-debug',
-			array( $this, 'display_debug_page' )
-		);
+		// Debug tools removed for WordPress.org compliance
+		// add_submenu_page(
+		//     'byebyepw',
+		//     __( 'Debug Tools', 'byebyepw' ),
+		//     __( 'Debug Tools', 'byebyepw' ),
+		//     'manage_options',
+		//     'byebyepw-debug',
+		//     array( $this, 'display_debug_page' )
+		// );
 	}
 
 	/**
@@ -135,13 +135,13 @@ class Byebyepw_Admin {
 	}
 	
 	/**
-	 * Display debug page
+	 * Display debug page (disabled for WordPress.org compliance)
 	 *
 	 * @since    1.0.0
 	 */
-	public function display_debug_page() {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/byebyepw-debug-display.php';
-	}
+	// public function display_debug_page() {
+	//     require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/byebyepw-debug-display.php';
+	// }
 
 	/**
 	 * Register plugin settings
@@ -149,7 +149,9 @@ class Byebyepw_Admin {
 	 * @since    1.0.0
 	 */
 	public function register_settings() {
-		register_setting( 'byebyepw_settings', 'byebyepw_settings' );
+		register_setting( 'byebyepw_settings', 'byebyepw_settings', array(
+			'sanitize_callback' => array( $this, 'sanitize_settings' )
+		) );
 
 		add_settings_section(
 			'byebyepw_general_settings',
@@ -177,8 +179,27 @@ class Byebyepw_Admin {
 		$value = isset( $options['password_login_disabled'] ) ? $options['password_login_disabled'] : false;
 		?>
 		<input type="checkbox" name="byebyepw_settings[password_login_disabled]" value="1" <?php checked( 1, $value ); ?> />
-		<p class="description"><?php _e( 'Warning: Only enable this if you have passkeys configured and recovery codes saved!', 'byebyepw' ); ?></p>
+		<p class="description"><?php esc_html_e( 'Warning: Only enable this if you have passkeys configured and recovery codes saved!', 'byebyepw' ); ?></p>
 		<?php
+	}
+
+	/**
+	 * Sanitize plugin settings
+	 *
+	 * @since    1.1.2
+	 * @param    array    $input    The input array from the settings form
+	 * @return   array              The sanitized settings array
+	 */
+	public function sanitize_settings( $input ) {
+		$sanitized = array();
+		
+		// Sanitize password_login_disabled checkbox
+		$sanitized['password_login_disabled'] = isset( $input['password_login_disabled'] ) ? (bool) $input['password_login_disabled'] : false;
+		
+		// Sanitize require_passkey_for_admins checkbox
+		$sanitized['require_passkey_for_admins'] = isset( $input['require_passkey_for_admins'] ) ? (bool) $input['require_passkey_for_admins'] : false;
+		
+		return $sanitized;
 	}
 
 	/**

@@ -1,0 +1,549 @@
+Checks complete. Errors were found.
+
+FILE: .gitignore
+
+Line	Column	Type	Code	Message
+0	0	ERROR	hidden_files	Hidden files are not permitted.
+
+FILE: lib/WebAuthn-r0/_test/rootCertificates/mds/.gitkeep
+
+Line	Column	Type	Code	Message
+0	0	ERROR	hidden_files	Hidden files are not permitted.
+
+FILE: lib/WebAuthn-r0/.gitignore
+
+Line	Column	Type	Code	Message
+0	0	ERROR	hidden_files	Hidden files are not permitted.
+
+FILE: admin/partials/byebyepw-debug-display.php
+
+Line	Column	Type	Code	Message	Edit Link
+139	37	ERROR	WordPress.Security.EscapeOutput.OutputNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'strlen'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+154	37	ERROR	WordPress.Security.EscapeOutput.OutputNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'strlen'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+155	75	ERROR	WordPress.Security.EscapeOutput.OutputNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'get_current_user_id'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+159	75	ERROR	WordPress.Security.EscapeOutput.OutputNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'get_current_user_id'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+225	57	ERROR	WordPress.Security.EscapeOutput.OutputNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'wp_nonce_url'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+260	33	ERROR	WordPress.Security.EscapeOutput.OutputNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'wp_nonce_url'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+334	30	ERROR	WordPress.Security.EscapeOutput.OutputNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$log'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+
+FILE: lib/WebAuthn-r0/_test/server.php
+
+Line	Column	Type	Code	Message	Edit Link
+331	15	ERROR	WordPress.Security.EscapeOutput.OutputNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$html'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+
+FILE: lib/WebAuthn-r0/src/WebAuthn.php
+
+Line	Column	Type	Code	Message	Edit Link
+66	90	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$invalidFormats'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+342	64	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+347	57	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+352	62	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+357	59	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+365	62	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+370	74	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+376	135	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+383	69	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+389	83	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+395	84	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+459	64	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+464	57	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+470	62	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+475	59	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+480	62	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+485	83	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+490	87	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+503	62	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+518	80	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+709	63	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+
+FILE: lib/WebAuthn-r0/src/CBOR/CborDecoder.php
+
+Line	Column	Type	Code	Message	Edit Link
+35	74	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+103	69	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+106	84	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+127	77	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$val'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+127	84	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+155	69	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+158	84	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+193	71	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$type'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+193	79	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+204	93	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+
+FILE: lib/WebAuthn-r0/src/Attestation/AttestationObject.php
+
+Line	Column	Type	Code	Message	Edit Link
+21	71	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+25	95	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+29	96	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+37	75	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$this'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+37	106	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+49	83	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$enc['fmt']'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+49	96	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+
+FILE: lib/WebAuthn-r0/src/Attestation/AuthenticatorData.php
+
+Line	Column	Type	Code	Message	Edit Link
+56	76	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+95	96	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+115	94	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+126	96	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+134	70	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+150	96	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+153	74	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+297	91	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+353	73	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+357	74	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+361	62	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+365	65	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+383	73	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+387	74	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+391	60	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+395	65	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+399	65	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+416	73	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+420	74	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+424	64	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+428	72	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+442	67	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+
+FILE: lib/WebAuthn-r0/src/Attestation/Format/Tpm.php
+
+Line	Column	Type	Code	Message	Edit Link
+30	67	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$attStmt['ver']'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+30	84	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+34	63	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$attStmt['alg']'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+34	80	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+38	64	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+42	63	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+46	62	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+61	72	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+74	69	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+115	85	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'openssl_error_string'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+115	109	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+130	67	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'openssl_error_string'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+130	91	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+141	78	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+146	79	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+156	89	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+
+FILE: lib/WebAuthn-r0/src/Attestation/Format/U2f.php
+
+Line	Column	Type	Code	Message	Edit Link
+21	95	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$attStmt['alg']'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+21	112	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+25	63	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+29	68	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+33	68	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+59	67	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'openssl_error_string'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+59	91	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+89	85	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'openssl_error_string'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+89	109	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+
+FILE: lib/WebAuthn-r0/src/Attestation/Format/Packed.php
+
+Line	Column	Type	Code	Message	Edit Link
+21	63	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$attStmt['alg']'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+21	80	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+25	63	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+38	72	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+93	85	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'openssl_error_string'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+93	109	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+108	67	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'openssl_error_string'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+108	91	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+
+FILE: lib/WebAuthn-r0/src/Attestation/Format/Apple.php
+
+Line	Column	Type	Code	Message	Edit Link
+26	72	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+38	93	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+72	85	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'openssl_error_string'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+72	109	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+87	67	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'openssl_error_string'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+87	91	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+99	72	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'openssl_error_string'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+99	96	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+124	124	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+132	116	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+
+FILE: lib/WebAuthn-r0/src/Attestation/Format/AndroidKey.php
+
+Line	Column	Type	Code	Message	Edit Link
+20	63	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$attStmt['alg']'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+20	80	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+24	63	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+28	68	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+32	68	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+63	67	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'openssl_error_string'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+63	91	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+91	85	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'openssl_error_string'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+91	109	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+
+FILE: lib/WebAuthn-r0/src/Attestation/Format/AndroidSafetyNet.php
+
+Line	Column	Type	Code	Message	Edit Link
+22	78	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+26	78	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+36	61	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+49	63	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+52	64	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+56	77	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+61	68	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$header'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+61	82	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+104	73	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+110	78	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$certInfo['subject']['CN']'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+110	119	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+115	78	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+137	85	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'openssl_error_string'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+137	109	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+
+FILE: lib/WebAuthn-r0/src/Binary/ByteBuffer.php
+
+Line	Column	Type	Code	Message	Edit Link
+47	82	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+60	75	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+78	85	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+88	81	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+95	71	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+103	42	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'json_last_error_msg'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+103	65	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+114	71	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+121	71	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+127	84	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+134	99	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+137	71	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+143	84	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+169	71	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+176	71	ERROR	WordPress.Security.EscapeOutput.ExceptionNotEscaped	All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'WebAuthnException'.
+Learn more (opens in a new tab)	View in code editor (opens in a new tab)
+
+FILE: includes/class-byebyepw-webauthn.php
+
+Line	Column	Type	Code	Message	Edit Link
+63	12	ERROR	WordPress.WP.AlternativeFunctions.parse_url_parse_url	parse_url() is discouraged because of inconsistency in the output across PHP versions; use wp_parse_url() instead.	View in code editor (opens in a new tab)
+54	4	WARNING	WordPress.PHP.DevelopmentFunctions.error_log_error_log	error_log() found. Debug code should not normally be used in production.	View in code editor (opens in a new tab)
+116	20	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_SERVER['REMOTE_ADDR'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+116	20	WARNING	WordPress.Security.ValidatedSanitizedInput.InputNotSanitized	Detected usage of a non-sanitized input variable: $_SERVER['REMOTE_ADDR']	View in code editor (opens in a new tab)
+163	19	WARNING	WordPress.Security.ValidatedSanitizedInput.InputNotSanitized	Detected usage of a non-sanitized input variable: $_SESSION['webauthn_challenge_id']	View in code editor (opens in a new tab)
+314	20	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_SERVER['REMOTE_ADDR'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+314	20	WARNING	WordPress.Security.ValidatedSanitizedInput.InputNotSanitized	Detected usage of a non-sanitized input variable: $_SERVER['REMOTE_ADDR']	View in code editor (opens in a new tab)
+365	19	WARNING	WordPress.Security.ValidatedSanitizedInput.InputNotSanitized	Detected usage of a non-sanitized input variable: $_SESSION['webauthn_challenge_id']	View in code editor (opens in a new tab)
+505	60	WARNING	WordPress.PHP.DevelopmentFunctions.error_log_print_r	print_r() found. Debug code should not normally be used in production.	View in code editor (opens in a new tab)
+536	4	WARNING	WordPress.DB.PreparedSQL.InterpolatedNotPrepared	Use placeholders and $wpdb->prepare(); found interpolated variable $table at "SELECT * FROM $table WHERE user_id = %d ORDER BY created_at DESC"	View in code editor (opens in a new tab)
+549	4	WARNING	WordPress.DB.PreparedSQL.InterpolatedNotPrepared	Use placeholders and $wpdb->prepare(); found interpolated variable $table at "SELECT * FROM $table WHERE credential_id = %s"	View in code editor (opens in a new tab)
+575	4	WARNING	WordPress.DB.PreparedSQL.InterpolatedNotPrepared	Use placeholders and $wpdb->prepare(); found interpolated variable $table at "SELECT sign_count FROM $table WHERE credential_id = %s"	View in code editor (opens in a new tab)
+
+FILE: admin/partials/byebyepw-debug-display.php
+
+Line	Column	Type	Code	Message	Edit Link
+310	14	ERROR	WordPress.WP.AlternativeFunctions.file_system_operations_fopen	File operations should use WP_Filesystem methods instead of direct PHP filesystem calls. Found: fopen().	View in code editor (opens in a new tab)
+316	16	ERROR	WordPress.WP.AlternativeFunctions.file_system_operations_fread	File operations should use WP_Filesystem methods instead of direct PHP filesystem calls. Found: fread().	View in code editor (opens in a new tab)
+317	5	ERROR	WordPress.WP.AlternativeFunctions.file_system_operations_fclose	File operations should use WP_Filesystem methods instead of direct PHP filesystem calls. Found: fclose().	View in code editor (opens in a new tab)
+13	11	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_GET['action'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+13	11	WARNING	WordPress.Security.ValidatedSanitizedInput.InputNotSanitized	Detected usage of a non-sanitized input variable: $_GET['action']	View in code editor (opens in a new tab)
+51	36	WARNING	WordPress.DB.PreparedSQL.InterpolatedNotPrepared	Use placeholders and $wpdb->prepare(); found interpolated variable $passkeys_table at "SHOW TABLES LIKE '$passkeys_table'"	View in code editor (opens in a new tab)
+52	36	WARNING	WordPress.DB.PreparedSQL.InterpolatedNotPrepared	Use placeholders and $wpdb->prepare(); found interpolated variable $recovery_table at "SHOW TABLES LIKE '$recovery_table'"	View in code editor (opens in a new tab)
+55	52	WARNING	WordPress.DB.PreparedSQL.InterpolatedNotPrepared	Use placeholders and $wpdb->prepare(); found interpolated variable $passkeys_table at "SELECT * FROM $passkeys_table ORDER BY user_id, created_at DESC"	View in code editor (opens in a new tab)
+139	27	WARNING	WordPress.Security.ValidatedSanitizedInput.InputNotSanitized	Detected usage of a non-sanitized input variable: $_SESSION['webauthn_challenge']	View in code editor (opens in a new tab)
+
+FILE: lib/WebAuthn-r0/_test/server.php
+
+Line	Column	Type	Code	Message	Edit Link
+348	67	ERROR	WordPress.DateTime.RestrictedFunctions.date_date	date() is affected by runtime timezone changes which can cause date/time to be incorrectly displayed. Use gmdate() instead.	View in code editor (opens in a new tab)
+352	49	ERROR	WordPress.DateTime.RestrictedFunctions.date_date	date() is affected by runtime timezone changes which can cause date/time to be incorrectly displayed. Use gmdate() instead.	View in code editor (opens in a new tab)
+176	26	WARNING	WordPress.Security.ValidatedSanitizedInput.InputNotSanitized	Detected usage of a non-sanitized input variable: $_SESSION['registrations']	View in code editor (opens in a new tab)
+205	22	WARNING	WordPress.Security.ValidatedSanitizedInput.InputNotSanitized	Detected usage of a non-sanitized input variable: $_SESSION['challenge']	View in code editor (opens in a new tab)
+247	22	WARNING	WordPress.Security.ValidatedSanitizedInput.InputNotSanitized	Detected usage of a non-sanitized input variable: $_SESSION['challenge']	View in code editor (opens in a new tab)
+254	22	WARNING	WordPress.Security.ValidatedSanitizedInput.InputNotSanitized	Detected usage of a non-sanitized input variable: $_SESSION['registrations']	View in code editor (opens in a new tab)
+305	22	WARNING	WordPress.Security.ValidatedSanitizedInput.InputNotSanitized	Detected usage of a non-sanitized input variable: $_SESSION['registrations']	View in code editor (opens in a new tab)
+
+FILE: lib/WebAuthn-r0/src/WebAuthn.php
+
+Line	Column	Type	Code	Message	Edit Link
+538	20	ERROR	WordPress.WP.AlternativeFunctions.curl_curl_init	Using cURL functions is highly discouraged. Use wp_remote_get() instead.	View in code editor (opens in a new tab)
+539	14	ERROR	WordPress.WP.AlternativeFunctions.curl_curl_setopt	Using cURL functions is highly discouraged. Use wp_remote_get() instead.	View in code editor (opens in a new tab)
+540	14	ERROR	WordPress.WP.AlternativeFunctions.curl_curl_setopt	Using cURL functions is highly discouraged. Use wp_remote_get() instead.	View in code editor (opens in a new tab)
+541	14	ERROR	WordPress.WP.AlternativeFunctions.curl_curl_setopt	Using cURL functions is highly discouraged. Use wp_remote_get() instead.	View in code editor (opens in a new tab)
+542	14	ERROR	WordPress.WP.AlternativeFunctions.curl_curl_setopt	Using cURL functions is highly discouraged. Use wp_remote_get() instead.	View in code editor (opens in a new tab)
+543	21	ERROR	WordPress.WP.AlternativeFunctions.curl_curl_exec	Using cURL functions is highly discouraged. Use wp_remote_get() instead.	View in code editor (opens in a new tab)
+544	14	ERROR	WordPress.WP.AlternativeFunctions.curl_curl_close	Using cURL functions is highly discouraged. Use wp_remote_get() instead.	View in code editor (opens in a new tab)
+566	26	ERROR	WordPress.WP.AlternativeFunctions.unlink_unlink	unlink() is discouraged. Use wp_delete_file() to delete a file.	View in code editor (opens in a new tab)
+631	46	ERROR	WordPress.WP.AlternativeFunctions.parse_url_parse_url	parse_url() is discouraged because of inconsistency in the output across PHP versions; use wp_parse_url() instead.	View in code editor (opens in a new tab)
+636	18	ERROR	WordPress.WP.AlternativeFunctions.parse_url_parse_url	parse_url() is discouraged because of inconsistency in the output across PHP versions; use wp_parse_url() instead.	View in code editor (opens in a new tab)
+
+FILE: lib/WebAuthn-r0/src/Attestation/Format/FormatBase.php
+
+Line	Column	Type	Code	Message	Edit Link
+31	14	ERROR	WordPress.WP.AlternativeFunctions.unlink_unlink	unlink() is discouraged. Use wp_delete_file() to delete a file.	View in code editor (opens in a new tab)
+
+FILE: includes/class-byebyepw-recovery-codes.php
+
+Line	Column	Type	Code	Message	Edit Link
+84	4	WARNING	WordPress.DB.PreparedSQL.InterpolatedNotPrepared	Use placeholders and $wpdb->prepare(); found interpolated variable $table at "SELECT id, code_hash FROM $table WHERE user_id = %d AND used = 0"	View in code editor (opens in a new tab)
+129	4	WARNING	WordPress.DB.PreparedSQL.InterpolatedNotPrepared	Use placeholders and $wpdb->prepare(); found interpolated variable $table at "SELECT COUNT(*) FROM $table WHERE user_id = %d AND used = 0"	View in code editor (opens in a new tab)
+
+FILE: includes/class-byebyepw-ajax.php
+
+Line	Column	Type	Code	Message	Edit Link
+44	4	WARNING	WordPress.PHP.DevelopmentFunctions.error_log_error_log	error_log() found. Debug code should not normally be used in production.	View in code editor (opens in a new tab)
+67	10	WARNING	WordPress.Security.ValidatedSanitizedInput.InputNotSanitized	Detected usage of a non-sanitized input variable: $_SESSION['byebyepw_csrf_token']	View in code editor (opens in a new tab)
+105	17	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_SERVER['REMOTE_ADDR'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+105	17	WARNING	WordPress.Security.ValidatedSanitizedInput.InputNotSanitized	Detected usage of a non-sanitized input variable: $_SERVER['REMOTE_ADDR']	View in code editor (opens in a new tab)
+200	44	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_POST['client_data_json'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+201	46	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_POST['attestation_object'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+202	32	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_POST['name'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+238	36	WARNING	WordPress.Security.NonceVerification.Missing	Processing form data without nonce verification.	View in code editor (opens in a new tab)
+238	36	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_POST['username'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+277	38	WARNING	WordPress.Security.NonceVerification.Missing	Processing form data without nonce verification.	View in code editor (opens in a new tab)
+277	38	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_POST['csrf_token'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+287	41	WARNING	WordPress.Security.NonceVerification.Missing	Processing form data without nonce verification.	View in code editor (opens in a new tab)
+287	41	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_POST['credential_id'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+288	44	WARNING	WordPress.Security.NonceVerification.Missing	Processing form data without nonce verification.	View in code editor (opens in a new tab)
+288	44	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_POST['client_data_json'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+289	46	WARNING	WordPress.Security.NonceVerification.Missing	Processing form data without nonce verification.	View in code editor (opens in a new tab)
+289	46	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_POST['authenticator_data'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+290	37	WARNING	WordPress.Security.NonceVerification.Missing	Processing form data without nonce verification.	View in code editor (opens in a new tab)
+290	37	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_POST['signature'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+291	39	WARNING	WordPress.Security.NonceVerification.Missing	Processing form data without nonce verification.	View in code editor (opens in a new tab)
+291	39	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_POST['user_handle'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+315	18	WARNING	WordPress.Security.NonceVerification.Missing	Processing form data without nonce verification.	View in code editor (opens in a new tab)
+315	18	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_POST['redirect_to'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+315	18	WARNING	WordPress.Security.ValidatedSanitizedInput.InputNotSanitized	Detected usage of a non-sanitized input variable: $_POST['redirect_to']	View in code editor (opens in a new tab)
+334	38	WARNING	WordPress.Security.NonceVerification.Missing	Processing form data without nonce verification.	View in code editor (opens in a new tab)
+334	38	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_POST['csrf_token'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+346	41	WARNING	WordPress.Security.NonceVerification.Missing	Processing form data without nonce verification.	View in code editor (opens in a new tab)
+346	41	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_POST['credential_id'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+347	44	WARNING	WordPress.Security.NonceVerification.Missing	Processing form data without nonce verification.	View in code editor (opens in a new tab)
+347	44	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_POST['client_data_json'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+348	46	WARNING	WordPress.Security.NonceVerification.Missing	Processing form data without nonce verification.	View in code editor (opens in a new tab)
+348	46	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_POST['authenticator_data'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+349	37	WARNING	WordPress.Security.NonceVerification.Missing	Processing form data without nonce verification.	View in code editor (opens in a new tab)
+349	37	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_POST['signature'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+350	39	WARNING	WordPress.Security.NonceVerification.Missing	Processing form data without nonce verification.	View in code editor (opens in a new tab)
+350	39	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_POST['user_handle'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+380	18	WARNING	WordPress.Security.NonceVerification.Missing	Processing form data without nonce verification.	View in code editor (opens in a new tab)
+380	18	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_POST['redirect_to'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+380	18	WARNING	WordPress.Security.ValidatedSanitizedInput.InputNotSanitized	Detected usage of a non-sanitized input variable: $_POST['redirect_to']	View in code editor (opens in a new tab)
+454	38	WARNING	WordPress.Security.NonceVerification.Missing	Processing form data without nonce verification.	View in code editor (opens in a new tab)
+454	38	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_POST['csrf_token'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+459	36	WARNING	WordPress.Security.NonceVerification.Missing	Processing form data without nonce verification.	View in code editor (opens in a new tab)
+459	36	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_POST['username'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+460	41	WARNING	WordPress.Security.NonceVerification.Missing	Processing form data without nonce verification.	View in code editor (opens in a new tab)
+460	41	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_POST['recovery_code'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+483	18	WARNING	WordPress.Security.NonceVerification.Missing	Processing form data without nonce verification.	View in code editor (opens in a new tab)
+483	18	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_POST['redirect_to'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+483	18	WARNING	WordPress.Security.ValidatedSanitizedInput.InputNotSanitized	Detected usage of a non-sanitized input variable: $_POST['redirect_to']	View in code editor (opens in a new tab)
+
+FILE: admin/partials/byebyepw-admin-display.php
+
+Line	Column	Type	Code	Message	Edit Link
+20	2	WARNING	WordPress.DB.PreparedSQL.InterpolatedNotPrepared	Use placeholders and $wpdb->prepare(); found interpolated variable $table_name at "SELECT * FROM $table_name WHERE user_id = %d ORDER BY created_at DESC"	View in code editor (opens in a new tab)
+27	2	WARNING	WordPress.DB.PreparedSQL.InterpolatedNotPrepared	Use placeholders and $wpdb->prepare(); found interpolated variable $recovery_codes_table at "SELECT COUNT(*) FROM $recovery_codes_table WHERE user_id = %d AND used = 0"	View in code editor (opens in a new tab)
+
+FILE: public/class-byebyepw-public.php
+
+Line	Column	Type	Code	Message	Edit Link
+135	28	WARNING	WordPress.Security.NonceVerification.Recommended	Processing form data without nonce verification.	View in code editor (opens in a new tab)
+135	57	WARNING	WordPress.Security.NonceVerification.Recommended	Processing form data without nonce verification.	View in code editor (opens in a new tab)
+135	57	WARNING	WordPress.Security.ValidatedSanitizedInput.MissingUnslash	$_REQUEST['redirect_to'] not unslashed before sanitization. Use wp_unslash() or similar	View in code editor (opens in a new tab)
+135	57	WARNING	WordPress.Security.ValidatedSanitizedInput.InputNotSanitized	Detected usage of a non-sanitized input variable: $_REQUEST['redirect_to']	View in code editor (opens in a new tab)
+
+FILE: includes/class-byebyepw-recovery-codes.php
+
+Line	Column	Type	Code	Message	Edit Link
+34	9	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	View in code editor (opens in a new tab)
+34	9	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	View in code editor (opens in a new tab)
+44	13	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	View in code editor (opens in a new tab)
+83	25	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	View in code editor (opens in a new tab)
+83	25	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	View in code editor (opens in a new tab)
+102	13	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	View in code editor (opens in a new tab)
+102	13	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	View in code editor (opens in a new tab)
+128	22	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	View in code editor (opens in a new tab)
+128	22	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	View in code editor (opens in a new tab)
+
+FILE: includes/class-byebyepw-webauthn.php
+
+Line	Column	Type	Code	Message	Edit Link
+513	16	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	View in code editor (opens in a new tab)
+535	16	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	View in code editor (opens in a new tab)
+535	16	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	View in code editor (opens in a new tab)
+548	16	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	View in code editor (opens in a new tab)
+548	16	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	View in code editor (opens in a new tab)
+563	20	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	View in code editor (opens in a new tab)
+563	20	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	View in code editor (opens in a new tab)
+574	20	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	View in code editor (opens in a new tab)
+574	20	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	View in code editor (opens in a new tab)
+583	16	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	View in code editor (opens in a new tab)
+583	16	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	View in code editor (opens in a new tab)
+600	16	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	View in code editor (opens in a new tab)
+600	16	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	View in code editor (opens in a new tab)
+616	16	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	View in code editor (opens in a new tab)
+616	16	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	View in code editor (opens in a new tab)
+
+FILE: admin/partials/byebyepw-admin-display.php
+
+Line	Column	Type	Code	Message	Edit Link
+19	13	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	View in code editor (opens in a new tab)
+19	13	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	View in code editor (opens in a new tab)
+26	23	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	View in code editor (opens in a new tab)
+26	23	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	View in code editor (opens in a new tab)
+
+FILE: admin/partials/byebyepw-debug-display.php
+
+Line	Column	Type	Code	Message	Edit Link
+26	20	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	View in code editor (opens in a new tab)
+26	20	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	View in code editor (opens in a new tab)
+51	20	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	View in code editor (opens in a new tab)
+51	20	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	View in code editor (opens in a new tab)
+52	20	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	View in code editor (opens in a new tab)
+52	20	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	View in code editor (opens in a new tab)
+55	32	WARNING	WordPress.DB.DirectDatabaseQuery.DirectQuery	Use of a direct database call is discouraged.	View in code editor (opens in a new tab)
+55	32	WARNING	WordPress.DB.DirectDatabaseQuery.NoCaching	Direct database call without caching detected. Consider using wp_cache_get() / wp_cache_set() or wp_cache_delete().	View in code editor (opens in a new tab)

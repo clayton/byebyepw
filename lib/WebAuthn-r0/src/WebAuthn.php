@@ -19,9 +19,21 @@ require_once 'CBOR/CborDecoder.php';
 /**
  * WebAuthn
  * @author Lukas Buchs
- * @license https://github.com/lbuchs/WebAuthn/blob/master/LICENSE MIT
+ * @license https://github.com/clayton/WebAuthn/blob/master/LICENSE MIT
+ * @modified WordPress.org compliance fixes by Clayton
  */
 class WebAuthn {
+
+    /**
+     * WordPress.org compliance: escape output for security
+     * Falls back to htmlspecialchars if WordPress function not available
+     */
+    private static function esc_output($text) {
+        if (function_exists('esc_html')) {
+            return esc_html($text);
+        }
+        return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+    }
     // relying party
     private $_rpName;
     private $_rpId;
@@ -63,7 +75,7 @@ class WebAuthn {
         // validate formats
         $invalidFormats = \array_diff($this->_formats, $supportedFormats);
         if (!$this->_formats || $invalidFormats) {
-            throw new WebAuthnException('invalid formats on construct: ' . implode(', ', $invalidFormats));
+            throw new WebAuthnException('invalid formats on construct: ' . self::esc_output(implode(', ', $invalidFormats)));
         }
     }
 

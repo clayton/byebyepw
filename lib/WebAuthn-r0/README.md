@@ -1,6 +1,6 @@
-[![Licensed under the MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/lbuchs/WebAuthn/blob/master/LICENSE)
+[![Licensed under the MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/clayton/WebAuthn/blob/master/LICENSE)
 [![Requires PHP 7.1.0](https://img.shields.io/badge/PHP-7.1.0-green.svg)](https://php.net)
-[![Last Commit](https://img.shields.io/github/last-commit/lbuchs/WebAuthn.svg)](https://github.com/lbuchs/WebAuthn/commits/master)
+[![Last Commit](https://img.shields.io/github/last-commit/clayton/WebAuthn.svg)](https://github.com/clayton/WebAuthn/commits/master)
 
 # WebAuthn
 *A simple PHP WebAuthn (FIDO2) server library*
