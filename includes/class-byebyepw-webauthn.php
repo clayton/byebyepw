@@ -462,15 +462,15 @@ class Byebyepw_WebAuthn {
 				}
 			}
 			
-			$sign_count_to_check = $stored_sign_count;
-			
+			// Pass null to disable library's strict sign count validation
+			// We handle sign count validation ourselves above with more lenient rules
 			$this->webauthn->processGet(
 				$client_data_json_decoded,
 				$authenticator_data_decoded,
 				$signature_decoded,
 				$credential->public_key,
 				$challenge,
-				$sign_count_to_check,
+				null, // Disable library sign count validation
 				false // user verification not required
 			);
 
