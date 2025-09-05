@@ -50,3 +50,6 @@ local-config.php
 # Documentation (development only)
 TESTING-GUIDE.md
 IMPLEMENTATION_GUIDE.md
+
+# Distribution files
+*.zip
