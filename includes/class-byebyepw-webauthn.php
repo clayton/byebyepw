@@ -449,11 +449,17 @@ class Byebyepw_WebAuthn {
 			$stored_sign_count = isset($credential->sign_count) ? intval($credential->sign_count) : 0;
 			$this->debug_log( 'Stored sign_count from DB: ' . $stored_sign_count );
 			
-			// Validate sign count - must be greater than stored (prevents replay attacks)
-			// Note: Some authenticators don't increment sign count, so allow 0
-			if ( $actual_sign_count > 0 && $actual_sign_count <= $stored_sign_count ) {
-				$this->debug_log( 'ERROR - Sign count validation failed. Stored: ' . $stored_sign_count . ', Actual: ' . $actual_sign_count );
-				return new WP_Error( 'sign_count_invalid', 'Sign count validation failed - possible cloned authenticator' );
+			// Validate sign count with lenient rules for platform authenticators
+			// Many authenticators (Touch ID, Face ID, Windows Hello) don't properly implement counters
+			if ( $actual_sign_count > 0 && $stored_sign_count > 0 && $actual_sign_count <= $stored_sign_count ) {
+				$this->debug_log( 'WARNING - Sign count did not increment. Stored: ' . $stored_sign_count . ', Actual: ' . $actual_sign_count );
+				// Only fail if there's a significant regression (possible cloning)
+				if ( $stored_sign_count - $actual_sign_count > 10 ) {
+					$this->debug_log( 'ERROR - Sign count regression too large, possible cloned authenticator' );
+					return new WP_Error( 'sign_count_invalid', 'Sign count validation failed - possible cloned authenticator' );
+				} else {
+					$this->debug_log( 'INFO - Allowing minor sign count inconsistency (common with platform authenticators)' );
+				}
 			}
 			
 			$sign_count_to_check = $stored_sign_count;
