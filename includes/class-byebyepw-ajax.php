@@ -35,6 +35,17 @@ class Byebyepw_Ajax {
 	private $recovery_codes;
 
 	/**
+	 * Log debug messages when WP_DEBUG is enabled
+	 *
+	 * @param string $message The message to log
+	 */
+	private function debug_log( $message ) {
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
+			error_log( 'ByeByePW: ' . $message );
+		}
+	}
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -110,18 +121,18 @@ class Byebyepw_Ajax {
 			wp_send_json_error( 'Missing required data' );
 		}
 
-		error_log( 'ByeByePW AJAX: Processing registration for user ' . $user_id );
-		error_log( 'ByeByePW AJAX: Passkey name: ' . $name );
+		$this->debug_log( 'AJAX: Processing registration for user ' . $user_id );
+		$this->debug_log( 'AJAX: Passkey name: ' . $name );
 		
 		$result = $this->webauthn->process_registration( $user_id, $client_data_json, $attestation_object, $name );
 
 		if ( is_wp_error( $result ) ) {
 			$error_msg = $result->get_error_message();
-			error_log( 'ByeByePW AJAX: Registration failed with error: ' . $error_msg );
+			$this->debug_log( 'AJAX: Registration failed with error: ' . $error_msg );
 			wp_send_json_error( $error_msg );
 		}
 
-		error_log( 'ByeByePW AJAX: Registration successful!' );
+		$this->debug_log( 'AJAX: Registration successful!' );
 		wp_send_json_success( 'Passkey registered successfully' );
 	}
 
@@ -216,7 +227,7 @@ class Byebyepw_Ajax {
 			session_start();
 		}
 
-		error_log( 'ByeByePW: handle_authenticate called' );
+		$this->debug_log( 'handle_authenticate called' );
 
 		$credential_id = sanitize_text_field( $_POST['credential_id'] ?? '' );
 		$client_data_json = sanitize_text_field( $_POST['client_data_json'] ?? '' );
@@ -224,10 +235,10 @@ class Byebyepw_Ajax {
 		$signature = sanitize_text_field( $_POST['signature'] ?? '' );
 		$user_handle = sanitize_text_field( $_POST['user_handle'] ?? '' );
 
-		error_log( 'ByeByePW: Authentication data received - credential_id: ' . substr( $credential_id, 0, 20 ) . '...' );
+		$this->debug_log( 'Authentication data received - credential_id: ' . substr( $credential_id, 0, 20 ) . '...' );
 
 		if ( empty( $credential_id ) || empty( $client_data_json ) || empty( $authenticator_data ) || empty( $signature ) ) {
-			error_log( 'ByeByePW: Missing required data in authentication' );
+			$this->debug_log( 'Missing required data in authentication' );
 			wp_send_json_error( 'Missing required data' );
 		}
 
@@ -240,11 +251,11 @@ class Byebyepw_Ajax {
 		);
 
 		if ( is_wp_error( $user_id ) ) {
-			error_log( 'ByeByePW: Authentication failed - ' . $user_id->get_error_message() );
+			$this->debug_log( 'Authentication failed - ' . $user_id->get_error_message() );
 			wp_send_json_error( $user_id->get_error_message() );
 		}
 
-		error_log( 'ByeByePW: Authentication successful for user ID: ' . $user_id );
+		$this->debug_log( 'Authentication successful for user ID: ' . $user_id );
 
 		// Log the user in
 		wp_clear_auth_cookie();
