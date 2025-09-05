@@ -219,13 +219,39 @@ class Byebyepw {
 	}
 	
 	/**
-	 * Start PHP session for WebAuthn challenges
+	 * Start PHP session for WebAuthn challenges with security settings
 	 *
 	 * @since    1.0.0
 	 */
 	public function start_session() {
 		if ( ! session_id() && ! headers_sent() ) {
+			// Set secure session parameters
+			session_set_cookie_params([
+				'lifetime' => 900, // 15 minutes
+				'path' => '/',
+				'domain' => '',
+				'secure' => is_ssl(),
+				'httponly' => true,
+				'samesite' => 'Strict'
+			]);
+			
 			session_start();
+			
+			// Regenerate session ID for security
+			if ( ! isset( $_SESSION['byebyepw_initiated'] ) ) {
+				session_regenerate_id( true );
+				$_SESSION['byebyepw_initiated'] = true;
+				$_SESSION['byebyepw_created'] = time();
+			}
+			
+			// Check session timeout
+			if ( isset( $_SESSION['byebyepw_created'] ) && 
+				 ( time() - $_SESSION['byebyepw_created'] > 900 ) ) {
+				session_destroy();
+				session_start();
+				$_SESSION['byebyepw_initiated'] = true;
+				$_SESSION['byebyepw_created'] = time();
+			}
 		}
 	}
 

@@ -44,6 +44,42 @@ class Byebyepw_Ajax {
 			error_log( 'ByeByePW: ' . $message );
 		}
 	}
+	
+	/**
+	 * Check rate limiting for authentication endpoints
+	 *
+	 * @param string $action The action being rate limited
+	 * @param int $max_attempts Maximum attempts allowed
+	 * @param int $time_window Time window in seconds
+	 * @return bool True if rate limit exceeded
+	 */
+	private function is_rate_limited( $action, $max_attempts = 5, $time_window = 300 ) {
+		$ip_address = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+		$transient_key = 'byebyepw_rate_limit_' . $action . '_' . md5( $ip_address );
+		
+		$attempts = get_transient( $transient_key );
+		if ( ! $attempts ) {
+			$attempts = [];
+		}
+		
+		// Clean old attempts outside the time window
+		$current_time = time();
+		$attempts = array_filter( $attempts, function( $timestamp ) use ( $current_time, $time_window ) {
+			return ( $current_time - $timestamp ) <= $time_window;
+		});
+		
+		// Check if rate limit exceeded
+		if ( count( $attempts ) >= $max_attempts ) {
+			$this->debug_log( 'Rate limit exceeded for action ' . $action . ' from IP: ' . $ip_address );
+			return true;
+		}
+		
+		// Add current attempt
+		$attempts[] = $current_time;
+		set_transient( $transient_key, $attempts, $time_window );
+		
+		return false;
+	}
 
 	/**
 	 * Constructor
@@ -140,6 +176,11 @@ class Byebyepw_Ajax {
 	 * Handle get authentication challenge request
 	 */
 	public function handle_get_authentication_challenge() {
+		// Rate limiting - 10 challenge requests per 5 minutes
+		if ( $this->is_rate_limited( 'auth_challenge', 10, 300 ) ) {
+			wp_send_json_error( 'Too many requests. Please try again later.' );
+		}
+		
 		// Start session if not already started
 		if ( ! session_id() ) {
 			session_start();
@@ -176,6 +217,11 @@ class Byebyepw_Ajax {
 	 * Handle authenticate passkey request
 	 */
 	public function handle_authenticate_passkey() {
+		// Rate limiting - 5 authentication attempts per 5 minutes
+		if ( $this->is_rate_limited( 'auth_attempt', 5, 300 ) ) {
+			wp_send_json_error( 'Too many authentication attempts. Please try again later.' );
+		}
+		
 		// Start session if not already started
 		if ( ! session_id() ) {
 			session_start();
@@ -222,6 +268,11 @@ class Byebyepw_Ajax {
 	 * Handle authenticate request (alias for handle_authenticate_passkey)
 	 */
 	public function handle_authenticate() {
+		// Rate limiting - 5 authentication attempts per 5 minutes
+		if ( $this->is_rate_limited( 'auth_attempt', 5, 300 ) ) {
+			wp_send_json_error( 'Too many authentication attempts. Please try again later.' );
+		}
+		
 		// Start session if not already started
 		if ( ! session_id() ) {
 			session_start();
@@ -331,6 +382,11 @@ class Byebyepw_Ajax {
 	 * Handle authenticate with recovery code
 	 */
 	public function handle_authenticate_recovery_code() {
+		// Rate limiting - 3 recovery code attempts per 10 minutes (stricter)
+		if ( $this->is_rate_limited( 'recovery_attempt', 3, 600 ) ) {
+			wp_send_json_error( 'Too many recovery code attempts. Please try again later.' );
+		}
+		
 		$username = sanitize_text_field( $_POST['username'] ?? '' );
 		$recovery_code = sanitize_text_field( $_POST['recovery_code'] ?? '' );
 

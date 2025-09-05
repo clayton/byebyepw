@@ -103,21 +103,31 @@ class Byebyepw_WebAuthn {
 		// Get challenge from WebAuthn library
 		$challenge = $this->webauthn->getChallenge();
 		
-		// Store challenge primarily in transient (more reliable for AJAX)
-		$transient_key = 'byebyepw_reg_challenge_' . get_current_user_id();
-		$transient_result = set_transient( $transient_key, base64_encode( $challenge ), 300 );
-		$this->debug_log( 'Stored challenge in transient key ' . $transient_key . ' for user ' . get_current_user_id() . ': ' . ($transient_result ? 'SUCCESS' : 'FAILED') );
-		$this->debug_log( 'Challenge length: ' . strlen( $challenge ) . ' bytes, base64: ' . strlen( base64_encode( $challenge ) ) . ' chars' );
+		// Generate secure challenge identifier to prevent predictable keys
+		$challenge_id = wp_generate_uuid4();
+		$user_id = get_current_user_id();
 		
-		// Also try session as secondary storage
+		// Store challenge with secure binding
+		$challenge_data = [
+			'challenge' => base64_encode( $challenge ),
+			'user_id' => $user_id,
+			'created' => time(),
+			'type' => 'registration',
+			'ip_address' => $_SERVER['REMOTE_ADDR'] ?? '',
+			'used' => false
+		];
+		
+		$transient_key = 'byebyepw_challenge_' . $challenge_id;
+		$transient_result = set_transient( $transient_key, $challenge_data, 300 );
+		$this->debug_log( 'Stored challenge with secure key for user ' . $user_id . ': ' . ($transient_result ? 'SUCCESS' : 'FAILED') );
+		
+		// Store challenge ID in session for retrieval
 		if ( ! session_id() ) {
-			@session_start();
-			$this->debug_log( 'Started new session: ' . session_id() );
-		} else {
-			$this->debug_log( 'Using existing session: ' . session_id() );
+			session_start();
 		}
-		$_SESSION['webauthn_challenge'] = $challenge;
-		$this->debug_log( 'Also stored challenge in session' );
+		$_SESSION['webauthn_challenge_id'] = $challenge_id;
+		$_SESSION['webauthn_challenge_created'] = time();
+		$this->debug_log( 'Stored challenge ID in session: ' . $challenge_id );
 		
 		// Convert binary fields to base64url for JSON transmission
 		if ( isset( $create_args->publicKey->challenge ) ) {
@@ -145,53 +155,54 @@ class Byebyepw_WebAuthn {
 	public function process_registration( $user_id, $client_data_json, $attestation_object, $name = 'Unnamed Passkey' ) {
 		$this->debug_log( 'Starting registration process for user ' . $user_id );
 		
-		// Try to get challenge from transient first (most reliable for AJAX)
-		$challenge = null;
-		$transient_key = 'byebyepw_reg_challenge_' . $user_id;
-		$transient_challenge = get_transient( $transient_key );
+		// Get challenge ID from session
+		if ( ! session_id() ) {
+			session_start();
+		}
 		
-		if ( $transient_challenge ) {
-			$challenge = base64_decode( $transient_challenge );
-			$this->debug_log( 'Retrieved challenge from transient key ' . $transient_key . ' (decoded length: ' . strlen( $challenge ) . ')' );
-			// Delete the transient after use (one-time use)
+		$challenge_id = $_SESSION['webauthn_challenge_id'] ?? null;
+		if ( ! $challenge_id ) {
+			$this->debug_log( 'ERROR - No challenge ID in session' );
+			return new WP_Error( 'no_challenge_id', 'No challenge ID found in session' );
+		}
+		
+		// Retrieve challenge data with validation
+		$transient_key = 'byebyepw_challenge_' . $challenge_id;
+		$challenge_data = get_transient( $transient_key );
+		
+		if ( ! $challenge_data || ! is_array( $challenge_data ) ) {
+			$this->debug_log( 'ERROR - No challenge data found for ID: ' . $challenge_id );
+			return new WP_Error( 'no_challenge', 'Challenge not found or expired' );
+		}
+		
+		// Validate challenge data
+		if ( $challenge_data['user_id'] !== $user_id ) {
+			$this->debug_log( 'ERROR - Challenge user ID mismatch' );
 			delete_transient( $transient_key );
-		} else {
-			$this->debug_log( 'No challenge in transient ' . $transient_key . ', checking session as fallback' );
-			
-			// Try session as fallback
-			if ( ! session_id() ) {
-				@session_start();
-				$this->debug_log( 'Started session in process_registration: ' . session_id() );
-			} else {
-				$this->debug_log( 'Existing session in process_registration: ' . session_id() );
-			}
-			
-			if ( isset( $_SESSION['webauthn_challenge'] ) ) {
-				$challenge = $_SESSION['webauthn_challenge'];
-				$this->debug_log( 'Retrieved challenge from session (length: ' . strlen( $challenge ) . ')' );
-				unset( $_SESSION['webauthn_challenge'] );
-			} else {
-				$this->debug_log( 'No challenge in session either' );
-			}
+			unset( $_SESSION['webauthn_challenge_id'] );
+			return new WP_Error( 'challenge_user_mismatch', 'Challenge user ID mismatch' );
 		}
 		
-		if ( ! $challenge ) {
-			$this->debug_log( 'ERROR - No challenge found anywhere!' );
-			$this->debug_log( 'Checked transient key: ' . $transient_key );
-			$this->debug_log( 'Session ID: ' . session_id() );
-			if ( isset( $_SESSION ) ) {
-				$this->debug_log( 'Session contents: ' . print_r( $_SESSION, true ) );
-			}
-			
-			// List all transients for debugging
-			global $wpdb;
-			$transients = $wpdb->get_results( 
-				"SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE '_transient_byebyepw%'"
-			);
-			$this->debug_log( 'All ByeByePW transients in database: ' . print_r( $transients, true ) );
-			
-			return new WP_Error( 'no_challenge', 'No challenge found in transient or session' );
+		if ( $challenge_data['type'] !== 'registration' ) {
+			$this->debug_log( 'ERROR - Challenge type mismatch' );
+			delete_transient( $transient_key );
+			unset( $_SESSION['webauthn_challenge_id'] );
+			return new WP_Error( 'challenge_type_mismatch', 'Invalid challenge type' );
 		}
+		
+		if ( $challenge_data['used'] ) {
+			$this->debug_log( 'ERROR - Challenge already used' );
+			delete_transient( $transient_key );
+			unset( $_SESSION['webauthn_challenge_id'] );
+			return new WP_Error( 'challenge_already_used', 'Challenge already used' );
+		}
+		
+		// Mark challenge as used immediately to prevent replay
+		$challenge_data['used'] = true;
+		set_transient( $transient_key, $challenge_data, 60 ); // Keep for 1 minute for debugging
+		
+		$challenge = base64_decode( $challenge_data['challenge'] );
+		$this->debug_log( 'Retrieved and validated challenge (length: ' . strlen( $challenge ) . ')' );
 
 		try {
 			// Decode base64url to binary
@@ -236,8 +247,9 @@ class Byebyepw_WebAuthn {
 				$this->debug_log( 'Failed to save credential to database' );
 			}
 
-			// Clear challenge
-			unset( $_SESSION['webauthn_challenge'] );
+			// Clear challenge data
+			unset( $_SESSION['webauthn_challenge_id'], $_SESSION['webauthn_challenge_created'] );
+			delete_transient( $transient_key );
 
 			return true;
 		} catch ( \lbuchs\WebAuthn\WebAuthnException $e ) {
@@ -284,10 +296,8 @@ class Byebyepw_WebAuthn {
 			'preferred' // user verification
 		);
 		
-		// Store the challenge that was created by getGetArgs
-		if ( ! session_id() ) {
-			@session_start();
-		}
+		// Generate secure challenge identifier
+		$challenge_id = wp_generate_uuid4();
 		
 		// The actual challenge is in $get_args->publicKey->challenge
 		$challenge = $get_args->publicKey->challenge;
@@ -295,14 +305,27 @@ class Byebyepw_WebAuthn {
 			$challenge = $challenge->getBinaryString();
 		}
 		
-		$_SESSION['webauthn_challenge'] = $challenge;
+		// Store challenge with secure binding
+		$challenge_data = [
+			'challenge' => base64_encode( $challenge ),
+			'user_id' => $user_id, // May be null for usernameless flow
+			'created' => time(),
+			'type' => 'authentication',
+			'ip_address' => $_SERVER['REMOTE_ADDR'] ?? '',
+			'used' => false
+		];
 		
-		// Also store in transient as backup (for login, we don't have user_id yet)
-		$session_id = session_id();
-		$transient_key = 'byebyepw_auth_challenge_' . $session_id;
-		$transient_result = set_transient( $transient_key, base64_encode( $challenge ), 300 );
-		$this->debug_log( 'Stored auth challenge in session and transient (key: ' . $transient_key . ', result: ' . ( $transient_result ? 'success' : 'failed' ) . ')' );
-		$this->debug_log( 'Challenge length: ' . strlen( $challenge ) . ', base64: ' . base64_encode( $challenge ) );
+		$transient_key = 'byebyepw_challenge_' . $challenge_id;
+		$transient_result = set_transient( $transient_key, $challenge_data, 300 );
+		$this->debug_log( 'Stored auth challenge with secure key (result: ' . ( $transient_result ? 'success' : 'failed' ) . ')' );
+		
+		// Store challenge ID in session for retrieval
+		if ( ! session_id() ) {
+			session_start();
+		}
+		$_SESSION['webauthn_challenge_id'] = $challenge_id;
+		$_SESSION['webauthn_challenge_created'] = time();
+		$this->debug_log( 'Challenge length: ' . strlen( $challenge ) . ', ID: ' . $challenge_id );
 		
 		// Convert binary fields to base64url for JSON transmission
 		if ( isset( $get_args->publicKey->challenge ) ) {
@@ -335,34 +358,46 @@ class Byebyepw_WebAuthn {
 		$this->debug_log( 'credential_id: ' . substr( $credential_id, 0, 20 ) . '...' );
 		
 		if ( ! session_id() ) {
-			@session_start();
+			session_start();
 		}
 
-		$session_id = session_id();
-		$this->debug_log( 'Session ID: ' . $session_id );
-
-		// Try to get challenge from session first, then transient
-		$challenge = null;
-		if ( isset( $_SESSION['webauthn_challenge'] ) ) {
-			$challenge = $_SESSION['webauthn_challenge'];
-			$this->debug_log( 'Challenge found in session, length: ' . strlen( $challenge ) . ', base64: ' . base64_encode( $challenge ) );
-		} else {
-			// Try transient as backup
-			$transient_key = 'byebyepw_auth_challenge_' . $session_id;
-			$transient_challenge = get_transient( $transient_key );
-			$this->debug_log( 'Looking for challenge in transient with key: ' . $transient_key );
-			if ( $transient_challenge ) {
-				$challenge = base64_decode( $transient_challenge );
-				$this->debug_log( 'Challenge found in transient, length: ' . strlen( $challenge ) . ', base64: ' . base64_encode( $challenge ) );
-			} else {
-				$this->debug_log( 'No challenge found in transient' );
-			}
+		// Get challenge ID from session
+		$challenge_id = $_SESSION['webauthn_challenge_id'] ?? null;
+		if ( ! $challenge_id ) {
+			$this->debug_log( 'ERROR - No challenge ID in session' );
+			return new WP_Error( 'no_challenge_id', 'No challenge ID found in session' );
 		}
 		
-		if ( ! $challenge ) {
-			$this->debug_log( 'ERROR - No challenge found in session or transient' );
-			return new WP_Error( 'no_challenge', 'No challenge found in session or transient' );
+		// Retrieve challenge data with validation
+		$transient_key = 'byebyepw_challenge_' . $challenge_id;
+		$challenge_data = get_transient( $transient_key );
+		
+		if ( ! $challenge_data || ! is_array( $challenge_data ) ) {
+			$this->debug_log( 'ERROR - No challenge data found for ID: ' . $challenge_id );
+			return new WP_Error( 'no_challenge', 'Challenge not found or expired' );
 		}
+		
+		// Validate challenge data
+		if ( $challenge_data['type'] !== 'authentication' ) {
+			$this->debug_log( 'ERROR - Challenge type mismatch' );
+			delete_transient( $transient_key );
+			unset( $_SESSION['webauthn_challenge_id'] );
+			return new WP_Error( 'challenge_type_mismatch', 'Invalid challenge type' );
+		}
+		
+		if ( $challenge_data['used'] ) {
+			$this->debug_log( 'ERROR - Challenge already used' );
+			delete_transient( $transient_key );
+			unset( $_SESSION['webauthn_challenge_id'] );
+			return new WP_Error( 'challenge_already_used', 'Challenge already used' );
+		}
+		
+		// Mark challenge as used immediately to prevent replay
+		$challenge_data['used'] = true;
+		set_transient( $transient_key, $challenge_data, 60 ); // Keep for 1 minute for debugging
+		
+		$challenge = base64_decode( $challenge_data['challenge'] );
+		$this->debug_log( 'Retrieved and validated auth challenge (length: ' . strlen( $challenge ) . ')' );
 
 		// Decode credential_id if it's base64url encoded
 		$credential_id_decoded = $this->base64url_decode( $credential_id );
@@ -402,20 +437,26 @@ class Byebyepw_WebAuthn {
 			$this->debug_log( 'Calling processGet with decoded data' );
 			$this->debug_log( 'Credential sign_count from DB: ' . $credential->sign_count );
 			
-			// Parse authenticator data to see the actual sign count
+			// Parse actual sign count from authenticator data
+			$actual_sign_count = 0;
 			if (strlen($authenticator_data_decoded) >= 37) {
 				$sign_count_bytes = substr($authenticator_data_decoded, 33, 4);
 				$actual_sign_count = unpack('N', $sign_count_bytes)[1];
 				$this->debug_log( 'Actual sign_count from authenticator: ' . $actual_sign_count );
 			}
 			
-			// Sign count can be null or 0 for some authenticators
-			// Some authenticators don't increment sign count, so we'll be lenient
-			$sign_count = isset($credential->sign_count) ? intval($credential->sign_count) : 0;
+			// Get stored sign count from database
+			$stored_sign_count = isset($credential->sign_count) ? intval($credential->sign_count) : 0;
+			$this->debug_log( 'Stored sign_count from DB: ' . $stored_sign_count );
 			
-			// If sign count is causing issues, we can disable the check by passing null
-			// Many authenticators don't properly implement sign counts
-			$sign_count_to_check = null; // Disable sign count validation for now
+			// Validate sign count - must be greater than stored (prevents replay attacks)
+			// Note: Some authenticators don't increment sign count, so allow 0
+			if ( $actual_sign_count > 0 && $actual_sign_count <= $stored_sign_count ) {
+				$this->debug_log( 'ERROR - Sign count validation failed. Stored: ' . $stored_sign_count . ', Actual: ' . $actual_sign_count );
+				return new WP_Error( 'sign_count_invalid', 'Sign count validation failed - possible cloned authenticator' );
+			}
+			
+			$sign_count_to_check = $stored_sign_count;
 			
 			$this->webauthn->processGet(
 				$client_data_json_decoded,
@@ -430,11 +471,11 @@ class Byebyepw_WebAuthn {
 			$this->debug_log( 'processGet succeeded!' );
 
 			// Update sign count and last used
-			$this->update_credential_usage( $credential->credential_id );
+			$this->update_credential_usage( $credential->credential_id, $actual_sign_count );
 
-			// Clear challenge
-			unset( $_SESSION['webauthn_challenge'] );
-			delete_transient( 'byebyepw_auth_challenge_' . $session_id );
+			// Clear challenge data
+			unset( $_SESSION['webauthn_challenge_id'], $_SESSION['webauthn_challenge_created'] );
+			delete_transient( $transient_key );
 
 			$this->debug_log( 'Authentication successful for user ' . $credential->user_id );
 			return $credential->user_id;
@@ -505,13 +546,25 @@ class Byebyepw_WebAuthn {
 	}
 
 	/**
-	 * Update credential usage
+	 * Update credential usage with actual sign count from authenticator
 	 */
-	private function update_credential_usage( $credential_id ) {
+	private function update_credential_usage( $credential_id, $actual_sign_count = null ) {
 		global $wpdb;
 		$table = $wpdb->prefix . 'byebyepw_passkeys';
 
-		// Get current sign count
+		// If we have actual sign count from authenticator, use it
+		if ( $actual_sign_count !== null ) {
+			return $wpdb->update(
+				$table,
+				array(
+					'last_used' => current_time( 'mysql' ),
+					'sign_count' => intval( $actual_sign_count ),
+				),
+				array( 'credential_id' => $credential_id )
+			);
+		}
+
+		// Fallback: increment stored count by 1 (legacy behavior)
 		$current = $wpdb->get_row( $wpdb->prepare(
 			"SELECT sign_count FROM $table WHERE credential_id = %s",
 			$credential_id
