@@ -130,9 +130,19 @@ class Byebyepw_Public {
 			false 
 		);
 		
+		// Prepare redirect URL - this is safe to access without nonce as it's just for determining redirect destination
+		$redirect_to = admin_url(); // Default
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not processing form data, just determining redirect URL
+		if ( isset( $_REQUEST['redirect_to'] ) ) {
+			// Safe URL parameter access for redirect destination (not processing form data)
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not processing form data, just determining redirect URL
+			$redirect_to = esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) );
+		}
+		
 		wp_localize_script( $this->plugin_name . '-login', 'byebyepw_ajax', array(
 			'ajax_url' => admin_url( 'admin-ajax.php' ),
-			'redirect_to' => isset( $_REQUEST['redirect_to'] ) ? $_REQUEST['redirect_to'] : admin_url()
+			'redirect_to' => $redirect_to,
+			'nonce' => wp_create_nonce( 'byebyepw_security' ) // Provide nonce for AJAX requests
 		));
 	}
 

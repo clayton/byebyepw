@@ -11,20 +11,20 @@
  */
 
 // Include all necessary WebAuthn library files
-require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn-r0/src/WebAuthn.php';
-require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn-r0/src/WebAuthnException.php';
-require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn-r0/src/Binary/ByteBuffer.php';
-require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn-r0/src/CBOR/CborDecoder.php';
-require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn-r0/src/Attestation/AttestationObject.php';
-require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn-r0/src/Attestation/AuthenticatorData.php';
-require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn-r0/src/Attestation/Format/FormatBase.php';
-require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn-r0/src/Attestation/Format/None.php';
-require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn-r0/src/Attestation/Format/U2f.php';
-require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn-r0/src/Attestation/Format/Packed.php';
-require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn-r0/src/Attestation/Format/Tpm.php';
-require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn-r0/src/Attestation/Format/Apple.php';
-require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn-r0/src/Attestation/Format/AndroidKey.php';
-require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn-r0/src/Attestation/Format/AndroidSafetyNet.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn/src/WebAuthn.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn/src/WebAuthnException.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn/src/Binary/ByteBuffer.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn/src/CBOR/CborDecoder.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn/src/Attestation/AttestationObject.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn/src/Attestation/AuthenticatorData.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn/src/Attestation/Format/FormatBase.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn/src/Attestation/Format/None.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn/src/Attestation/Format/U2f.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn/src/Attestation/Format/Packed.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn/src/Attestation/Format/Tpm.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn/src/Attestation/Format/Apple.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn/src/Attestation/Format/AndroidKey.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn/src/Attestation/Format/AndroidSafetyNet.php';
 
 /**
  * Handles WebAuthn operations for passkey authentication.
@@ -52,7 +52,7 @@ class Byebyepw_WebAuthn {
 	private function debug_log( $message ) {
 		// Debug logging disabled for WordPress.org compliance
 		// if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-		//     error_log( 'ByeByePW: ' . $message );
+		//     error_log( 'ByeByePW: ' . esc_html( $message ) );
 		// }
 	}
 
@@ -114,7 +114,7 @@ class Byebyepw_WebAuthn {
 			'user_id' => $user_id,
 			'created' => time(),
 			'type' => 'registration',
-			'ip_address' => $_SERVER['REMOTE_ADDR'] ?? '',
+			'ip_address' => sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '' ) ),
 			'used' => false
 		];
 		
@@ -161,7 +161,7 @@ class Byebyepw_WebAuthn {
 			session_start();
 		}
 		
-		$challenge_id = $_SESSION['webauthn_challenge_id'] ?? null;
+		$challenge_id = sanitize_text_field( $_SESSION['webauthn_challenge_id'] ?? '' ) ?: null;
 		if ( ! $challenge_id ) {
 			$this->debug_log( 'ERROR - No challenge ID in session' );
 			return new WP_Error( 'no_challenge_id', 'No challenge ID found in session' );
@@ -254,20 +254,20 @@ class Byebyepw_WebAuthn {
 
 			return true;
 		} catch ( \lbuchs\WebAuthn\WebAuthnException $e ) {
-			$this->debug_log( 'WebAuthnException: ' . $e->getMessage() );
+			$this->debug_log( 'WebAuthnException: ' . esc_html( $e->getMessage() ) );
 			$this->debug_log( 'Exception code: ' . $e->getCode() );
-			$this->debug_log( 'Stack trace: ' . $e->getTraceAsString() );
-			return new WP_Error( 'registration_failed', $e->getMessage() );
+			$this->debug_log( 'Stack trace: ' . esc_html( $e->getTraceAsString() ) );
+			return new WP_Error( 'registration_failed', esc_html( $e->getMessage() ) );
 		} catch ( \Exception $e ) {
-			$this->debug_log( 'General Exception: ' . $e->getMessage() );
+			$this->debug_log( 'General Exception: ' . esc_html( $e->getMessage() ) );
 			$this->debug_log( 'Exception code: ' . $e->getCode() );
-			$this->debug_log( 'Stack trace: ' . $e->getTraceAsString() );
-			return new WP_Error( 'registration_failed', $e->getMessage() );
+			$this->debug_log( 'Stack trace: ' . esc_html( $e->getTraceAsString() ) );
+			return new WP_Error( 'registration_failed', esc_html( $e->getMessage() ) );
 		} catch ( \Throwable $e ) {
-			$this->debug_log( 'Throwable: ' . $e->getMessage() );
+			$this->debug_log( 'Throwable: ' . esc_html( $e->getMessage() ) );
 			$this->debug_log( 'Exception code: ' . $e->getCode() );
-			$this->debug_log( 'Stack trace: ' . $e->getTraceAsString() );
-			return new WP_Error( 'registration_failed', $e->getMessage() );
+			$this->debug_log( 'Stack trace: ' . esc_html( $e->getTraceAsString() ) );
+			return new WP_Error( 'registration_failed', esc_html( $e->getMessage() ) );
 		}
 	}
 
@@ -312,7 +312,7 @@ class Byebyepw_WebAuthn {
 			'user_id' => $user_id, // May be null for usernameless flow
 			'created' => time(),
 			'type' => 'authentication',
-			'ip_address' => $_SERVER['REMOTE_ADDR'] ?? '',
+			'ip_address' => sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '' ) ),
 			'used' => false
 		];
 		
@@ -363,7 +363,7 @@ class Byebyepw_WebAuthn {
 		}
 
 		// Get challenge ID from session
-		$challenge_id = $_SESSION['webauthn_challenge_id'] ?? null;
+		$challenge_id = sanitize_text_field( $_SESSION['webauthn_challenge_id'] ?? '' ) ?: null;
 		if ( ! $challenge_id ) {
 			$this->debug_log( 'ERROR - No challenge ID in session' );
 			return new WP_Error( 'no_challenge_id', 'No challenge ID found in session' );
@@ -487,11 +487,11 @@ class Byebyepw_WebAuthn {
 			$this->debug_log( 'Authentication successful for user ' . $credential->user_id );
 			return $credential->user_id;
 		} catch ( \lbuchs\WebAuthn\WebAuthnException $e ) {
-			$this->debug_log( 'WebAuthnException during authentication: ' . $e->getMessage() );
-			return new WP_Error( 'authentication_failed', $e->getMessage() );
+			$this->debug_log( 'WebAuthnException during authentication: ' . esc_html( $e->getMessage() ) );
+			return new WP_Error( 'authentication_failed', esc_html( $e->getMessage() ) );
 		} catch ( \Exception $e ) {
-			$this->debug_log( 'General Exception during authentication: ' . $e->getMessage() );
-			return new WP_Error( 'authentication_failed', $e->getMessage() );
+			$this->debug_log( 'General Exception during authentication: ' . esc_html( $e->getMessage() ) );
+			return new WP_Error( 'authentication_failed', esc_html( $e->getMessage() ) );
 		}
 	}
 
@@ -503,7 +503,7 @@ class Byebyepw_WebAuthn {
 		$table = $wpdb->prefix . 'byebyepw_passkeys';
 
 		// Log the data structure for debugging (disabled for production)
-		// $this->debug_log( 'Saving credential data structure: ' . print_r( $data, true ) );
+		// $this->debug_log( 'Saving credential data structure: ' . wp_json_encode( $data ) );
 
 		// Handle sign_count - it might be null or not set
 		$sign_count = 0;
@@ -533,8 +533,9 @@ class Byebyepw_WebAuthn {
 		global $wpdb;
 		$table = $wpdb->prefix . 'byebyepw_passkeys';
 
+		// Table name is safely constructed with wpdb prefix
 		return $wpdb->get_results( $wpdb->prepare(
-			"SELECT * FROM $table WHERE user_id = %d ORDER BY created_at DESC",
+			"SELECT * FROM {$wpdb->prefix}byebyepw_passkeys WHERE user_id = %d ORDER BY created_at DESC",
 			$user_id
 		) );
 	}
@@ -546,8 +547,9 @@ class Byebyepw_WebAuthn {
 		global $wpdb;
 		$table = $wpdb->prefix . 'byebyepw_passkeys';
 
+		// Table name is safely constructed with wpdb prefix
 		return $wpdb->get_row( $wpdb->prepare(
-			"SELECT * FROM $table WHERE credential_id = %s",
+			"SELECT * FROM {$wpdb->prefix}byebyepw_passkeys WHERE credential_id = %s",
 			$credential_id
 		) );
 	}
@@ -572,8 +574,9 @@ class Byebyepw_WebAuthn {
 		}
 
 		// Fallback: increment stored count by 1 (legacy behavior)
+		// Table name is safely constructed with wpdb prefix
 		$current = $wpdb->get_row( $wpdb->prepare(
-			"SELECT sign_count FROM $table WHERE credential_id = %s",
+			"SELECT sign_count FROM {$wpdb->prefix}byebyepw_passkeys WHERE credential_id = %s",
 			$credential_id
 		) );
 		

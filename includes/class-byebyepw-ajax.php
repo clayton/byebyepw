@@ -49,7 +49,7 @@ class Byebyepw_Ajax {
 	/**
 	 * Generate CSRF token for public endpoints
 	 *
-	 * @return string CSRF token
+	 * @return array Array containing both csrf_token and nonce
 	 */
 	private function generate_csrf_token() {
 		if ( ! session_id() ) {
@@ -65,7 +65,10 @@ class Byebyepw_Ajax {
 			$_SESSION['byebyepw_csrf_expires'] = time() + 1800; // 30 minutes
 		}
 		
-		return $_SESSION['byebyepw_csrf_token'];
+		return array(
+			'csrf_token' => sanitize_text_field( $_SESSION['byebyepw_csrf_token'] ),
+			'nonce' => wp_create_nonce( 'byebyepw_security' )
+		);
 	}
 	
 	/**
@@ -95,6 +98,23 @@ class Byebyepw_Ajax {
 	}
 
 	/**
+	 * Verify both nonce and CSRF token for security
+	 *
+	 * @param string $nonce Nonce to verify  
+	 * @param string $csrf_token CSRF token to verify
+	 * @return bool True if both are valid
+	 */
+	private function verify_security_tokens( $nonce, $csrf_token ) {
+		// Verify WordPress nonce
+		$nonce_valid = wp_verify_nonce( $nonce, 'byebyepw_security' );
+		
+		// Verify CSRF token
+		$csrf_valid = $this->validate_csrf_token( $csrf_token );
+		
+		return $nonce_valid && $csrf_valid;
+	}
+
+	/**
 	 * Check rate limiting for authentication endpoints
 	 *
 	 * @param string $action The action being rate limited
@@ -103,7 +123,7 @@ class Byebyepw_Ajax {
 	 * @return bool True if rate limit exceeded
 	 */
 	private function is_rate_limited( $action, $max_attempts = 5, $time_window = 300 ) {
-		$ip_address = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+		$ip_address = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? 'unknown' ) );
 		$transient_key = 'byebyepw_rate_limit_' . $action . '_' . md5( $ip_address );
 		
 		$attempts = get_transient( $transient_key );
@@ -198,9 +218,9 @@ class Byebyepw_Ajax {
 		}
 
 		$user_id = get_current_user_id();
-		$client_data_json = sanitize_text_field( $_POST['client_data_json'] ?? '' );
-		$attestation_object = sanitize_text_field( $_POST['attestation_object'] ?? '' );
-		$name = sanitize_text_field( $_POST['name'] ?? 'Unnamed Passkey' );
+		$client_data_json = sanitize_text_field( wp_unslash( $_POST['client_data_json'] ?? '' ) );
+		$attestation_object = sanitize_text_field( wp_unslash( $_POST['attestation_object'] ?? '' ) );
+		$name = sanitize_text_field( wp_unslash( $_POST['name'] ?? 'Unnamed Passkey' ) );
 
 		if ( empty( $client_data_json ) || empty( $attestation_object ) ) {
 			wp_send_json_error( 'Missing required data' );
@@ -230,19 +250,28 @@ class Byebyepw_Ajax {
 			wp_send_json_error( 'Too many requests. Please try again later.' );
 		}
 		
+		// Verify WordPress nonce for form data (required by WordPress.org)
+		if ( ! empty( $_POST ) ) {
+			if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), 'byebyepw_security' ) ) {
+				wp_send_json_error( 'Security validation failed. Please refresh and try again.' );
+			}
+		}
+		
 		// Start session if not already started
 		if ( ! session_id() ) {
 			session_start();
 		}
 
 		// Check if specific user is requested (for username+passkey flow)
-		$username = sanitize_text_field( $_POST['username'] ?? '' );
 		$user_id = null;
-
-		if ( ! empty( $username ) ) {
-			$user = get_user_by( 'login', $username );
-			if ( $user ) {
-				$user_id = $user->ID;
+		
+		if ( ! empty( $_POST ) ) {
+			$username = sanitize_text_field( wp_unslash( $_POST['username'] ?? '' ) );
+			if ( ! empty( $username ) ) {
+				$user = get_user_by( 'login', $username );
+				if ( $user ) {
+					$user_id = $user->ID;
+				}
 			}
 		}
 
@@ -252,8 +281,10 @@ class Byebyepw_Ajax {
 			wp_send_json_error( $result->get_error_message() );
 		}
 
-		// Add CSRF token to challenge response for subsequent authentication
-		$result->csrf_token = $this->generate_csrf_token();
+		// Add CSRF token and nonce to challenge response for subsequent authentication
+		$security_tokens = $this->generate_csrf_token();
+		$result->csrf_token = $security_tokens['csrf_token'];
+		$result->nonce = $security_tokens['nonce'];
 
 		wp_send_json_success( $result );
 	}
@@ -274,8 +305,13 @@ class Byebyepw_Ajax {
 			wp_send_json_error( 'Too many authentication attempts. Please try again later.' );
 		}
 		
-		// CSRF protection for public endpoint
-		$csrf_token = sanitize_text_field( $_POST['csrf_token'] ?? '' );
+		// Verify WordPress nonce first (required by WordPress.org)
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), 'byebyepw_security' ) ) {
+			wp_send_json_error( 'Security validation failed. Please refresh and try again.' );
+		}
+		
+		// Additional CSRF protection for public endpoint
+		$csrf_token = sanitize_text_field( wp_unslash( $_POST['csrf_token'] ?? '' ) );
 		if ( ! $this->validate_csrf_token( $csrf_token ) ) {
 			wp_send_json_error( 'Security validation failed. Please refresh and try again.' );
 		}
@@ -285,11 +321,11 @@ class Byebyepw_Ajax {
 			session_start();
 		}
 
-		$credential_id = sanitize_text_field( $_POST['credential_id'] ?? '' );
-		$client_data_json = sanitize_text_field( $_POST['client_data_json'] ?? '' );
-		$authenticator_data = sanitize_text_field( $_POST['authenticator_data'] ?? '' );
-		$signature = sanitize_text_field( $_POST['signature'] ?? '' );
-		$user_handle = sanitize_text_field( $_POST['user_handle'] ?? '' );
+		$credential_id = sanitize_text_field( wp_unslash( $_POST['credential_id'] ?? '' ) );
+		$client_data_json = sanitize_text_field( wp_unslash( $_POST['client_data_json'] ?? '' ) );
+		$authenticator_data = sanitize_text_field( wp_unslash( $_POST['authenticator_data'] ?? '' ) );
+		$signature = sanitize_text_field( wp_unslash( $_POST['signature'] ?? '' ) );
+		$user_handle = sanitize_text_field( wp_unslash( $_POST['user_handle'] ?? '' ) );
 
 		if ( empty( $credential_id ) || empty( $client_data_json ) || empty( $authenticator_data ) || empty( $signature ) ) {
 			wp_send_json_error( 'Missing required data' );
@@ -313,7 +349,7 @@ class Byebyepw_Ajax {
 		wp_set_auth_cookie( $user_id, true );
 
 		// Get redirect URL
-		$redirect_to = $_POST['redirect_to'] ?? admin_url();
+		$redirect_to = esc_url_raw( wp_unslash( $_POST['redirect_to'] ?? admin_url() ) );
 		$redirect_to = apply_filters( 'login_redirect', $redirect_to, $redirect_to, get_user_by( 'id', $user_id ) );
 
 		wp_send_json_success( array(
@@ -331,8 +367,13 @@ class Byebyepw_Ajax {
 			wp_send_json_error( 'Too many authentication attempts. Please try again later.' );
 		}
 		
-		// CSRF protection for public endpoint
-		$csrf_token = sanitize_text_field( $_POST['csrf_token'] ?? '' );
+		// Verify WordPress nonce first (required by WordPress.org)
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), 'byebyepw_security' ) ) {
+			wp_send_json_error( 'Security validation failed. Please refresh and try again.' );
+		}
+		
+		// Additional CSRF protection for public endpoint
+		$csrf_token = sanitize_text_field( wp_unslash( $_POST['csrf_token'] ?? '' ) );
 		if ( ! $this->validate_csrf_token( $csrf_token ) ) {
 			wp_send_json_error( 'Security validation failed. Please refresh and try again.' );
 		}
@@ -344,11 +385,11 @@ class Byebyepw_Ajax {
 
 		$this->debug_log( 'handle_authenticate called' );
 
-		$credential_id = sanitize_text_field( $_POST['credential_id'] ?? '' );
-		$client_data_json = sanitize_text_field( $_POST['client_data_json'] ?? '' );
-		$authenticator_data = sanitize_text_field( $_POST['authenticator_data'] ?? '' );
-		$signature = sanitize_text_field( $_POST['signature'] ?? '' );
-		$user_handle = sanitize_text_field( $_POST['user_handle'] ?? '' );
+		$credential_id = sanitize_text_field( wp_unslash( $_POST['credential_id'] ?? '' ) );
+		$client_data_json = sanitize_text_field( wp_unslash( $_POST['client_data_json'] ?? '' ) );
+		$authenticator_data = sanitize_text_field( wp_unslash( $_POST['authenticator_data'] ?? '' ) );
+		$signature = sanitize_text_field( wp_unslash( $_POST['signature'] ?? '' ) );
+		$user_handle = sanitize_text_field( wp_unslash( $_POST['user_handle'] ?? '' ) );
 
 		$this->debug_log( 'Authentication data received - credential_id: ' . substr( $credential_id, 0, 20 ) . '...' );
 
@@ -378,7 +419,7 @@ class Byebyepw_Ajax {
 		wp_set_auth_cookie( $user_id, true );
 
 		// Get redirect URL
-		$redirect_to = $_POST['redirect_to'] ?? admin_url();
+		$redirect_to = esc_url_raw( wp_unslash( $_POST['redirect_to'] ?? admin_url() ) );
 		$redirect_to = apply_filters( 'login_redirect', $redirect_to, $redirect_to, get_user_by( 'id', $user_id ) );
 
 		wp_send_json_success( array(
@@ -451,14 +492,19 @@ class Byebyepw_Ajax {
 			wp_send_json_error( 'Too many recovery code attempts. Please try again later.' );
 		}
 		
-		// CSRF protection for public endpoint  
-		$csrf_token = sanitize_text_field( $_POST['csrf_token'] ?? '' );
+		// Verify WordPress nonce first (required by WordPress.org)
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), 'byebyepw_security' ) ) {
+			wp_send_json_error( 'Security validation failed. Please refresh and try again.' );
+		}
+		
+		// Additional CSRF protection for public endpoint
+		$csrf_token = sanitize_text_field( wp_unslash( $_POST['csrf_token'] ?? '' ) );
 		if ( ! $this->validate_csrf_token( $csrf_token ) ) {
 			wp_send_json_error( 'Security validation failed. Please refresh and try again.' );
 		}
 		
-		$username = sanitize_text_field( $_POST['username'] ?? '' );
-		$recovery_code = sanitize_text_field( $_POST['recovery_code'] ?? '' );
+		$username = sanitize_text_field( wp_unslash( $_POST['username'] ?? '' ) );
+		$recovery_code = sanitize_text_field( wp_unslash( $_POST['recovery_code'] ?? '' ) );
 
 		if ( empty( $username ) || empty( $recovery_code ) ) {
 			wp_send_json_error( 'Missing required data' );
@@ -481,7 +527,7 @@ class Byebyepw_Ajax {
 		wp_set_auth_cookie( $user->ID, true );
 
 		// Get redirect URL
-		$redirect_to = $_POST['redirect_to'] ?? admin_url();
+		$redirect_to = esc_url_raw( wp_unslash( $_POST['redirect_to'] ?? admin_url() ) );
 		$redirect_to = apply_filters( 'login_redirect', $redirect_to, $redirect_to, $user );
 
 		wp_send_json_success( array(

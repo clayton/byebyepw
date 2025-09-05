@@ -51,6 +51,9 @@ class Byebyepw_Recovery_Codes {
 			);
 		}
 
+		// Clear cache since we generated new codes
+		wp_cache_delete( 'byebyepw_recovery_codes_count_' . $user_id );
+
 		return $codes;
 	}
 
@@ -80,8 +83,10 @@ class Byebyepw_Recovery_Codes {
 		$table = $wpdb->prefix . 'byebyepw_recovery_codes';
 
 		// Get unused codes for this user
+		// Note: Direct database query is necessary for security-sensitive recovery code validation
+		// Table name is safely constructed with wpdb prefix
 		$stored_codes = $wpdb->get_results( $wpdb->prepare(
-			"SELECT id, code_hash FROM $table WHERE user_id = %d AND used = 0",
+			"SELECT id, code_hash FROM {$wpdb->prefix}byebyepw_recovery_codes WHERE user_id = %d AND used = 0",
 			$user_id
 		) );
 
@@ -107,6 +112,9 @@ class Byebyepw_Recovery_Codes {
 				),
 				array( 'id' => $matched_id )
 			);
+			
+			// Clear cache since code count changed
+			wp_cache_delete( 'byebyepw_recovery_codes_count_' . $user_id );
 		}
 		
 		// Add small artificial delay to normalize timing
@@ -125,10 +133,23 @@ class Byebyepw_Recovery_Codes {
 		global $wpdb;
 		$table = $wpdb->prefix . 'byebyepw_recovery_codes';
 
-		return (int) $wpdb->get_var( $wpdb->prepare(
-			"SELECT COUNT(*) FROM $table WHERE user_id = %d AND used = 0",
-			$user_id
-		) );
+		// Check cache first
+		$cache_key = 'byebyepw_recovery_codes_count_' . $user_id;
+		$count = wp_cache_get( $cache_key );
+		
+		if ( false === $count ) {
+			// Note: Direct database query is necessary for recovery code management
+			// Table name is safely constructed with wpdb prefix
+			$count = (int) $wpdb->get_var( $wpdb->prepare(
+				"SELECT COUNT(*) FROM {$wpdb->prefix}byebyepw_recovery_codes WHERE user_id = %d AND used = 0",
+				$user_id
+			) );
+			
+			// Cache for 5 minutes
+			wp_cache_set( $cache_key, $count, '', 300 );
+		}
+		
+		return $count;
 	}
 
 	/**

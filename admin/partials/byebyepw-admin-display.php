@@ -16,17 +16,39 @@ $user_id = $current_user->ID;
 // Get existing passkeys
 global $wpdb;
 $table_name = $wpdb->prefix . 'byebyepw_passkeys';
-$passkeys = $wpdb->get_results( $wpdb->prepare(
-	"SELECT * FROM $table_name WHERE user_id = %d ORDER BY created_at DESC",
-	$user_id
-) );
+
+// Check cache first for passkeys
+$passkeys_cache_key = 'byebyepw_passkeys_' . $user_id;
+$passkeys = wp_cache_get( $passkeys_cache_key );
+
+if ( false === $passkeys ) {
+	// Table name is safely constructed with wpdb prefix
+	$passkeys = $wpdb->get_results( $wpdb->prepare(
+		"SELECT * FROM {$wpdb->prefix}byebyepw_passkeys WHERE user_id = %d ORDER BY created_at DESC",
+		$user_id
+	) );
+	
+	// Cache for 5 minutes
+	wp_cache_set( $passkeys_cache_key, $passkeys, '', 300 );
+}
 
 // Get recovery codes
 $recovery_codes_table = $wpdb->prefix . 'byebyepw_recovery_codes';
-$has_recovery_codes = $wpdb->get_var( $wpdb->prepare(
-	"SELECT COUNT(*) FROM $recovery_codes_table WHERE user_id = %d AND used = 0",
-	$user_id
-) );
+
+// Check cache first for recovery codes count
+$recovery_cache_key = 'byebyepw_recovery_codes_count_' . $user_id;
+$has_recovery_codes = wp_cache_get( $recovery_cache_key );
+
+if ( false === $has_recovery_codes ) {
+	// Table name is safely constructed with wpdb prefix
+	$has_recovery_codes = $wpdb->get_var( $wpdb->prepare(
+		"SELECT COUNT(*) FROM {$wpdb->prefix}byebyepw_recovery_codes WHERE user_id = %d AND used = 0",
+		$user_id
+	) );
+	
+	// Cache for 5 minutes
+	wp_cache_set( $recovery_cache_key, $has_recovery_codes, '', 300 );
+}
 ?>
 
 <div class="wrap byebyepw-wrap">

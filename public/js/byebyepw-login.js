@@ -53,8 +53,9 @@
                         return;
                     }
                     
-                    // Store CSRF token for authentication request
+                    // Store security tokens for authentication request
                     const csrfToken = response.data.csrf_token;
+                    const nonce = response.data.nonce;
                     
                     let publicKeyOptions = response.data;
                     // Handle nested publicKey structure
@@ -92,7 +93,8 @@
                                     signature: bufferToBase64url(credential.response.signature),
                                     user_handle: credential.response.userHandle ? bufferToBase64url(credential.response.userHandle) : null,
                                     redirect_to: byebyepw_ajax.redirect_to,
-                                    csrf_token: csrfToken
+                                    csrf_token: csrfToken,
+                                    nonce: nonce
                                 },
                                 success: function(response) {
                                     if (response.success) {
@@ -159,8 +161,9 @@
                         return;
                     }
                     
-                    // Use CSRF token from challenge response
+                    // Use security tokens from challenge response
                     const csrfToken = challengeResponse.data.csrf_token;
+                    const nonce = challengeResponse.data.nonce;
                     
                     // Now attempt recovery code authentication
                     $.ajax({
@@ -171,7 +174,8 @@
                             username: username,
                             recovery_code: recovery_code,
                             redirect_to: byebyepw_ajax.redirect_to,
-                            csrf_token: csrfToken
+                            csrf_token: csrfToken,
+                            nonce: nonce
                         },
                         success: function(response) {
                             if (response.success) {

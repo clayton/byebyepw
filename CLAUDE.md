@@ -76,3 +76,4 @@ The plugin uses `byebyepw` as its text domain for internationalization. All tran
 __('Text', 'byebyepw')
 _e('Text', 'byebyepw')
 ```
+- remember to always make a zip file named byebyepw.zip so it works for wordpress upload naming conventions

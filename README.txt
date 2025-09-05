@@ -4,7 +4,7 @@ Donate link: https://claytonlz.com/
 Tags: passwordless, webauthn, passkeys, authentication, security
 Requires at least: 5.0
 Tested up to: 6.8
-Stable tag: 1.1.2
+Stable tag: 1.2.0
 Requires PHP: 7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -81,6 +81,17 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 * Enhancement: Strengthen session security with secure CSRF token management
 * Enhancement: Improve error message consistency across all authentication flows
 
+= 1.2.0 =
+* Compliance: Complete WordPress.org plugin directory compliance overhaul
+* Security: Enhanced nonce verification for all AJAX endpoints to meet WordPress.org standards
+* Security: Fixed output escaping throughout WebAuthn library with WordPress-specific modifications
+* Security: Improved input sanitization and validation across all user-facing forms
+* Security: Removed discouraged PHP functions (unlink, curl) in favor of WordPress equivalents
+* Enhancement: Updated text domain to match WordPress.org requirements (bye-bye-passwords)
+* Enhancement: Cleaned up plugin structure removing development files from distribution
+* Documentation: Added comprehensive phpcs ignore comments for legitimate security exceptions
+* Library: Forked and customized WebAuthn library for WordPress.org compliance requirements
+
 = 1.1.1 =
 * Fix: Resolve authentication failure with platform authenticators (Touch ID, Face ID, Windows Hello)
 * Fix: Improve sign count validation to be more lenient with authenticators that don't increment counters
@@ -110,6 +121,9 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 * GPL v2 licensing for WordPress.org compatibility
 
 == Upgrade Notice ==
+
+= 1.2.0 =
+WordPress.org compliance update: Enhanced security, improved nonce verification, and plugin directory requirements. Recommended for all users.
 
 = 1.1.2 =
 Security update: Fixes username enumeration, timing attacks, and adds CSRF protection. Recommended upgrade.
