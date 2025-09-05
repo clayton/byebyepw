@@ -1,0 +1,123 @@
+/**
+ * Public-facing stylesheet for Bye Bye Passwords
+ * Login page styles
+ */
+
+/* Passkey login button */
+.byebyepw-passkey-button {
+    display: block;
+    width: 100%;
+    margin: 20px 0;
+    padding: 12px;
+    background: #2271b1;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.2s;
+}
+
+.byebyepw-passkey-button:hover {
+    background: #135e96;
+}
+
+.byebyepw-passkey-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Divider between passkey and password login */
+.byebyepw-login-divider {
+    margin: 20px 0;
+    text-align: center;
+    position: relative;
+}
+
+.byebyepw-login-divider:before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #dcdcde;
+}
+
+.byebyepw-login-divider span {
+    background: #fff;
+    padding: 0 10px;
+    position: relative;
+    color: #50575e;
+    font-size: 13px;
+}
+
+/* Toggle link for password fields */
+.byebyepw-toggle-password {
+    display: block;
+    margin-top: 10px;
+    color: #2271b1;
+    text-decoration: none;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.byebyepw-toggle-password:hover {
+    color: #135e96;
+    text-decoration: underline;
+}
+
+/* Error and success messages */
+.byebyepw-message {
+    margin: 10px 0;
+    padding: 10px;
+    border-left: 4px solid;
+    background: #fff;
+}
+
+.byebyepw-message.error {
+    border-color: #d63638;
+    background: #fcf0f1;
+    color: #d63638;
+}
+
+.byebyepw-message.success {
+    border-color: #00a32a;
+    background: #f0f8ff;
+    color: #00a32a;
+}
+
+/* Loading spinner */
+.byebyepw-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #2271b1;
+    border-radius: 50%;
+    animation: byebyepw-spin 1s linear infinite;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+@keyframes byebyepw-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Hidden elements */
+.byebyepw-hidden {
+    display: none !important;
+}
+
+/* Password fields container */
+#byebyepw-password-fields {
+    transition: opacity 0.3s;
+}
+
+#byebyepw-password-fields.byebyepw-hidden {
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+}
