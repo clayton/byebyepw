@@ -3,7 +3,7 @@
 /**
  * The public-facing functionality of the plugin.
  *
- * @link       https://labountylabs.com
+ * @link       https://claytonlz.com
  * @since      1.0.0
  *
  * @package    Byebyepw
@@ -18,7 +18,7 @@
  *
  * @package    Byebyepw
  * @subpackage Byebyepw/public
- * @author     Clayton <clayton@labountylabs.com>
+ * @author     Clayton <clayton@claytonlz.com>
  */
 class Byebyepw_Public {
 

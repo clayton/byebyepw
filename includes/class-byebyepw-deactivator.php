@@ -3,7 +3,7 @@
 /**
  * Fired during plugin deactivation
  *
- * @link       https://labountylabs.com
+ * @link       https://claytonlz.com
  * @since      1.0.0
  *
  * @package    Byebyepw
@@ -18,7 +18,7 @@
  * @since      1.0.0
  * @package    Byebyepw
  * @subpackage Byebyepw/includes
- * @author     Clayton <clayton@labountylabs.com>
+ * @author     Clayton <clayton@claytonlz.com>
  */
 class Byebyepw_Deactivator {
 

@@ -1,6 +1,6 @@
 === Bye Bye Passwords ===
 Contributors: claytonlz
-Donate link: https://labountylabs.com/
+Donate link: https://claytonlz.com/
 Tags: passwordless, webauthn, passkeys, authentication, security, login, fido2, biometric
 Requires at least: 5.0
 Tested up to: 6.4

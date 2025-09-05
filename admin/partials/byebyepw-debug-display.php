@@ -2,7 +2,7 @@
 /**
  * Debug tools admin page
  *
- * @link       https://labountylabs.com
+ * @link       https://claytonlz.com
  * @since      1.0.0
  *
  * @package    Byebyepw

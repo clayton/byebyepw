@@ -2,7 +2,7 @@
 /**
  * Admin area view for managing passkeys
  *
- * @link       https://labountylabs.com
+ * @link       https://claytonlz.com
  * @since      1.0.0
  *
  * @package    Byebyepw

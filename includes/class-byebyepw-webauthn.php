@@ -3,7 +3,7 @@
 /**
  * WebAuthn functionality handler
  *
- * @link       https://labountylabs.com
+ * @link       https://claytonlz.com
  * @since      1.0.0
  *
  * @package    Byebyepw
@@ -32,7 +32,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn-r0/src/Attes
  * @since      1.0.0
  * @package    Byebyepw
  * @subpackage Byebyepw/includes
- * @author     Clayton <clayton@labountylabs.com>
+ * @author     Clayton <clayton@claytonlz.com>
  */
 class Byebyepw_WebAuthn {
 

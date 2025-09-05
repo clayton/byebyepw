@@ -8,7 +8,7 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link              https://labountylabs.com
+ * @link              https://claytonlz.com
  * @since             1.0.0
  * @package           Byebyepw
  *
@@ -18,7 +18,7 @@
  * Description:       Passwordless login with WebAuthN and Passkeys for WordPress
  * Version:           1.1.0
  * Author:            Clayton
- * Author URI:        https://labountylabs.com/
+ * Author URI:        https://claytonlz.com/
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       byebyepw

@@ -6,7 +6,7 @@
  * A class definition that includes attributes and functions used across both the
  * public-facing side of the site and the admin area.
  *
- * @link       https://labountylabs.com
+ * @link       https://claytonlz.com
  * @since      1.0.0
  *
  * @package    Byebyepw
@@ -25,7 +25,7 @@
  * @since      1.0.0
  * @package    Byebyepw
  * @subpackage Byebyepw/includes
- * @author     Clayton <clayton@labountylabs.com>
+ * @author     Clayton <clayton@claytonlz.com>
  */
 class Byebyepw {
 
