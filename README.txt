@@ -4,7 +4,7 @@ Donate link: https://claytonlz.com/
 Tags: passwordless, webauthn, passkeys, authentication, security, login, fido2, biometric
 Requires at least: 5.0
 Tested up to: 6.4
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 Requires PHP: 7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -74,6 +74,13 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 
 == Changelog ==
 
+= 1.1.2 =
+* Security: Fix username enumeration vulnerability by standardizing authentication error messages
+* Security: Implement constant-time comparison for recovery code verification to prevent timing attacks  
+* Security: Add comprehensive CSRF protection for all public authentication endpoints
+* Enhancement: Strengthen session security with secure CSRF token management
+* Enhancement: Improve error message consistency across all authentication flows
+
 = 1.1.1 =
 * Fix: Resolve authentication failure with platform authenticators (Touch ID, Face ID, Windows Hello)
 * Fix: Improve sign count validation to be more lenient with authenticators that don't increment counters
@@ -103,6 +110,9 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 * GPL v2 licensing for WordPress.org compatibility
 
 == Upgrade Notice ==
+
+= 1.1.2 =
+Security update: Fixes username enumeration, timing attacks, and adds CSRF protection. Recommended upgrade.
 
 = 1.1.1 =
 Recommended update: Fixes authentication issues with platform authenticators while maintaining security.

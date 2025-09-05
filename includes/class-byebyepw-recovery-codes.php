@@ -69,7 +69,7 @@ class Byebyepw_Recovery_Codes {
 	}
 
 	/**
-	 * Verify a recovery code
+	 * Verify a recovery code using constant-time comparison
 	 *
 	 * @param int    $user_id User ID
 	 * @param string $code    Recovery code to verify
@@ -85,22 +85,34 @@ class Byebyepw_Recovery_Codes {
 			$user_id
 		) );
 
+		$found_match = false;
+		$matched_id = null;
+		
+		// Check ALL codes to prevent timing attacks
 		foreach ( $stored_codes as $stored ) {
 			if ( wp_check_password( $code, $stored->code_hash ) ) {
-				// Mark code as used
-				$wpdb->update(
-					$table,
-					array(
-						'used' => 1,
-						'used_at' => current_time( 'mysql' ),
-					),
-					array( 'id' => $stored->id )
-				);
-				return true;
+				$found_match = true;
+				$matched_id = $stored->id;
+				// Continue checking all codes instead of returning early
 			}
 		}
+		
+		// Only mark as used if we found a match
+		if ( $found_match && $matched_id ) {
+			$wpdb->update(
+				$table,
+				array(
+					'used' => 1,
+					'used_at' => current_time( 'mysql' ),
+				),
+				array( 'id' => $matched_id )
+			);
+		}
+		
+		// Add small artificial delay to normalize timing
+		usleep( mt_rand( 10000, 50000 ) ); // 10-50ms random delay
 
-		return false;
+		return $found_match;
 	}
 
 	/**

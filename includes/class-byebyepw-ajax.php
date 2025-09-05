@@ -46,6 +46,54 @@ class Byebyepw_Ajax {
 	}
 	
 	/**
+	 * Generate CSRF token for public endpoints
+	 *
+	 * @return string CSRF token
+	 */
+	private function generate_csrf_token() {
+		if ( ! session_id() ) {
+			session_start();
+		}
+		
+		// Generate token if not exists or expired
+		if ( ! isset( $_SESSION['byebyepw_csrf_token'] ) || 
+			 ! isset( $_SESSION['byebyepw_csrf_expires'] ) ||
+			 $_SESSION['byebyepw_csrf_expires'] < time() ) {
+			
+			$_SESSION['byebyepw_csrf_token'] = bin2hex( random_bytes( 16 ) );
+			$_SESSION['byebyepw_csrf_expires'] = time() + 1800; // 30 minutes
+		}
+		
+		return $_SESSION['byebyepw_csrf_token'];
+	}
+	
+	/**
+	 * Validate CSRF token for public endpoints
+	 *
+	 * @param string $token Token to validate
+	 * @return bool True if valid
+	 */
+	private function validate_csrf_token( $token ) {
+		if ( ! session_id() ) {
+			session_start();
+		}
+		
+		if ( ! isset( $_SESSION['byebyepw_csrf_token'] ) || 
+			 ! isset( $_SESSION['byebyepw_csrf_expires'] ) ) {
+			return false;
+		}
+		
+		// Check expiration
+		if ( $_SESSION['byebyepw_csrf_expires'] < time() ) {
+			unset( $_SESSION['byebyepw_csrf_token'], $_SESSION['byebyepw_csrf_expires'] );
+			return false;
+		}
+		
+		// Use hash_equals for constant-time comparison
+		return hash_equals( $_SESSION['byebyepw_csrf_token'], $token );
+	}
+
+	/**
 	 * Check rate limiting for authentication endpoints
 	 *
 	 * @param string $action The action being rate limited
@@ -203,6 +251,9 @@ class Byebyepw_Ajax {
 			wp_send_json_error( $result->get_error_message() );
 		}
 
+		// Add CSRF token to challenge response for subsequent authentication
+		$result->csrf_token = $this->generate_csrf_token();
+
 		wp_send_json_success( $result );
 	}
 
@@ -220,6 +271,12 @@ class Byebyepw_Ajax {
 		// Rate limiting - 5 authentication attempts per 5 minutes
 		if ( $this->is_rate_limited( 'auth_attempt', 5, 300 ) ) {
 			wp_send_json_error( 'Too many authentication attempts. Please try again later.' );
+		}
+		
+		// CSRF protection for public endpoint
+		$csrf_token = sanitize_text_field( $_POST['csrf_token'] ?? '' );
+		if ( ! $this->validate_csrf_token( $csrf_token ) ) {
+			wp_send_json_error( 'Security validation failed. Please refresh and try again.' );
 		}
 		
 		// Start session if not already started
@@ -271,6 +328,12 @@ class Byebyepw_Ajax {
 		// Rate limiting - 5 authentication attempts per 5 minutes
 		if ( $this->is_rate_limited( 'auth_attempt', 5, 300 ) ) {
 			wp_send_json_error( 'Too many authentication attempts. Please try again later.' );
+		}
+		
+		// CSRF protection for public endpoint
+		$csrf_token = sanitize_text_field( $_POST['csrf_token'] ?? '' );
+		if ( ! $this->validate_csrf_token( $csrf_token ) ) {
+			wp_send_json_error( 'Security validation failed. Please refresh and try again.' );
 		}
 		
 		// Start session if not already started
@@ -387,6 +450,12 @@ class Byebyepw_Ajax {
 			wp_send_json_error( 'Too many recovery code attempts. Please try again later.' );
 		}
 		
+		// CSRF protection for public endpoint  
+		$csrf_token = sanitize_text_field( $_POST['csrf_token'] ?? '' );
+		if ( ! $this->validate_csrf_token( $csrf_token ) ) {
+			wp_send_json_error( 'Security validation failed. Please refresh and try again.' );
+		}
+		
 		$username = sanitize_text_field( $_POST['username'] ?? '' );
 		$recovery_code = sanitize_text_field( $_POST['recovery_code'] ?? '' );
 
@@ -396,12 +465,13 @@ class Byebyepw_Ajax {
 
 		$user = get_user_by( 'login', $username );
 		if ( ! $user ) {
-			wp_send_json_error( 'Invalid credentials' );
+			// Use same error message to prevent username enumeration
+			wp_send_json_error( 'Authentication failed' );
 		}
 
 		// Verify recovery code
 		if ( ! $this->recovery_codes->verify_recovery_code( $user->ID, $recovery_code ) ) {
-			wp_send_json_error( 'Invalid recovery code' );
+			wp_send_json_error( 'Authentication failed' );
 		}
 
 		// Log the user in

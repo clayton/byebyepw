@@ -53,6 +53,9 @@
                         return;
                     }
                     
+                    // Store CSRF token for authentication request
+                    const csrfToken = response.data.csrf_token;
+                    
                     let publicKeyOptions = response.data;
                     // Handle nested publicKey structure
                     if (publicKeyOptions.publicKey) {
@@ -88,7 +91,8 @@
                                     authenticator_data: bufferToBase64url(credential.response.authenticatorData),
                                     signature: bufferToBase64url(credential.response.signature),
                                     user_handle: credential.response.userHandle ? bufferToBase64url(credential.response.userHandle) : null,
-                                    redirect_to: byebyepw_ajax.redirect_to
+                                    redirect_to: byebyepw_ajax.redirect_to,
+                                    csrf_token: csrfToken
                                 },
                                 success: function(response) {
                                     if (response.success) {
@@ -141,21 +145,45 @@
                 return;
             }
             
+            // First get a CSRF token by requesting a challenge (but ignore the challenge)
             $.ajax({
                 url: byebyepw_ajax.ajax_url,
                 method: 'POST',
                 data: {
-                    action: 'byebyepw_authenticate_recovery_code',
-                    username: username,
-                    recovery_code: recovery_code,
-                    redirect_to: byebyepw_ajax.redirect_to
+                    action: 'byebyepw_get_authentication_challenge',
+                    username: username
                 },
-                success: function(response) {
-                    if (response.success) {
-                        window.location.href = response.data.redirect;
-                    } else {
-                        alert('Invalid recovery code');
+                success: function(challengeResponse) {
+                    if (!challengeResponse.success) {
+                        alert('Authentication failed');
+                        return;
                     }
+                    
+                    // Use CSRF token from challenge response
+                    const csrfToken = challengeResponse.data.csrf_token;
+                    
+                    // Now attempt recovery code authentication
+                    $.ajax({
+                        url: byebyepw_ajax.ajax_url,
+                        method: 'POST',
+                        data: {
+                            action: 'byebyepw_authenticate_recovery_code',
+                            username: username,
+                            recovery_code: recovery_code,
+                            redirect_to: byebyepw_ajax.redirect_to,
+                            csrf_token: csrfToken
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                window.location.href = response.data.redirect;
+                            } else {
+                                alert('Authentication failed');
+                            }
+                        },
+                        error: function() {
+                            alert('Authentication failed');
+                        }
+                    });
                 },
                 error: function() {
                     alert('Authentication failed');
