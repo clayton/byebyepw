@@ -4,7 +4,7 @@ Donate link: https://claytonlz.com/
 Tags: passwordless, webauthn, passkeys, authentication, security, login, fido2, biometric
 Requires at least: 5.0
 Tested up to: 6.4
-Stable tag: 1.0.0
+Stable tag: 1.1.1
 Requires PHP: 7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -74,6 +74,22 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 
 == Changelog ==
 
+= 1.1.1 =
+* Fix: Resolve authentication failure with platform authenticators (Touch ID, Face ID, Windows Hello)
+* Fix: Improve sign count validation to be more lenient with authenticators that don't increment counters
+* Security: Maintain protection against cloned authenticators while allowing normal platform authenticator operation
+* Improved: Enhanced logging for sign count validation debugging
+
+= 1.1.0 =
+* Security: Critical security updates - Fix session hijacking and race conditions
+* Security: Strengthen challenge management to prevent authentication bypass  
+* Security: Re-enable sign count validation to detect cloned authenticators
+* Security: Add rate limiting to authentication endpoints (10 challenges/5min, 5 auth attempts/5min, 3 recovery codes/10min)
+* Enhancement: Implement secure session handling with proper timeout and regeneration
+* Enhancement: Replace predictable transient keys with secure UUIDs
+* Enhancement: Add comprehensive challenge validation and immediate invalidation
+* Update: Domain references changed from labountylabs.com to claytonlz.com
+
 = 1.0.0 =
 * Initial release
 * Core WebAuthn/Passkeys authentication functionality
@@ -87,6 +103,12 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 * GPL v2 licensing for WordPress.org compatibility
 
 == Upgrade Notice ==
+
+= 1.1.1 =
+Recommended update: Fixes authentication issues with platform authenticators while maintaining security.
+
+= 1.1.0 =
+CRITICAL SECURITY UPDATE: Fixes multiple high-risk vulnerabilities. Immediate upgrade recommended.
 
 = 1.0.0 =
 Initial release of Bye Bye Passwords - Enable passwordless authentication for WordPress using WebAuthn/Passkeys technology.

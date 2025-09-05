@@ -67,7 +67,7 @@ class Byebyepw_Activator {
 		dbDelta($sql_recovery);
 
 		// Store database version for future upgrades
-		add_option('byebyepw_db_version', '1.1.0');
+		add_option('byebyepw_db_version', '1.1.1');
 		
 		// Add default plugin settings
 		add_option('byebyepw_settings', array(
