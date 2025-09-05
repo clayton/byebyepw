@@ -46,3 +46,7 @@ coverage/
 .claude/
 local-config.php
 *.local.php
+
+# Documentation (development only)
+TESTING-GUIDE.md
+IMPLEMENTATION_GUIDE.md
