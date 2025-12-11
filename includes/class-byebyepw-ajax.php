@@ -165,22 +165,20 @@ class Byebyepw_Ajax {
 	 * Register AJAX handlers
 	 */
 	public function register_ajax_handlers() {
-		// Admin AJAX handlers (logged in users)
+		// Admin AJAX handlers (logged in users only)
 		add_action( 'wp_ajax_byebyepw_get_registration_challenge', array( $this, 'handle_get_registration_challenge' ) );
 		add_action( 'wp_ajax_byebyepw_register_passkey', array( $this, 'handle_register_passkey' ) );
 		add_action( 'wp_ajax_byebyepw_delete_passkey', array( $this, 'handle_delete_passkey' ) );
 		add_action( 'wp_ajax_byebyepw_generate_recovery_codes', array( $this, 'handle_generate_recovery_codes' ) );
-		
-		// Public AJAX handlers (for login page)
+
+		// Public AJAX handlers (for login page - unauthenticated users)
 		add_action( 'wp_ajax_nopriv_byebyepw_get_authentication_challenge', array( $this, 'handle_get_authentication_challenge' ) );
-		add_action( 'wp_ajax_nopriv_byebyepw_get_authentication_options', array( $this, 'handle_get_authentication_options' ) );
 		add_action( 'wp_ajax_nopriv_byebyepw_authenticate_passkey', array( $this, 'handle_authenticate_passkey' ) );
-		add_action( 'wp_ajax_nopriv_byebyepw_authenticate', array( $this, 'handle_authenticate' ) );
 		add_action( 'wp_ajax_nopriv_byebyepw_authenticate_recovery_code', array( $this, 'handle_authenticate_recovery_code' ) );
-		add_action( 'wp_ajax_nopriv_byebyepw_verify_recovery_code', array( $this, 'handle_authenticate_recovery_code' ) );
-		// Also allow logged in users to use these
-		add_action( 'wp_ajax_byebyepw_get_authentication_options', array( $this, 'handle_get_authentication_options' ) );
-		add_action( 'wp_ajax_byebyepw_authenticate', array( $this, 'handle_authenticate' ) );
+
+		// Allow logged in users to also use authentication endpoints (for re-authentication scenarios)
+		add_action( 'wp_ajax_byebyepw_get_authentication_challenge', array( $this, 'handle_get_authentication_challenge' ) );
+		add_action( 'wp_ajax_byebyepw_authenticate_passkey', array( $this, 'handle_authenticate_passkey' ) );
 	}
 
 	/**
@@ -290,13 +288,6 @@ class Byebyepw_Ajax {
 	}
 
 	/**
-	 * Handle get authentication options request (alias for get_authentication_challenge)
-	 */
-	public function handle_get_authentication_options() {
-		$this->handle_get_authentication_challenge();
-	}
-
-	/**
 	 * Handle authenticate passkey request
 	 */
 	public function handle_authenticate_passkey() {
@@ -343,6 +334,11 @@ class Byebyepw_Ajax {
 			wp_send_json_error( $user_id->get_error_message() );
 		}
 
+		// Regenerate session ID for security after successful authentication
+		if ( session_id() ) {
+			session_regenerate_id( true );
+		}
+
 		// Log the user in
 		wp_clear_auth_cookie();
 		wp_set_current_user( $user_id );
@@ -350,80 +346,11 @@ class Byebyepw_Ajax {
 
 		// Get redirect URL
 		$redirect_to = esc_url_raw( wp_unslash( $_POST['redirect_to'] ?? admin_url() ) );
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Using WordPress core filter
 		$redirect_to = apply_filters( 'login_redirect', $redirect_to, $redirect_to, get_user_by( 'id', $user_id ) );
 
 		wp_send_json_success( array(
 			'redirect' => $redirect_to,
-			'user_id' => $user_id
-		) );
-	}
-
-	/**
-	 * Handle authenticate request (alias for handle_authenticate_passkey)
-	 */
-	public function handle_authenticate() {
-		// Rate limiting - 5 authentication attempts per 5 minutes
-		if ( $this->is_rate_limited( 'auth_attempt', 5, 300 ) ) {
-			wp_send_json_error( 'Too many authentication attempts. Please try again later.' );
-		}
-		
-		// Verify WordPress nonce first (required by WordPress.org)
-		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), 'byebyepw_security' ) ) {
-			wp_send_json_error( 'Security validation failed. Please refresh and try again.' );
-		}
-		
-		// Additional CSRF protection for public endpoint
-		$csrf_token = sanitize_text_field( wp_unslash( $_POST['csrf_token'] ?? '' ) );
-		if ( ! $this->validate_csrf_token( $csrf_token ) ) {
-			wp_send_json_error( 'Security validation failed. Please refresh and try again.' );
-		}
-		
-		// Start session if not already started
-		if ( ! session_id() ) {
-			session_start();
-		}
-
-		$this->debug_log( 'handle_authenticate called' );
-
-		$credential_id = sanitize_text_field( wp_unslash( $_POST['credential_id'] ?? '' ) );
-		$client_data_json = sanitize_text_field( wp_unslash( $_POST['client_data_json'] ?? '' ) );
-		$authenticator_data = sanitize_text_field( wp_unslash( $_POST['authenticator_data'] ?? '' ) );
-		$signature = sanitize_text_field( wp_unslash( $_POST['signature'] ?? '' ) );
-		$user_handle = sanitize_text_field( wp_unslash( $_POST['user_handle'] ?? '' ) );
-
-		$this->debug_log( 'Authentication data received - credential_id: ' . substr( $credential_id, 0, 20 ) . '...' );
-
-		if ( empty( $credential_id ) || empty( $client_data_json ) || empty( $authenticator_data ) || empty( $signature ) ) {
-			$this->debug_log( 'Missing required data in authentication' );
-			wp_send_json_error( 'Missing required data' );
-		}
-
-		$user_id = $this->webauthn->process_authentication( 
-			$credential_id, 
-			$client_data_json, 
-			$authenticator_data, 
-			$signature, 
-			$user_handle 
-		);
-
-		if ( is_wp_error( $user_id ) ) {
-			$this->debug_log( 'Authentication failed - ' . $user_id->get_error_message() );
-			wp_send_json_error( $user_id->get_error_message() );
-		}
-
-		$this->debug_log( 'Authentication successful for user ID: ' . $user_id );
-
-		// Log the user in
-		wp_clear_auth_cookie();
-		wp_set_current_user( $user_id );
-		wp_set_auth_cookie( $user_id, true );
-
-		// Get redirect URL
-		$redirect_to = esc_url_raw( wp_unslash( $_POST['redirect_to'] ?? admin_url() ) );
-		$redirect_to = apply_filters( 'login_redirect', $redirect_to, $redirect_to, get_user_by( 'id', $user_id ) );
-
-		wp_send_json_success( array(
-			'redirect_url' => $redirect_to,
 			'user_id' => $user_id
 		) );
 	}
@@ -521,6 +448,11 @@ class Byebyepw_Ajax {
 			wp_send_json_error( 'Authentication failed' );
 		}
 
+		// Regenerate session ID for security after successful authentication
+		if ( session_id() ) {
+			session_regenerate_id( true );
+		}
+
 		// Log the user in
 		wp_clear_auth_cookie();
 		wp_set_current_user( $user->ID );
@@ -528,6 +460,7 @@ class Byebyepw_Ajax {
 
 		// Get redirect URL
 		$redirect_to = esc_url_raw( wp_unslash( $_POST['redirect_to'] ?? admin_url() ) );
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Using WordPress core filter
 		$redirect_to = apply_filters( 'login_redirect', $redirect_to, $redirect_to, $user );
 
 		wp_send_json_success( array(

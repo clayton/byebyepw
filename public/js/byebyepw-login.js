@@ -3,8 +3,22 @@
  */
 (function($) {
     'use strict';
-    
+
     $(document).ready(function() {
+        // Check WebAuthn support
+        const isWebAuthnSupported = window.PublicKeyCredential !== undefined;
+
+        if (!isWebAuthnSupported) {
+            // Hide passkey button and show unsupported message
+            $('#byebyepw-authenticate-passkey').hide();
+            $('#byebyepw-login-section').prepend(
+                '<div class="byebyepw-browser-warning" style="background: #fff3cd; border: 1px solid #ffc107; padding: 10px; margin-bottom: 10px; border-radius: 4px;">' +
+                '<strong>Browser Not Supported:</strong> Your browser does not support passkey authentication. ' +
+                'Please use a modern browser (Chrome, Firefox, Safari, Edge) or use a recovery code to sign in.' +
+                '</div>'
+            );
+        }
+
         // WebAuthn helper functions
         const base64urlToBuffer = function(base64url) {
             const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
@@ -44,7 +58,8 @@
                 method: 'POST',
                 data: {
                     action: 'byebyepw_get_authentication_challenge',
-                    username: username
+                    username: username,
+                    nonce: byebyepw_ajax.nonce
                 },
                 success: function(response) {
                     if (!response.success) {
@@ -153,7 +168,8 @@
                 method: 'POST',
                 data: {
                     action: 'byebyepw_get_authentication_challenge',
-                    username: username
+                    username: username,
+                    nonce: byebyepw_ajax.nonce
                 },
                 success: function(challengeResponse) {
                     if (!challengeResponse.success) {

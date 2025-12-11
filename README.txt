@@ -3,8 +3,8 @@ Contributors: claytonlz
 Donate link: https://claytonlz.com/
 Tags: passwordless, webauthn, passkeys, authentication, security
 Requires at least: 5.0
-Tested up to: 6.8
-Stable tag: 1.2.0
+Tested up to: 6.9
+Stable tag: 1.2.1
 Requires PHP: 7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -73,6 +73,20 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 2. This is the second screen shot
 
 == Changelog ==
+
+= 1.2.1 =
+* Fix: Text domain corrected to match plugin slug (byebyepw)
+* Fix: Property name bug in user profile display
+* Security: Session regeneration after successful authentication
+* Security: HTTPS enforcement check with admin notice
+* Security: Browser WebAuthn support detection with user feedback
+* Enhancement: Complete uninstall cleanup (tables, options, transients)
+* Enhancement: Deactivator cleanup for transients
+* Enhancement: Dependency injection in Admin class
+* Enhancement: Removed duplicate AJAX handler registrations
+* Enhancement: Increased recovery code entropy to 64-bit (4 segments)
+* Compliance: Fixed global variable and function name prefixes
+* Compliance: Updated to WordPress 6.9 compatibility
 
 = 1.1.2 =
 * Security: Fix username enumeration vulnerability by standardizing authentication error messages

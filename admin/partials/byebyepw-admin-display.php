@@ -10,44 +10,40 @@
  */
 
 // Get current user
-$current_user = wp_get_current_user();
-$user_id = $current_user->ID;
+$byebyepw_current_user = wp_get_current_user();
+$byebyepw_user_id = $byebyepw_current_user->ID;
 
 // Get existing passkeys
 global $wpdb;
-$table_name = $wpdb->prefix . 'byebyepw_passkeys';
 
 // Check cache first for passkeys
-$passkeys_cache_key = 'byebyepw_passkeys_' . $user_id;
-$passkeys = wp_cache_get( $passkeys_cache_key );
+$byebyepw_passkeys_cache_key = 'byebyepw_passkeys_' . $byebyepw_user_id;
+$byebyepw_passkeys = wp_cache_get( $byebyepw_passkeys_cache_key );
 
-if ( false === $passkeys ) {
-	// Table name is safely constructed with wpdb prefix
-	$passkeys = $wpdb->get_results( $wpdb->prepare(
+if ( false === $byebyepw_passkeys ) {
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table query with caching
+	$byebyepw_passkeys = $wpdb->get_results( $wpdb->prepare(
 		"SELECT * FROM {$wpdb->prefix}byebyepw_passkeys WHERE user_id = %d ORDER BY created_at DESC",
-		$user_id
+		$byebyepw_user_id
 	) );
-	
+
 	// Cache for 5 minutes
-	wp_cache_set( $passkeys_cache_key, $passkeys, '', 300 );
+	wp_cache_set( $byebyepw_passkeys_cache_key, $byebyepw_passkeys, '', 300 );
 }
 
-// Get recovery codes
-$recovery_codes_table = $wpdb->prefix . 'byebyepw_recovery_codes';
-
 // Check cache first for recovery codes count
-$recovery_cache_key = 'byebyepw_recovery_codes_count_' . $user_id;
-$has_recovery_codes = wp_cache_get( $recovery_cache_key );
+$byebyepw_recovery_cache_key = 'byebyepw_recovery_codes_count_' . $byebyepw_user_id;
+$byebyepw_has_recovery_codes = wp_cache_get( $byebyepw_recovery_cache_key );
 
-if ( false === $has_recovery_codes ) {
-	// Table name is safely constructed with wpdb prefix
-	$has_recovery_codes = $wpdb->get_var( $wpdb->prepare(
+if ( false === $byebyepw_has_recovery_codes ) {
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table query with caching
+	$byebyepw_has_recovery_codes = $wpdb->get_var( $wpdb->prepare(
 		"SELECT COUNT(*) FROM {$wpdb->prefix}byebyepw_recovery_codes WHERE user_id = %d AND used = 0",
-		$user_id
+		$byebyepw_user_id
 	) );
-	
+
 	// Cache for 5 minutes
-	wp_cache_set( $recovery_cache_key, $has_recovery_codes, '', 300 );
+	wp_cache_set( $byebyepw_recovery_cache_key, $byebyepw_has_recovery_codes, '', 300 );
 }
 ?>
 
@@ -59,7 +55,7 @@ if ( false === $has_recovery_codes ) {
 		<div class="card">
 			<h2><?php esc_html_e( 'Your Passkeys', 'byebyepw' ); ?></h2>
 			
-			<?php if ( empty( $passkeys ) ) : ?>
+			<?php if ( empty( $byebyepw_passkeys ) ) : ?>
 				<p><?php esc_html_e( 'You have not registered any passkeys yet.', 'byebyepw' ); ?></p>
 			<?php else : ?>
 				<table class="wp-list-table widefat fixed striped">
@@ -72,21 +68,21 @@ if ( false === $has_recovery_codes ) {
 						</tr>
 					</thead>
 					<tbody>
-						<?php foreach ( $passkeys as $passkey ) : ?>
+						<?php foreach ( $byebyepw_passkeys as $byebyepw_passkey ) : ?>
 							<tr>
-								<td><?php echo esc_html( $passkey->name ); ?></td>
-								<td><?php echo esc_html( date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $passkey->created_at ) ) ); ?></td>
+								<td><?php echo esc_html( $byebyepw_passkey->name ); ?></td>
+								<td><?php echo esc_html( date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $byebyepw_passkey->created_at ) ) ); ?></td>
 								<td>
-									<?php 
-									if ( $passkey->last_used ) {
-										echo esc_html( date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $passkey->last_used ) ) );
+									<?php
+									if ( $byebyepw_passkey->last_used ) {
+										echo esc_html( date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $byebyepw_passkey->last_used ) ) );
 									} else {
 										esc_html_e( 'Never', 'byebyepw' );
 									}
 									?>
 								</td>
 								<td>
-									<button class="button button-small byebyepw-delete-passkey" data-passkey-id="<?php echo esc_attr( $passkey->id ); ?>">
+									<button class="button button-small byebyepw-delete-passkey" data-passkey-id="<?php echo esc_attr( $byebyepw_passkey->id ); ?>">
 										<?php esc_html_e( 'Delete', 'byebyepw' ); ?>
 									</button>
 								</td>
@@ -107,11 +103,11 @@ if ( false === $has_recovery_codes ) {
 		<div class="card">
 			<h2><?php esc_html_e( 'Recovery Codes', 'byebyepw' ); ?></h2>
 			
-			<?php if ( $has_recovery_codes ) : ?>
+			<?php if ( $byebyepw_has_recovery_codes ) : ?>
 				<p><?php esc_html_e( 'You have active recovery codes. Keep them safe!', 'byebyepw' ); ?></p>
 				<p><?php
 					// translators: %d is the number of remaining recovery codes
-					echo sprintf( esc_html__( 'Active codes remaining: %d', 'byebyepw' ), intval( $has_recovery_codes ) ); ?></p>
+					echo sprintf( esc_html__( 'Active codes remaining: %d', 'byebyepw' ), intval( $byebyepw_has_recovery_codes ) ); ?></p>
 			<?php else : ?>
 				<p><?php esc_html_e( 'You have no active recovery codes.', 'byebyepw' ); ?></p>
 			<?php endif; ?>

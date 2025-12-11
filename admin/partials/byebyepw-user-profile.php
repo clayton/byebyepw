@@ -20,10 +20,10 @@
                 <p><?php esc_html_e( 'No passkeys registered.', 'byebyepw' ); ?></p>
             <?php else : ?>
                 <ul>
-                    <?php foreach ( $credentials as $credential ) : ?>
+                    <?php foreach ( $credentials as $byebyepw_credential ) : ?>
                         <li>
-                            <?php echo esc_html( $credential->friendly_name ?: __( 'Unnamed Passkey', 'byebyepw' ) ); ?>
-                            - <?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $credential->created_at ) ) ); ?>
+                            <?php echo esc_html( $byebyepw_credential->name ?: __( 'Unnamed Passkey', 'byebyepw' ) ); ?>
+                            - <?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $byebyepw_credential->created_at ) ) ); ?>
                         </li>
                     <?php endforeach; ?>
                 </ul>

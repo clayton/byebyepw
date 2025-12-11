@@ -511,6 +511,7 @@ class Byebyepw_WebAuthn {
 			$sign_count = intval( $data->signCount );
 		}
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table insert for passkey storage
 		return $wpdb->insert(
 			$table,
 			array(
@@ -533,7 +534,7 @@ class Byebyepw_WebAuthn {
 		global $wpdb;
 		$table = $wpdb->prefix . 'byebyepw_passkeys';
 
-		// Table name is safely constructed with wpdb prefix
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table query, results change frequently
 		return $wpdb->get_results( $wpdb->prepare(
 			"SELECT * FROM {$wpdb->prefix}byebyepw_passkeys WHERE user_id = %d ORDER BY created_at DESC",
 			$user_id
@@ -547,7 +548,7 @@ class Byebyepw_WebAuthn {
 		global $wpdb;
 		$table = $wpdb->prefix . 'byebyepw_passkeys';
 
-		// Table name is safely constructed with wpdb prefix
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Security-sensitive credential lookup
 		return $wpdb->get_row( $wpdb->prepare(
 			"SELECT * FROM {$wpdb->prefix}byebyepw_passkeys WHERE credential_id = %s",
 			$credential_id
@@ -563,6 +564,7 @@ class Byebyepw_WebAuthn {
 
 		// If we have actual sign count from authenticator, use it
 		if ( $actual_sign_count !== null ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table update
 			return $wpdb->update(
 				$table,
 				array(
@@ -574,7 +576,7 @@ class Byebyepw_WebAuthn {
 		}
 
 		// Fallback: increment stored count by 1 (legacy behavior)
-		// Table name is safely constructed with wpdb prefix
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table query
 		$current = $wpdb->get_row( $wpdb->prepare(
 			"SELECT sign_count FROM {$wpdb->prefix}byebyepw_passkeys WHERE credential_id = %s",
 			$credential_id
@@ -584,6 +586,7 @@ class Byebyepw_WebAuthn {
 			return false;
 		}
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table update
 		return $wpdb->update(
 			$table,
 			array(
@@ -601,6 +604,7 @@ class Byebyepw_WebAuthn {
 		global $wpdb;
 		$table = $wpdb->prefix . 'byebyepw_passkeys';
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table delete
 		return $wpdb->delete(
 			$table,
 			array(
@@ -617,6 +621,7 @@ class Byebyepw_WebAuthn {
 		global $wpdb;
 		$table = $wpdb->prefix . 'byebyepw_passkeys';
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table delete
 		return $wpdb->delete(
 			$table,
 			array(

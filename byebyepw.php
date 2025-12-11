@@ -16,12 +16,12 @@
  * Plugin Name:       Bye Bye Passwords
  * Plugin URI:        https://github.com/clayton/byebyepw
  * Description:       Passwordless login with WebAuthN and Passkeys for WordPress
- * Version:           1.2.0
+ * Version:           1.2.1
  * Author:            Clayton
  * Author URI:        https://claytonlz.com/
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain:       bye-bye-passwords
+ * Text Domain:       byebyepw
  * Domain Path:       /languages
  */
 
@@ -35,13 +35,13 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'BYEBYEPW_VERSION', '1.2.0' );
+define( 'BYEBYEPW_VERSION', '1.2.1' );
 
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-byebyepw-activator.php
  */
-function activate_byebyepw() {
+function byebyepw_activate() {
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-byebyepw-activator.php';
 	Byebyepw_Activator::activate();
 }
@@ -50,13 +50,13 @@ function activate_byebyepw() {
  * The code that runs during plugin deactivation.
  * This action is documented in includes/class-byebyepw-deactivator.php
  */
-function deactivate_byebyepw() {
+function byebyepw_deactivate() {
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-byebyepw-deactivator.php';
 	Byebyepw_Deactivator::deactivate();
 }
 
-register_activation_hook( __FILE__, 'activate_byebyepw' );
-register_deactivation_hook( __FILE__, 'deactivate_byebyepw' );
+register_activation_hook( __FILE__, 'byebyepw_activate' );
+register_deactivation_hook( __FILE__, 'byebyepw_deactivate' );
 
 /**
  * The core plugin class that is used to define internationalization,
@@ -73,10 +73,10 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-byebyepw.php';
  *
  * @since    1.0.0
  */
-function run_byebyepw() {
+function byebyepw_run() {
 
 	$plugin = new Byebyepw();
 	$plugin->run();
 
 }
-run_byebyepw();
+byebyepw_run();

@@ -31,6 +31,7 @@ class Byebyepw_Recovery_Codes {
 		$table = $wpdb->prefix . 'byebyepw_recovery_codes';
 
 		// Delete existing codes
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table, cache invalidated below
 		$wpdb->delete( $table, array( 'user_id' => $user_id ) );
 
 		$codes = array();
@@ -41,6 +42,7 @@ class Byebyepw_Recovery_Codes {
 			$codes[] = $code;
 			
 			// Store hashed version in database
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table insert
 			$wpdb->insert(
 				$table,
 				array(
@@ -63,9 +65,9 @@ class Byebyepw_Recovery_Codes {
 	 * @return string Recovery code
 	 */
 	private function generate_code() {
-		// Generate a random code in format: XXXX-XXXX-XXXX
+		// Generate a random code in format: XXXX-XXXX-XXXX-XXXX (64-bit entropy)
 		$segments = array();
-		for ( $i = 0; $i < 3; $i++ ) {
+		for ( $i = 0; $i < 4; $i++ ) {
 			$segments[] = strtoupper( substr( bin2hex( random_bytes( 2 ) ), 0, 4 ) );
 		}
 		return implode( '-', $segments );
@@ -82,9 +84,8 @@ class Byebyepw_Recovery_Codes {
 		global $wpdb;
 		$table = $wpdb->prefix . 'byebyepw_recovery_codes';
 
-		// Get unused codes for this user
-		// Note: Direct database query is necessary for security-sensitive recovery code validation
-		// Table name is safely constructed with wpdb prefix
+		// Get unused codes for this user - direct query required for security-sensitive recovery code validation
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Security-sensitive, no caching for timing attack prevention
 		$stored_codes = $wpdb->get_results( $wpdb->prepare(
 			"SELECT id, code_hash FROM {$wpdb->prefix}byebyepw_recovery_codes WHERE user_id = %d AND used = 0",
 			$user_id
@@ -104,6 +105,7 @@ class Byebyepw_Recovery_Codes {
 		
 		// Only mark as used if we found a match
 		if ( $found_match && $matched_id ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table, cache invalidated below
 			$wpdb->update(
 				$table,
 				array(
@@ -138,8 +140,7 @@ class Byebyepw_Recovery_Codes {
 		$count = wp_cache_get( $cache_key );
 		
 		if ( false === $count ) {
-			// Note: Direct database query is necessary for recovery code management
-			// Table name is safely constructed with wpdb prefix
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table, result is cached
 			$count = (int) $wpdb->get_var( $wpdb->prepare(
 				"SELECT COUNT(*) FROM {$wpdb->prefix}byebyepw_recovery_codes WHERE user_id = %d AND used = 0",
 				$user_id

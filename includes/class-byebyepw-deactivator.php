@@ -23,14 +23,24 @@
 class Byebyepw_Deactivator {
 
 	/**
-	 * Short Description. (use period)
+	 * Clean up temporary data on plugin deactivation.
 	 *
-	 * Long Description.
+	 * Removes transients and clears caches but preserves user data
+	 * (passkeys, recovery codes, settings) for when the plugin is reactivated.
 	 *
 	 * @since    1.0.0
 	 */
 	public static function deactivate() {
+		global $wpdb;
 
+		// Delete all plugin transients (rate limiting, challenge data, etc.)
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk transient cleanup on deactivation
+		$wpdb->query(
+			"DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_byebyepw_%' OR option_name LIKE '_transient_timeout_byebyepw_%'"
+		);
+
+		// Clear object cache for plugin data
+		wp_cache_flush();
 	}
 
 }

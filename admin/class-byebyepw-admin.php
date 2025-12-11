@@ -41,17 +41,67 @@ class Byebyepw_Admin {
 	private $version;
 
 	/**
+	 * WebAuthn handler instance.
+	 *
+	 * @since    1.2.1
+	 * @access   private
+	 * @var      Byebyepw_WebAuthn    $webauthn    WebAuthn handler.
+	 */
+	private $webauthn;
+
+	/**
+	 * Recovery codes handler instance.
+	 *
+	 * @since    1.2.1
+	 * @access   private
+	 * @var      Byebyepw_Recovery_Codes    $recovery_codes    Recovery codes handler.
+	 */
+	private $recovery_codes;
+
+	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    1.0.0
-	 * @param      string    $plugin_name       The name of this plugin.
-	 * @param      string    $version    The version of this plugin.
+	 * @param    string                      $plugin_name       The name of this plugin.
+	 * @param    string                      $version           The version of this plugin.
+	 * @param    Byebyepw_WebAuthn|null      $webauthn          Optional WebAuthn handler.
+	 * @param    Byebyepw_Recovery_Codes|null $recovery_codes   Optional Recovery codes handler.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct( $plugin_name, $version, $webauthn = null, $recovery_codes = null ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
+		$this->webauthn = $webauthn;
+		$this->recovery_codes = $recovery_codes;
 
+	}
+
+	/**
+	 * Get the WebAuthn handler instance (lazy loading).
+	 *
+	 * @since    1.2.1
+	 * @return   Byebyepw_WebAuthn    WebAuthn handler instance.
+	 */
+	private function get_webauthn() {
+		if ( null === $this->webauthn ) {
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-byebyepw-webauthn.php';
+			$this->webauthn = new Byebyepw_WebAuthn();
+		}
+		return $this->webauthn;
+	}
+
+	/**
+	 * Get the Recovery Codes handler instance (lazy loading).
+	 *
+	 * @since    1.2.1
+	 * @return   Byebyepw_Recovery_Codes    Recovery codes handler instance.
+	 */
+	private function get_recovery_codes() {
+		if ( null === $this->recovery_codes ) {
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-byebyepw-recovery-codes.php';
+			$this->recovery_codes = new Byebyepw_Recovery_Codes();
+		}
+		return $this->recovery_codes;
 	}
 
 	/**
@@ -206,22 +256,17 @@ class Byebyepw_Admin {
 	 * Add user profile fields
 	 *
 	 * @since    1.0.0
+	 * @param    WP_User    $user    The user object being edited.
 	 */
 	public function add_user_profile_fields( $user ) {
 		if ( ! current_user_can( 'edit_user', $user->ID ) ) {
 			return;
 		}
 
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-byebyepw-webauthn.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-byebyepw-recovery-codes.php';
-		
-		$webauthn = new Byebyepw_WebAuthn();
-		$recovery_codes = new Byebyepw_Recovery_Codes();
-		
-		$credentials = $webauthn->get_user_credentials( $user->ID );
-		$has_recovery_codes = $recovery_codes->has_recovery_codes( $user->ID );
-		$remaining_codes = $recovery_codes->get_remaining_codes_count( $user->ID );
-		
+		$credentials = $this->get_webauthn()->get_user_credentials( $user->ID );
+		$has_recovery_codes = $this->get_recovery_codes()->has_recovery_codes( $user->ID );
+		$remaining_codes = $this->get_recovery_codes()->get_remaining_codes_count( $user->ID );
+
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/byebyepw-user-profile.php';
 	}
 

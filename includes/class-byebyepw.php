@@ -180,11 +180,45 @@ class Byebyepw {
 		$this->loader->add_action( 'show_user_profile', $plugin_admin, 'add_user_profile_fields' );
 		$this->loader->add_action( 'edit_user_profile', $plugin_admin, 'add_user_profile_fields' );
 
-		// Initialize AJAX handlers
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-byebyepw-ajax.php';
-		$ajax_handler = new Byebyepw_Ajax();
-		$ajax_handler->register_ajax_handlers();
+		// Add HTTPS check admin notice
+		$this->loader->add_action( 'admin_notices', $this, 'display_https_notice' );
 
+	}
+
+	/**
+	 * Display admin notice if site is not using HTTPS.
+	 *
+	 * WebAuthn requires a secure context (HTTPS) to function properly.
+	 *
+	 * @since    1.2.1
+	 */
+	public function display_https_notice() {
+		// Only show on plugin pages and only if not using HTTPS
+		if ( is_ssl() ) {
+			return;
+		}
+
+		// Only show to administrators
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		// Check if we're on a plugin page or the login page
+		$screen = get_current_screen();
+		$is_plugin_page = $screen && ( strpos( $screen->id, 'byebyepw' ) !== false || strpos( $screen->id, 'byebyepw' ) !== false );
+
+		if ( ! $is_plugin_page ) {
+			return;
+		}
+
+		?>
+		<div class="notice notice-error">
+			<p>
+				<strong><?php esc_html_e( 'Bye Bye Passwords Security Warning:', 'byebyepw' ); ?></strong>
+				<?php esc_html_e( 'Your site is not using HTTPS. WebAuthn/Passkeys require a secure connection (HTTPS) to work properly. Please enable HTTPS on your site before using passkey authentication.', 'byebyepw' ); ?>
+			</p>
+		</div>
+		<?php
 	}
 
 	/**
