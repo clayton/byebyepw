@@ -8,6 +8,10 @@
  * @package    Byebyepw
  * @subpackage Byebyepw/admin/partials
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
 ?>
 
 <div class="wrap byebyepw-wrap">
@@ -22,17 +26,17 @@
     </form>
     
     <div class="card">
-        <h2><?php esc_html_e( 'Important Security Notice', 'byebyepw' ); ?></h2>
+        <h2><?php esc_html_e( 'Important Security Notice', 'bye-bye-passwords' ); ?></h2>
         <p class="notice notice-warning">
-            <?php esc_html_e( 'Before disabling password login, make sure you have:', 'byebyepw' ); ?>
+            <?php esc_html_e( 'Before disabling password login, make sure you have:', 'bye-bye-passwords' ); ?>
         </p>
         <ul style="list-style-type: disc; margin-left: 20px;">
-            <li><?php esc_html_e( 'At least one passkey registered', 'byebyepw' ); ?></li>
-            <li><?php esc_html_e( 'Recovery codes generated and saved in a secure location', 'byebyepw' ); ?></li>
-            <li><?php esc_html_e( 'Tested passkey login successfully', 'byebyepw' ); ?></li>
+            <li><?php esc_html_e( 'At least one passkey registered', 'bye-bye-passwords' ); ?></li>
+            <li><?php esc_html_e( 'Recovery codes generated and saved in a secure location', 'bye-bye-passwords' ); ?></li>
+            <li><?php esc_html_e( 'Tested passkey login successfully', 'bye-bye-passwords' ); ?></li>
         </ul>
         <p>
-            <strong><?php esc_html_e( 'Disabling password login without proper passkey setup will lock you out of your site!', 'byebyepw' ); ?></strong>
+            <strong><?php esc_html_e( 'Disabling password login without proper passkey setup will lock you out of your site!', 'bye-bye-passwords' ); ?></strong>
         </p>
     </div>
 </div>

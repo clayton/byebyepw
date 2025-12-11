@@ -10,6 +10,10 @@
  * @subpackage Byebyepw/includes
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
 // Include all necessary WebAuthn library files
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn/src/WebAuthn.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'lib/WebAuthn/src/WebAuthnException.php';

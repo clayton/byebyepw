@@ -136,8 +136,8 @@ class Byebyepw_Admin {
 	public function add_admin_menu() {
 		// Add main menu item
 		add_menu_page(
-			__( 'Bye Bye Passwords', 'byebyepw' ),
-			__( 'Bye Bye PW', 'byebyepw' ),
+			__( 'Bye Bye Passwords', 'bye-bye-passwords' ),
+			__( 'Bye Bye PW', 'bye-bye-passwords' ),
 			'manage_options',
 			'byebyepw',
 			array( $this, 'display_admin_page' ),
@@ -148,8 +148,8 @@ class Byebyepw_Admin {
 		// Add submenu for settings
 		add_submenu_page(
 			'byebyepw',
-			__( 'Settings', 'byebyepw' ),
-			__( 'Settings', 'byebyepw' ),
+			__( 'Settings', 'bye-bye-passwords' ),
+			__( 'Settings', 'bye-bye-passwords' ),
 			'manage_options',
 			'byebyepw-settings',
 			array( $this, 'display_settings_page' )
@@ -158,8 +158,8 @@ class Byebyepw_Admin {
 		// Debug tools removed for WordPress.org compliance
 		// add_submenu_page(
 		//     'byebyepw',
-		//     __( 'Debug Tools', 'byebyepw' ),
-		//     __( 'Debug Tools', 'byebyepw' ),
+		//     __( 'Debug Tools', 'bye-bye-passwords' ),
+		//     __( 'Debug Tools', 'bye-bye-passwords' ),
 		//     'manage_options',
 		//     'byebyepw-debug',
 		//     array( $this, 'display_debug_page' )
@@ -205,14 +205,14 @@ class Byebyepw_Admin {
 
 		add_settings_section(
 			'byebyepw_general_settings',
-			__( 'General Settings', 'byebyepw' ),
+			__( 'General Settings', 'bye-bye-passwords' ),
 			null,
 			'byebyepw-settings'
 		);
 
 		add_settings_field(
 			'password_login_disabled',
-			__( 'Disable Password Login', 'byebyepw' ),
+			__( 'Disable Password Login', 'bye-bye-passwords' ),
 			array( $this, 'render_password_login_field' ),
 			'byebyepw-settings',
 			'byebyepw_general_settings'
@@ -229,7 +229,7 @@ class Byebyepw_Admin {
 		$value = isset( $options['password_login_disabled'] ) ? $options['password_login_disabled'] : false;
 		?>
 		<input type="checkbox" name="byebyepw_settings[password_login_disabled]" value="1" <?php checked( 1, $value ); ?> />
-		<p class="description"><?php esc_html_e( 'Warning: Only enable this if you have passkeys configured and recovery codes saved!', 'byebyepw' ); ?></p>
+		<p class="description"><?php esc_html_e( 'Warning: Only enable this if you have passkeys configured and recovery codes saved!', 'bye-bye-passwords' ); ?></p>
 		<?php
 	}
 

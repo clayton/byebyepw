@@ -171,7 +171,7 @@ class Byebyepw_Recovery_Codes {
 	 */
 	public function format_codes_for_display( $codes ) {
 		$html = '<div class="byebyepw-recovery-codes">';
-		$html .= '<p><strong>' . __( 'Save these recovery codes in a safe place:', 'byebyepw' ) . '</strong></p>';
+		$html .= '<p><strong>' . __( 'Save these recovery codes in a safe place:', 'bye-bye-passwords' ) . '</strong></p>';
 		$html .= '<ul class="recovery-codes-list">';
 		
 		foreach ( $codes as $index => $code ) {
@@ -179,7 +179,7 @@ class Byebyepw_Recovery_Codes {
 		}
 		
 		$html .= '</ul>';
-		$html .= '<p class="description">' . __( 'Each code can only be used once. Store them securely.', 'byebyepw' ) . '</p>';
+		$html .= '<p class="description">' . __( 'Each code can only be used once. Store them securely.', 'bye-bye-passwords' ) . '</p>';
 		$html .= '</div>';
 		
 		return $html;

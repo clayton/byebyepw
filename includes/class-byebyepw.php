@@ -205,7 +205,7 @@ class Byebyepw {
 
 		// Check if we're on a plugin page or the login page
 		$screen = get_current_screen();
-		$is_plugin_page = $screen && ( strpos( $screen->id, 'byebyepw' ) !== false || strpos( $screen->id, 'byebyepw' ) !== false );
+		$is_plugin_page = $screen && ( strpos( $screen->id, 'bye-bye-passwords' ) !== false || strpos( $screen->id, 'bye-bye-passwords' ) !== false );
 
 		if ( ! $is_plugin_page ) {
 			return;
@@ -214,8 +214,8 @@ class Byebyepw {
 		?>
 		<div class="notice notice-error">
 			<p>
-				<strong><?php esc_html_e( 'Bye Bye Passwords Security Warning:', 'byebyepw' ); ?></strong>
-				<?php esc_html_e( 'Your site is not using HTTPS. WebAuthn/Passkeys require a secure connection (HTTPS) to work properly. Please enable HTTPS on your site before using passkey authentication.', 'byebyepw' ); ?>
+				<strong><?php esc_html_e( 'Bye Bye Passwords Security Warning:', 'bye-bye-passwords' ); ?></strong>
+				<?php esc_html_e( 'Your site is not using HTTPS. WebAuthn/Passkeys require a secure connection (HTTPS) to work properly. Please enable HTTPS on your site before using passkey authentication.', 'bye-bye-passwords' ); ?>
 			</p>
 		</div>
 		<?php

@@ -9,6 +9,10 @@
  * @subpackage Byebyepw/admin/partials
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
 // Get current user
 $byebyepw_current_user = wp_get_current_user();
 $byebyepw_user_id = $byebyepw_current_user->ID;
@@ -53,18 +57,18 @@ if ( false === $byebyepw_has_recovery_codes ) {
 	<div class="byebyepw-admin-container">
 		<!-- Passkeys Section -->
 		<div class="card">
-			<h2><?php esc_html_e( 'Your Passkeys', 'byebyepw' ); ?></h2>
+			<h2><?php esc_html_e( 'Your Passkeys', 'bye-bye-passwords' ); ?></h2>
 			
 			<?php if ( empty( $byebyepw_passkeys ) ) : ?>
-				<p><?php esc_html_e( 'You have not registered any passkeys yet.', 'byebyepw' ); ?></p>
+				<p><?php esc_html_e( 'You have not registered any passkeys yet.', 'bye-bye-passwords' ); ?></p>
 			<?php else : ?>
 				<table class="wp-list-table widefat fixed striped">
 					<thead>
 						<tr>
-							<th><?php esc_html_e( 'Name', 'byebyepw' ); ?></th>
-							<th><?php esc_html_e( 'Created', 'byebyepw' ); ?></th>
-							<th><?php esc_html_e( 'Last Used', 'byebyepw' ); ?></th>
-							<th><?php esc_html_e( 'Actions', 'byebyepw' ); ?></th>
+							<th><?php esc_html_e( 'Name', 'bye-bye-passwords' ); ?></th>
+							<th><?php esc_html_e( 'Created', 'bye-bye-passwords' ); ?></th>
+							<th><?php esc_html_e( 'Last Used', 'bye-bye-passwords' ); ?></th>
+							<th><?php esc_html_e( 'Actions', 'bye-bye-passwords' ); ?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -77,13 +81,13 @@ if ( false === $byebyepw_has_recovery_codes ) {
 									if ( $byebyepw_passkey->last_used ) {
 										echo esc_html( date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $byebyepw_passkey->last_used ) ) );
 									} else {
-										esc_html_e( 'Never', 'byebyepw' );
+										esc_html_e( 'Never', 'bye-bye-passwords' );
 									}
 									?>
 								</td>
 								<td>
 									<button class="button button-small byebyepw-delete-passkey" data-passkey-id="<?php echo esc_attr( $byebyepw_passkey->id ); ?>">
-										<?php esc_html_e( 'Delete', 'byebyepw' ); ?>
+										<?php esc_html_e( 'Delete', 'bye-bye-passwords' ); ?>
 									</button>
 								</td>
 							</tr>
@@ -94,32 +98,32 @@ if ( false === $byebyepw_has_recovery_codes ) {
 			
 			<p class="byebyepw-actions">
 				<button id="byebyepw-register-passkey" class="button button-primary">
-					<?php esc_html_e( 'Register New Passkey', 'byebyepw' ); ?>
+					<?php esc_html_e( 'Register New Passkey', 'bye-bye-passwords' ); ?>
 				</button>
 			</p>
 		</div>
 		
 		<!-- Recovery Codes Section -->
 		<div class="card">
-			<h2><?php esc_html_e( 'Recovery Codes', 'byebyepw' ); ?></h2>
+			<h2><?php esc_html_e( 'Recovery Codes', 'bye-bye-passwords' ); ?></h2>
 			
 			<?php if ( $byebyepw_has_recovery_codes ) : ?>
-				<p><?php esc_html_e( 'You have active recovery codes. Keep them safe!', 'byebyepw' ); ?></p>
+				<p><?php esc_html_e( 'You have active recovery codes. Keep them safe!', 'bye-bye-passwords' ); ?></p>
 				<p><?php
 					// translators: %d is the number of remaining recovery codes
-					echo sprintf( esc_html__( 'Active codes remaining: %d', 'byebyepw' ), intval( $byebyepw_has_recovery_codes ) ); ?></p>
+					echo sprintf( esc_html__( 'Active codes remaining: %d', 'bye-bye-passwords' ), intval( $byebyepw_has_recovery_codes ) ); ?></p>
 			<?php else : ?>
-				<p><?php esc_html_e( 'You have no active recovery codes.', 'byebyepw' ); ?></p>
+				<p><?php esc_html_e( 'You have no active recovery codes.', 'bye-bye-passwords' ); ?></p>
 			<?php endif; ?>
 			
 			<p class="byebyepw-actions">
 				<button id="byebyepw-generate-recovery-codes" class="button">
-					<?php esc_html_e( 'Generate New Recovery Codes', 'byebyepw' ); ?>
+					<?php esc_html_e( 'Generate New Recovery Codes', 'bye-bye-passwords' ); ?>
 				</button>
 			</p>
 			
 			<div class="notice notice-warning">
-				<p><?php esc_html_e( 'Warning: Generating new recovery codes will invalidate all existing codes.', 'byebyepw' ); ?></p>
+				<p><?php esc_html_e( 'Warning: Generating new recovery codes will invalidate all existing codes.', 'bye-bye-passwords' ); ?></p>
 			</div>
 		</div>
 	</div>
@@ -128,14 +132,14 @@ if ( false === $byebyepw_has_recovery_codes ) {
 	<div id="byebyepw-register-modal" class="byebyepw-modal">
 		<div class="byebyepw-modal-content">
 			<span class="byebyepw-modal-close">&times;</span>
-			<h2><?php esc_html_e( 'Register New Passkey', 'byebyepw' ); ?></h2>
+			<h2><?php esc_html_e( 'Register New Passkey', 'bye-bye-passwords' ); ?></h2>
 			
 			<div class="byebyepw-modal-body">
-				<label for="byebyepw-passkey-name"><?php esc_html_e( 'Passkey Name:', 'byebyepw' ); ?></label>
-				<input type="text" id="byebyepw-passkey-name" placeholder="<?php esc_attr_e( 'e.g., MacBook TouchID', 'byebyepw' ); ?>" />
+				<label for="byebyepw-passkey-name"><?php esc_html_e( 'Passkey Name:', 'bye-bye-passwords' ); ?></label>
+				<input type="text" id="byebyepw-passkey-name" placeholder="<?php esc_attr_e( 'e.g., MacBook TouchID', 'bye-bye-passwords' ); ?>" />
 				
 				<button id="byebyepw-start-registration" class="button button-primary">
-					<?php esc_html_e( 'Start Registration', 'byebyepw' ); ?>
+					<?php esc_html_e( 'Start Registration', 'bye-bye-passwords' ); ?>
 				</button>
 				
 				<div id="byebyepw-registration-status"></div>
@@ -147,19 +151,19 @@ if ( false === $byebyepw_has_recovery_codes ) {
 	<div id="byebyepw-recovery-modal" class="byebyepw-modal">
 		<div class="byebyepw-modal-content">
 			<span class="byebyepw-modal-close">&times;</span>
-			<h2><?php esc_html_e( 'Your Recovery Codes', 'byebyepw' ); ?></h2>
+			<h2><?php esc_html_e( 'Your Recovery Codes', 'bye-bye-passwords' ); ?></h2>
 			
 			<div class="byebyepw-modal-body">
-				<p><?php esc_html_e( 'Save these codes in a safe place. Each code can only be used once.', 'byebyepw' ); ?></p>
+				<p><?php esc_html_e( 'Save these codes in a safe place. Each code can only be used once.', 'bye-bye-passwords' ); ?></p>
 				
 				<div id="byebyepw-recovery-codes-list" class="byebyepw-recovery-codes"></div>
 				
 				<button id="byebyepw-copy-codes" class="button">
-					<?php esc_html_e( 'Copy to Clipboard', 'byebyepw' ); ?>
+					<?php esc_html_e( 'Copy to Clipboard', 'bye-bye-passwords' ); ?>
 				</button>
 				
 				<button id="byebyepw-download-codes" class="button">
-					<?php esc_html_e( 'Download as Text File', 'byebyepw' ); ?>
+					<?php esc_html_e( 'Download as Text File', 'bye-bye-passwords' ); ?>
 				</button>
 			</div>
 		</div>

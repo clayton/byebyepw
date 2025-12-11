@@ -84,33 +84,33 @@ class Byebyepw_Public {
 		<div id="byebyepw-login-section" style="margin: 20px 0;">
 			<?php if ( ! $password_disabled ) : ?>
 			<p class="byebyepw-divider" style="text-align: center; margin: 20px 0;">
-				<span style="background: #fff; padding: 0 10px;"><?php esc_html_e( 'Or', 'byebyepw' ); ?></span>
+				<span style="background: #fff; padding: 0 10px;"><?php esc_html_e( 'Or', 'bye-bye-passwords' ); ?></span>
 			</p>
 			<?php endif; ?>
 			<button type="button" id="byebyepw-authenticate-passkey" class="button button-large" style="width: 100%;">
-				<?php esc_html_e( 'Sign in with Passkey', 'byebyepw' ); ?>
+				<?php esc_html_e( 'Sign in with Passkey', 'bye-bye-passwords' ); ?>
 			</button>
 			<p style="margin-top: 10px; text-align: center;">
-				<a href="#" id="byebyepw-use-recovery-code"><?php esc_html_e( 'Use recovery code', 'byebyepw' ); ?></a>
+				<a href="#" id="byebyepw-use-recovery-code"><?php esc_html_e( 'Use recovery code', 'bye-bye-passwords' ); ?></a>
 			</p>
 		</div>
 		
 		<div id="byebyepw-recovery-form" style="display: none;">
 			<?php if ( $password_disabled ) : ?>
 			<p>
-				<label for="byebyepw-recovery-username"><?php esc_html_e( 'Username or Email Address', 'byebyepw' ); ?></label>
+				<label for="byebyepw-recovery-username"><?php esc_html_e( 'Username or Email Address', 'bye-bye-passwords' ); ?></label>
 				<input type="text" name="username" id="byebyepw-recovery-username" class="input" size="20" />
 			</p>
 			<?php endif; ?>
 			<p>
-				<label for="byebyepw-recovery-code"><?php esc_html_e( 'Recovery Code', 'byebyepw' ); ?></label>
+				<label for="byebyepw-recovery-code"><?php esc_html_e( 'Recovery Code', 'bye-bye-passwords' ); ?></label>
 				<input type="text" name="recovery_code" id="byebyepw-recovery-code" class="input" size="20" />
 			</p>
 			<button type="button" id="byebyepw-submit-recovery" class="button button-primary button-large" style="width: 100%;">
-				<?php esc_html_e( 'Sign in with Recovery Code', 'byebyepw' ); ?>
+				<?php esc_html_e( 'Sign in with Recovery Code', 'bye-bye-passwords' ); ?>
 			</button>
 			<p style="margin-top: 10px; text-align: center;">
-				<a href="#" id="byebyepw-back-to-passkey"><?php esc_html_e( 'Back to Passkey', 'byebyepw' ); ?></a>
+				<a href="#" id="byebyepw-back-to-passkey"><?php esc_html_e( 'Back to Passkey', 'bye-bye-passwords' ); ?></a>
 			</p>
 		</div>
 		<?php

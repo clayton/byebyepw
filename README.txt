@@ -4,7 +4,7 @@ Donate link: https://claytonlz.com/
 Tags: passwordless, webauthn, passkeys, authentication, security
 Requires at least: 5.0
 Tested up to: 6.9
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 Requires PHP: 7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -73,6 +73,11 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 2. This is the second screen shot
 
 == Changelog ==
+
+= 1.2.2 =
+* Compliance: Text domain changed to 'bye-bye-passwords' to match WordPress.org slug
+* Security: Added ABSPATH direct access protection to template files
+* Compliance: Removed plugin assets from ZIP (uploaded via SVN separately)
 
 = 1.2.1 =
 * Fix: Text domain corrected to match plugin slug (byebyepw)
