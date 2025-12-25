@@ -4,7 +4,7 @@ Donate link: https://claytonlz.com/
 Tags: passwordless, webauthn, passkeys, authentication, security
 Requires at least: 5.0
 Tested up to: 6.9
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 Requires PHP: 7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -22,7 +22,7 @@ Enable passwordless authentication for WordPress using WebAuthn/Passkeys. More s
 * **Recovery Codes** - Generate one-time backup codes for emergency access
 * **Enhanced Security** - Eliminate password-based attacks completely
 * **User-Friendly** - Simple setup with no technical knowledge required
-* **Privacy-Focused** - No external services or tracking
+* **Privacy-Focused** - Your authentication data stays on your server
 * **WordPress Integration** - Seamlessly integrated into WordPress admin and login
 
 = How It Works =
@@ -73,6 +73,13 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 2. This is the second screen shot
 
 == Changelog ==
+
+= 1.2.3 =
+* Compliance: Use wp_enqueue commands for all CSS (removed inline styles)
+* Compliance: Document external FIDO Alliance Metadata Service in readme
+* Compliance: Replace PHP sessions with cookies + transients for cache compatibility
+* Security: Mandatory nonce validation for authentication challenge endpoint
+* Performance: Plugin no longer starts sessions on every page load
 
 = 1.2.2 =
 * Compliance: Text domain changed to 'bye-bye-passwords' to match WordPress.org slug
@@ -141,6 +148,9 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 
 == Upgrade Notice ==
 
+= 1.2.3 =
+WordPress.org compliance update: Improved CSS enqueue, removed PHP sessions for cache compatibility, documented external services. Recommended for all users.
+
 = 1.2.0 =
 WordPress.org compliance update: Enhanced security, improved nonce verification, and plugin directory requirements. Recommended for all users.
 
@@ -156,33 +166,18 @@ CRITICAL SECURITY UPDATE: Fixes multiple high-risk vulnerabilities. Immediate up
 = 1.0.0 =
 Initial release of Bye Bye Passwords - Enable passwordless authentication for WordPress using WebAuthn/Passkeys technology.
 
-== Arbitrary section ==
+== External Services ==
 
-You may provide arbitrary sections, in the same format as the ones above.  This may be of use for extremely complicated
-plugins where more information needs to be conveyed that doesn't fit into the categories of "description" or
-"installation."  Arbitrary sections will be shown below the built-in sections outlined above.
+This plugin may connect to the FIDO Alliance Metadata Service (MDS) to download root certificates for authenticator validation.
 
-== A brief Markdown Example ==
+= FIDO Alliance Metadata Service =
 
-Ordered list:
+* **URL:** https://mds.fidoalliance.org/
+* **Purpose:** Downloads attestation root certificates to verify the authenticity of security keys and passkey devices
+* **When:** Only when attestation verification is enabled and the plugin needs to update its certificate store (not during normal authentication)
+* **Data sent:** No personal or user data is transmitted - only a standard HTTP GET request
+* **Service provider:** FIDO Alliance
+* **Terms of Use:** https://fidoalliance.org/metadata/
+* **Privacy Policy:** https://fidoalliance.org/privacy-policy/
 
-1. Some feature
-1. Another feature
-1. Something else about the plugin
-
-Unordered list:
-
-* something
-* something else
-* third thing
-
-Here's a link to [WordPress](http://wordpress.org/ "Your favorite software") and one to [Markdown's Syntax Documentation][markdown syntax].
-Titles are optional, naturally.
-
-[markdown syntax]: http://daringfireball.net/projects/markdown/syntax
-            "Markdown is what the parser uses to process much of the readme file"
-
-Markdown uses email style notation for blockquotes and I've been told:
-> Asterisks for *emphasis*. Double it up  for **strong**.
-
-`<?php code(); // goes in backticks ?>`
+No user data, credentials, or personal information is ever sent to external services. All authentication happens locally on your server.

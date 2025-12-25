@@ -125,14 +125,10 @@ class Byebyepw_WebAuthn {
 		$transient_key = 'byebyepw_challenge_' . $challenge_id;
 		$transient_result = set_transient( $transient_key, $challenge_data, 300 );
 		$this->debug_log( 'Stored challenge with secure key for user ' . $user_id . ': ' . ($transient_result ? 'SUCCESS' : 'FAILED') );
-		
-		// Store challenge ID in session for retrieval
-		if ( ! session_id() ) {
-			session_start();
-		}
-		$_SESSION['webauthn_challenge_id'] = $challenge_id;
-		$_SESSION['webauthn_challenge_created'] = time();
-		$this->debug_log( 'Stored challenge ID in session: ' . $challenge_id );
+
+		// Store challenge ID in cookie for retrieval
+		Byebyepw::set_challenge_cookie( $challenge_id );
+		$this->debug_log( 'Stored challenge ID in cookie: ' . $challenge_id );
 		
 		// Convert binary fields to base64url for JSON transmission
 		if ( isset( $create_args->publicKey->challenge ) ) {
@@ -159,16 +155,12 @@ class Byebyepw_WebAuthn {
 	 */
 	public function process_registration( $user_id, $client_data_json, $attestation_object, $name = 'Unnamed Passkey' ) {
 		$this->debug_log( 'Starting registration process for user ' . $user_id );
-		
-		// Get challenge ID from session
-		if ( ! session_id() ) {
-			session_start();
-		}
-		
-		$challenge_id = sanitize_text_field( $_SESSION['webauthn_challenge_id'] ?? '' ) ?: null;
+
+		// Get challenge ID from cookie
+		$challenge_id = Byebyepw::get_challenge_cookie();
 		if ( ! $challenge_id ) {
-			$this->debug_log( 'ERROR - No challenge ID in session' );
-			return new WP_Error( 'no_challenge_id', 'No challenge ID found in session' );
+			$this->debug_log( 'ERROR - No challenge ID in cookie' );
+			return new WP_Error( 'no_challenge_id', 'No challenge ID found' );
 		}
 		
 		// Retrieve challenge data with validation
@@ -184,21 +176,21 @@ class Byebyepw_WebAuthn {
 		if ( $challenge_data['user_id'] !== $user_id ) {
 			$this->debug_log( 'ERROR - Challenge user ID mismatch' );
 			delete_transient( $transient_key );
-			unset( $_SESSION['webauthn_challenge_id'] );
+			Byebyepw::clear_challenge_cookie();
 			return new WP_Error( 'challenge_user_mismatch', 'Challenge user ID mismatch' );
 		}
-		
+
 		if ( $challenge_data['type'] !== 'registration' ) {
 			$this->debug_log( 'ERROR - Challenge type mismatch' );
 			delete_transient( $transient_key );
-			unset( $_SESSION['webauthn_challenge_id'] );
+			Byebyepw::clear_challenge_cookie();
 			return new WP_Error( 'challenge_type_mismatch', 'Invalid challenge type' );
 		}
-		
+
 		if ( $challenge_data['used'] ) {
 			$this->debug_log( 'ERROR - Challenge already used' );
 			delete_transient( $transient_key );
-			unset( $_SESSION['webauthn_challenge_id'] );
+			Byebyepw::clear_challenge_cookie();
 			return new WP_Error( 'challenge_already_used', 'Challenge already used' );
 		}
 		
@@ -253,7 +245,7 @@ class Byebyepw_WebAuthn {
 			}
 
 			// Clear challenge data
-			unset( $_SESSION['webauthn_challenge_id'], $_SESSION['webauthn_challenge_created'] );
+			Byebyepw::clear_challenge_cookie();
 			delete_transient( $transient_key );
 
 			return true;
@@ -323,13 +315,9 @@ class Byebyepw_WebAuthn {
 		$transient_key = 'byebyepw_challenge_' . $challenge_id;
 		$transient_result = set_transient( $transient_key, $challenge_data, 300 );
 		$this->debug_log( 'Stored auth challenge with secure key (result: ' . ( $transient_result ? 'success' : 'failed' ) . ')' );
-		
-		// Store challenge ID in session for retrieval
-		if ( ! session_id() ) {
-			session_start();
-		}
-		$_SESSION['webauthn_challenge_id'] = $challenge_id;
-		$_SESSION['webauthn_challenge_created'] = time();
+
+		// Store challenge ID in cookie for retrieval
+		Byebyepw::set_challenge_cookie( $challenge_id );
 		$this->debug_log( 'Challenge length: ' . strlen( $challenge ) . ', ID: ' . $challenge_id );
 		
 		// Convert binary fields to base64url for JSON transmission
@@ -361,16 +349,12 @@ class Byebyepw_WebAuthn {
 	public function process_authentication( $credential_id, $client_data_json, $authenticator_data, $signature, $user_handle = null ) {
 		$this->debug_log( 'process_authentication called' );
 		$this->debug_log( 'credential_id: ' . substr( $credential_id, 0, 20 ) . '...' );
-		
-		if ( ! session_id() ) {
-			session_start();
-		}
 
-		// Get challenge ID from session
-		$challenge_id = sanitize_text_field( $_SESSION['webauthn_challenge_id'] ?? '' ) ?: null;
+		// Get challenge ID from cookie
+		$challenge_id = Byebyepw::get_challenge_cookie();
 		if ( ! $challenge_id ) {
-			$this->debug_log( 'ERROR - No challenge ID in session' );
-			return new WP_Error( 'no_challenge_id', 'No challenge ID found in session' );
+			$this->debug_log( 'ERROR - No challenge ID in cookie' );
+			return new WP_Error( 'no_challenge_id', 'No challenge ID found' );
 		}
 		
 		// Retrieve challenge data with validation
@@ -386,14 +370,14 @@ class Byebyepw_WebAuthn {
 		if ( $challenge_data['type'] !== 'authentication' ) {
 			$this->debug_log( 'ERROR - Challenge type mismatch' );
 			delete_transient( $transient_key );
-			unset( $_SESSION['webauthn_challenge_id'] );
+			Byebyepw::clear_challenge_cookie();
 			return new WP_Error( 'challenge_type_mismatch', 'Invalid challenge type' );
 		}
-		
+
 		if ( $challenge_data['used'] ) {
 			$this->debug_log( 'ERROR - Challenge already used' );
 			delete_transient( $transient_key );
-			unset( $_SESSION['webauthn_challenge_id'] );
+			Byebyepw::clear_challenge_cookie();
 			return new WP_Error( 'challenge_already_used', 'Challenge already used' );
 		}
 		
@@ -485,7 +469,7 @@ class Byebyepw_WebAuthn {
 			$this->update_credential_usage( $credential->credential_id, $actual_sign_count );
 
 			// Clear challenge data
-			unset( $_SESSION['webauthn_challenge_id'], $_SESSION['webauthn_challenge_created'] );
+			Byebyepw::clear_challenge_cookie();
 			delete_transient( $transient_key );
 
 			$this->debug_log( 'Authentication successful for user ' . $credential->user_id );

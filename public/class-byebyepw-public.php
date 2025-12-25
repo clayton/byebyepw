@@ -81,21 +81,21 @@ class Byebyepw_Public {
 		$options = get_option( 'byebyepw_settings' );
 		$password_disabled = isset( $options['password_login_disabled'] ) ? $options['password_login_disabled'] : false;
 		?>
-		<div id="byebyepw-login-section" style="margin: 20px 0;">
+		<div id="byebyepw-login-section">
 			<?php if ( ! $password_disabled ) : ?>
-			<p class="byebyepw-divider" style="text-align: center; margin: 20px 0;">
-				<span style="background: #fff; padding: 0 10px;"><?php esc_html_e( 'Or', 'bye-bye-passwords' ); ?></span>
+			<p class="byebyepw-divider">
+				<span><?php esc_html_e( 'Or', 'bye-bye-passwords' ); ?></span>
 			</p>
 			<?php endif; ?>
-			<button type="button" id="byebyepw-authenticate-passkey" class="button button-large" style="width: 100%;">
+			<button type="button" id="byebyepw-authenticate-passkey" class="button button-large">
 				<?php esc_html_e( 'Sign in with Passkey', 'bye-bye-passwords' ); ?>
 			</button>
-			<p style="margin-top: 10px; text-align: center;">
+			<p class="byebyepw-option-text">
 				<a href="#" id="byebyepw-use-recovery-code"><?php esc_html_e( 'Use recovery code', 'bye-bye-passwords' ); ?></a>
 			</p>
 		</div>
-		
-		<div id="byebyepw-recovery-form" style="display: none;">
+
+		<div id="byebyepw-recovery-form">
 			<?php if ( $password_disabled ) : ?>
 			<p>
 				<label for="byebyepw-recovery-username"><?php esc_html_e( 'Username or Email Address', 'bye-bye-passwords' ); ?></label>
@@ -106,10 +106,10 @@ class Byebyepw_Public {
 				<label for="byebyepw-recovery-code"><?php esc_html_e( 'Recovery Code', 'bye-bye-passwords' ); ?></label>
 				<input type="text" name="recovery_code" id="byebyepw-recovery-code" class="input" size="20" />
 			</p>
-			<button type="button" id="byebyepw-submit-recovery" class="button button-primary button-large" style="width: 100%;">
+			<button type="button" id="byebyepw-submit-recovery" class="button button-primary button-large">
 				<?php esc_html_e( 'Sign in with Recovery Code', 'bye-bye-passwords' ); ?>
 			</button>
-			<p style="margin-top: 10px; text-align: center;">
+			<p class="byebyepw-option-text">
 				<a href="#" id="byebyepw-back-to-passkey"><?php esc_html_e( 'Back to Passkey', 'bye-bye-passwords' ); ?></a>
 			</p>
 		</div>
@@ -117,17 +117,26 @@ class Byebyepw_Public {
 	}
 
 	/**
-	 * Enqueue login scripts
+	 * Enqueue login scripts and styles
 	 *
 	 * @since    1.0.0
 	 */
 	public function enqueue_login_scripts() {
-		wp_enqueue_script( 
-			$this->plugin_name . '-login', 
-			plugin_dir_url( __FILE__ ) . 'js/byebyepw-login.js', 
-			array( 'jquery' ), 
-			$this->version, 
-			false 
+		// Enqueue login page styles
+		wp_enqueue_style(
+			$this->plugin_name . '-login',
+			plugin_dir_url( __FILE__ ) . 'css/byebyepw-public.css',
+			array(),
+			$this->version,
+			'all'
+		);
+
+		wp_enqueue_script(
+			$this->plugin_name . '-login',
+			plugin_dir_url( __FILE__ ) . 'js/byebyepw-login.js',
+			array( 'jquery' ),
+			$this->version,
+			false
 		);
 		
 		// Prepare redirect URL - this is safe to access without nonce as it's just for determining redirect destination
@@ -147,35 +156,18 @@ class Byebyepw_Public {
 	}
 
 	/**
-	 * Hide password field if disabled
+	 * Add body class when password login is disabled
 	 *
 	 * @since    1.0.0
+	 * @param    array $classes Body classes.
+	 * @return   array Modified body classes.
 	 */
-	public function maybe_hide_password_field() {
+	public function maybe_hide_password_field( $classes ) {
 		$options = get_option( 'byebyepw_settings' );
 		if ( isset( $options['password_login_disabled'] ) && $options['password_login_disabled'] ) {
-			?>
-			<style>
-				/* Hide username/email and password fields */
-				#loginform #user_login,
-				#loginform label[for="user_login"],
-				#loginform .user-login-wrap,
-				#loginform #user_pass, 
-				#loginform label[for="user_pass"],
-				#loginform .user-pass-wrap,
-				#loginform .forgetmenot,
-				#loginform #wp-submit,
-				#nav {
-					display: none !important;
-				}
-				
-				/* Hide the "Or" divider when passwords disabled */
-				.byebyepw-divider {
-					display: none !important;
-				}
-			</style>
-			<?php
+			$classes[] = 'byebyepw-password-disabled';
 		}
+		return $classes;
 	}
 
 }

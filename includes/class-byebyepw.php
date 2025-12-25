@@ -79,9 +79,6 @@ class Byebyepw {
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
 		$this->define_ajax_hooks();
-		
-		// Initialize PHP sessions if not already started
-		add_action( 'init', array( $this, 'start_session' ), 1 );
 
 	}
 
@@ -236,7 +233,7 @@ class Byebyepw {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 		$this->loader->add_action( 'login_form', $plugin_public, 'add_passkey_login_button' );
 		$this->loader->add_action( 'login_enqueue_scripts', $plugin_public, 'enqueue_login_scripts' );
-		$this->loader->add_action( 'login_head', $plugin_public, 'maybe_hide_password_field' );
+		$this->loader->add_filter( 'login_body_class', $plugin_public, 'maybe_hide_password_field' );
 
 	}
 	
@@ -253,40 +250,103 @@ class Byebyepw {
 	}
 	
 	/**
-	 * Start PHP session for WebAuthn challenges with security settings
+	 * Set challenge cookie for WebAuthn operations
 	 *
-	 * @since    1.0.0
+	 * @since    1.2.3
+	 * @param    string $challenge_id The challenge ID to store.
+	 * @return   bool True on success.
 	 */
-	public function start_session() {
-		if ( ! session_id() && ! headers_sent() ) {
-			// Set secure session parameters
-			session_set_cookie_params([
-				'lifetime' => 900, // 15 minutes
-				'path' => '/',
-				'domain' => '',
-				'secure' => is_ssl(),
-				'httponly' => true,
-				'samesite' => 'Strict'
-			]);
-			
-			session_start();
-			
-			// Regenerate session ID for security
-			if ( ! isset( $_SESSION['byebyepw_initiated'] ) ) {
-				session_regenerate_id( true );
-				$_SESSION['byebyepw_initiated'] = true;
-				$_SESSION['byebyepw_created'] = time();
-			}
-			
-			// Check session timeout
-			if ( isset( $_SESSION['byebyepw_created'] ) && 
-				 ( time() - $_SESSION['byebyepw_created'] > 900 ) ) {
-				session_destroy();
-				session_start();
-				$_SESSION['byebyepw_initiated'] = true;
-				$_SESSION['byebyepw_created'] = time();
-			}
+	public static function set_challenge_cookie( $challenge_id ) {
+		if ( headers_sent() ) {
+			return false;
 		}
+
+		$cookie_options = array(
+			'expires'  => time() + 300, // 5 minutes
+			'path'     => '/',
+			'domain'   => '',
+			'secure'   => is_ssl(),
+			'httponly' => true,
+			'samesite' => 'Strict',
+		);
+
+		// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.cookies_setcookie -- Required for WebAuthn challenge storage
+		return setcookie( 'byebyepw_challenge', $challenge_id, $cookie_options );
+	}
+
+	/**
+	 * Get challenge cookie value
+	 *
+	 * @since    1.2.3
+	 * @return   string|null The challenge ID or null if not set.
+	 */
+	public static function get_challenge_cookie() {
+		if ( isset( $_COOKIE['byebyepw_challenge'] ) ) {
+			return sanitize_text_field( wp_unslash( $_COOKIE['byebyepw_challenge'] ) );
+		}
+		return null;
+	}
+
+	/**
+	 * Clear challenge cookie
+	 *
+	 * @since    1.2.3
+	 * @return   bool True on success.
+	 */
+	public static function clear_challenge_cookie() {
+		if ( headers_sent() ) {
+			return false;
+		}
+
+		$cookie_options = array(
+			'expires'  => time() - 3600,
+			'path'     => '/',
+			'domain'   => '',
+			'secure'   => is_ssl(),
+			'httponly' => true,
+			'samesite' => 'Strict',
+		);
+
+		// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.cookies_setcookie -- Required for clearing WebAuthn challenge
+		return setcookie( 'byebyepw_challenge', '', $cookie_options );
+	}
+
+	/**
+	 * Set CSRF token cookie for public endpoints
+	 *
+	 * @since    1.2.3
+	 * @param    string $token The CSRF token to store.
+	 * @return   bool True on success.
+	 */
+	public static function set_csrf_cookie( $token ) {
+		if ( headers_sent() ) {
+			return false;
+		}
+
+		$cookie_options = array(
+			'expires'  => time() + 1800, // 30 minutes
+			'path'     => '/',
+			'domain'   => '',
+			'secure'   => is_ssl(),
+			'httponly' => true,
+			'samesite' => 'Strict',
+		);
+
+		// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.cookies_setcookie -- Required for CSRF protection
+		return setcookie( 'byebyepw_csrf', $token, $cookie_options );
+	}
+
+	/**
+	 * Get CSRF token from cookie
+	 *
+	 * @since    1.2.3
+	 * @return   string|null The CSRF token or null if not set.
+	 */
+	public static function get_csrf_cookie() {
+		if ( isset( $_COOKIE['byebyepw_csrf'] ) ) {
+			return sanitize_text_field( wp_unslash( $_COOKIE['byebyepw_csrf'] ) );
+		}
+		return null;
 	}
 
 	/**

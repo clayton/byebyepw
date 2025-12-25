@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <p class="notice notice-warning">
             <?php esc_html_e( 'Before disabling password login, make sure you have:', 'bye-bye-passwords' ); ?>
         </p>
-        <ul style="list-style-type: disc; margin-left: 20px;">
+        <ul class="byebyepw-notice-list">
             <li><?php esc_html_e( 'At least one passkey registered', 'bye-bye-passwords' ); ?></li>
             <li><?php esc_html_e( 'Recovery codes generated and saved in a secure location', 'bye-bye-passwords' ); ?></li>
             <li><?php esc_html_e( 'Tested passkey login successfully', 'bye-bye-passwords' ); ?></li>

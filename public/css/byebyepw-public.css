@@ -121,3 +121,53 @@
     height: 0;
     overflow: hidden;
 }
+
+/* Login page section */
+#byebyepw-login-section {
+    margin: 20px 0;
+}
+
+/* Divider between password and passkey login */
+.byebyepw-divider {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.byebyepw-divider span {
+    background: #fff;
+    padding: 0 10px;
+}
+
+/* Full-width buttons on login page */
+#byebyepw-authenticate-passkey,
+#byebyepw-submit-recovery {
+    width: 100%;
+}
+
+/* Option text links */
+.byebyepw-option-text {
+    margin-top: 10px;
+    text-align: center;
+}
+
+/* Recovery form hidden by default */
+#byebyepw-recovery-form {
+    display: none;
+}
+
+/* Styles when password login is disabled */
+.byebyepw-password-disabled #loginform #user_login,
+.byebyepw-password-disabled #loginform label[for="user_login"],
+.byebyepw-password-disabled #loginform .user-login-wrap,
+.byebyepw-password-disabled #loginform #user_pass,
+.byebyepw-password-disabled #loginform label[for="user_pass"],
+.byebyepw-password-disabled #loginform .user-pass-wrap,
+.byebyepw-password-disabled #loginform .forgetmenot,
+.byebyepw-password-disabled #loginform #wp-submit,
+.byebyepw-password-disabled #nav {
+    display: none !important;
+}
+
+.byebyepw-password-disabled .byebyepw-divider {
+    display: none !important;
+}

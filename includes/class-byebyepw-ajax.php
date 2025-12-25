@@ -52,22 +52,23 @@ class Byebyepw_Ajax {
 	 * @return array Array containing both csrf_token and nonce
 	 */
 	private function generate_csrf_token() {
-		if ( ! session_id() ) {
-			session_start();
-		}
-		
-		// Generate token if not exists or expired
-		if ( ! isset( $_SESSION['byebyepw_csrf_token'] ) || 
-			 ! isset( $_SESSION['byebyepw_csrf_expires'] ) ||
-			 $_SESSION['byebyepw_csrf_expires'] < time() ) {
-			
-			$_SESSION['byebyepw_csrf_token'] = bin2hex( random_bytes( 16 ) );
-			$_SESSION['byebyepw_csrf_expires'] = time() + 1800; // 30 minutes
-		}
-		
+		// Generate a unique token identifier
+		$token_id = wp_generate_uuid4();
+		$csrf_token = bin2hex( random_bytes( 16 ) );
+
+		// Store token in transient with token_id as key
+		$token_data = array(
+			'token'   => $csrf_token,
+			'expires' => time() + 1800, // 30 minutes
+		);
+		set_transient( 'byebyepw_csrf_' . $token_id, $token_data, 1800 );
+
+		// Set cookie with token_id for retrieval
+		Byebyepw::set_csrf_cookie( $token_id );
+
 		return array(
-			'csrf_token' => sanitize_text_field( $_SESSION['byebyepw_csrf_token'] ),
-			'nonce' => wp_create_nonce( 'byebyepw_security' )
+			'csrf_token' => $csrf_token,
+			'nonce'      => wp_create_nonce( 'byebyepw_security' ),
 		);
 	}
 	
@@ -78,23 +79,30 @@ class Byebyepw_Ajax {
 	 * @return bool True if valid
 	 */
 	private function validate_csrf_token( $token ) {
-		if ( ! session_id() ) {
-			session_start();
-		}
-		
-		if ( ! isset( $_SESSION['byebyepw_csrf_token'] ) || 
-			 ! isset( $_SESSION['byebyepw_csrf_expires'] ) ) {
+		// Get token_id from cookie
+		$token_id = Byebyepw::get_csrf_cookie();
+		if ( ! $token_id ) {
 			return false;
 		}
-		
+
+		// Get token data from transient
+		$token_data = get_transient( 'byebyepw_csrf_' . $token_id );
+		if ( ! $token_data || ! is_array( $token_data ) ) {
+			return false;
+		}
+
 		// Check expiration
-		if ( $_SESSION['byebyepw_csrf_expires'] < time() ) {
-			unset( $_SESSION['byebyepw_csrf_token'], $_SESSION['byebyepw_csrf_expires'] );
+		if ( ! isset( $token_data['expires'] ) || $token_data['expires'] < time() ) {
+			delete_transient( 'byebyepw_csrf_' . $token_id );
 			return false;
 		}
-		
+
 		// Use hash_equals for constant-time comparison
-		return hash_equals( $_SESSION['byebyepw_csrf_token'], $token );
+		if ( ! isset( $token_data['token'] ) ) {
+			return false;
+		}
+
+		return hash_equals( $token_data['token'], $token );
 	}
 
 	/**
@@ -247,29 +255,19 @@ class Byebyepw_Ajax {
 		if ( $this->is_rate_limited( 'auth_challenge', 10, 300 ) ) {
 			wp_send_json_error( 'Too many requests. Please try again later.' );
 		}
-		
-		// Verify WordPress nonce for form data (required by WordPress.org)
-		if ( ! empty( $_POST ) ) {
-			if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), 'byebyepw_security' ) ) {
-				wp_send_json_error( 'Security validation failed. Please refresh and try again.' );
-			}
-		}
-		
-		// Start session if not already started
-		if ( ! session_id() ) {
-			session_start();
+
+		// Verify WordPress nonce (required by WordPress.org)
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'byebyepw_security' ) ) {
+			wp_send_json_error( 'Security validation failed. Please refresh and try again.' );
 		}
 
 		// Check if specific user is requested (for username+passkey flow)
 		$user_id = null;
-		
-		if ( ! empty( $_POST ) ) {
-			$username = sanitize_text_field( wp_unslash( $_POST['username'] ?? '' ) );
-			if ( ! empty( $username ) ) {
-				$user = get_user_by( 'login', $username );
-				if ( $user ) {
-					$user_id = $user->ID;
-				}
+		$username = sanitize_text_field( wp_unslash( $_POST['username'] ?? '' ) );
+		if ( ! empty( $username ) ) {
+			$user = get_user_by( 'login', $username );
+			if ( $user ) {
+				$user_id = $user->ID;
 			}
 		}
 
@@ -306,11 +304,6 @@ class Byebyepw_Ajax {
 		if ( ! $this->validate_csrf_token( $csrf_token ) ) {
 			wp_send_json_error( 'Security validation failed. Please refresh and try again.' );
 		}
-		
-		// Start session if not already started
-		if ( ! session_id() ) {
-			session_start();
-		}
 
 		$credential_id = sanitize_text_field( wp_unslash( $_POST['credential_id'] ?? '' ) );
 		$client_data_json = sanitize_text_field( wp_unslash( $_POST['client_data_json'] ?? '' ) );
@@ -332,11 +325,6 @@ class Byebyepw_Ajax {
 
 		if ( is_wp_error( $user_id ) ) {
 			wp_send_json_error( $user_id->get_error_message() );
-		}
-
-		// Regenerate session ID for security after successful authentication
-		if ( session_id() ) {
-			session_regenerate_id( true );
 		}
 
 		// Log the user in
@@ -446,11 +434,6 @@ class Byebyepw_Ajax {
 		// Verify recovery code
 		if ( ! $this->recovery_codes->verify_recovery_code( $user->ID, $recovery_code ) ) {
 			wp_send_json_error( 'Authentication failed' );
-		}
-
-		// Regenerate session ID for security after successful authentication
-		if ( session_id() ) {
-			session_regenerate_id( true );
 		}
 
 		// Log the user in
