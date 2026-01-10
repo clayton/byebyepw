@@ -22,7 +22,7 @@ A WordPress plugin that enables passwordless authentication using WebAuthn/Passk
 ## Installation
 
 1. Download the plugin zip file or clone this repository
-2. Upload to `/wp-content/plugins/byebyepw` directory
+2. Upload to `/wp-content/plugins/bye-bye-passwords` directory
 3. Activate the plugin through the 'Plugins' menu in WordPress
 4. Navigate to "Bye Bye Passwords" in the admin menu to get started
 
@@ -119,13 +119,13 @@ This plugin is built using the WordPress Plugin Boilerplate architecture and inc
 ### File Structure
 
 ```
-byebyepw/
+bye-bye-passwords/
 ├── admin/           # Admin-specific functionality
 ├── includes/        # Core plugin files
 ├── lib/            # WebAuthn library
 ├── public/         # Public-facing functionality
 ├── languages/      # Translation files
-└── byebyepw.php   # Main plugin file
+└── bye-bye-passwords.php   # Main plugin file
 ```
 
 ## Contributing

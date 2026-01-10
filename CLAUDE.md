@@ -10,7 +10,7 @@ Bye Bye Passwords (byebyepw) is a WordPress plugin that implements passwordless 
 
 The plugin follows the WordPress Plugin Boilerplate pattern with clear separation of concerns:
 
-- **`byebyepw.php`**: Main plugin bootstrap file that initializes the plugin
+- **`bye-bye-passwords.php`**: Main plugin bootstrap file that initializes the plugin
 - **`includes/`**: Core plugin functionality
   - `class-byebyepw.php`: Main plugin class that coordinates all components
   - `class-byebyepw-loader.php`: Manages all hooks and filters
@@ -39,7 +39,7 @@ Since this is a WordPress plugin, development typically requires:
 
 To check PHP syntax:
 ```bash
-php -l byebyepw.php
+php -l bye-bye-passwords.php
 php -l includes/*.php
 php -l admin/*.php
 php -l public/*.php
@@ -49,7 +49,7 @@ php -l public/*.php
 
 If WordPress Coding Standards (WPCS) is installed:
 ```bash
-phpcs --standard=WordPress byebyepw.php includes/ admin/ public/
+phpcs --standard=WordPress bye-bye-passwords.php includes/ admin/ public/
 ```
 
 ## Key Implementation Areas
@@ -71,9 +71,14 @@ All hooks are registered through the loader pattern:
 
 ## Plugin Text Domain
 
-The plugin uses `byebyepw` as its text domain for internationalization. All translatable strings should use:
+The plugin uses `bye-bye-passwords` as its text domain for internationalization. All translatable strings should use:
 ```php
-__('Text', 'byebyepw')
-_e('Text', 'byebyepw')
+__('Text', 'bye-bye-passwords')
+_e('Text', 'bye-bye-passwords')
 ```
-- remember to always make a zip file named byebyepw.zip so it works for wordpress upload naming conventions
+
+## Building for Distribution
+
+When creating a zip file for WordPress.org submission, use:
+- Zip filename: `bye-bye-passwords.zip`
+- Folder name inside zip: `bye-bye-passwords/`
