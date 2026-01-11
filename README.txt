@@ -4,7 +4,7 @@ Donate link: https://claytonlz.com/
 Tags: passwordless, webauthn, passkeys, authentication, security
 Requires at least: 5.0
 Tested up to: 6.9
-Stable tag: 1.2.3
+Stable tag: 1.2.4
 Requires PHP: 7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -73,6 +73,10 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 2. This is the second screen shot
 
 == Changelog ==
+
+= 1.2.4 =
+* Compliance: Renamed main plugin file to bye-bye-passwords.php per WordPress.org naming convention
+* Compliance: Plugin folder structure updated to match plugin slug
 
 = 1.2.3 =
 * Compliance: Use wp_enqueue commands for all CSS (removed inline styles)
@@ -147,6 +151,9 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 * GPL v2 licensing for WordPress.org compatibility
 
 == Upgrade Notice ==
+
+= 1.2.4 =
+File naming convention update per WordPress.org review. Recommended for all users.
 
 = 1.2.3 =
 WordPress.org compliance update: Improved CSS enqueue, removed PHP sessions for cache compatibility, documented external services. Recommended for all users.
