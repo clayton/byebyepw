@@ -44,6 +44,7 @@ coverage/
 
 # Local development
 .claude/
+CLAUDE.md
 local-config.php
 *.local.php
 
