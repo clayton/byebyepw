@@ -66,11 +66,11 @@ No, most modern devices have built-in authenticators (Touch ID, Face ID, Windows
 
 == Screenshots ==
 
-1. This screen shot description corresponds to screenshot-1.(png|jpg|jpeg|gif). Note that the screenshot is taken from
-the /assets directory or the directory that contains the stable readme.txt (tags or trunk). Screenshots in the /assets
-directory take precedence. For example, `/assets/screenshot-1.png` would win over `/tags/4.3/screenshot-1.png`
-(or jpg, jpeg, gif).
-2. This is the second screen shot
+1. Login page with both password and "Sign in with Passkey" options
+2. Registering a new passkey from the admin dashboard
+3. Recovery codes for emergency account access
+4. Plugin settings page with security configuration
+5. Passwordless-only login page with password authentication disabled
 
 == Changelog ==
 
@@ -107,13 +107,6 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 * Compliance: Fixed global variable and function name prefixes
 * Compliance: Updated to WordPress 6.9 compatibility
 
-= 1.1.2 =
-* Security: Fix username enumeration vulnerability by standardizing authentication error messages
-* Security: Implement constant-time comparison for recovery code verification to prevent timing attacks  
-* Security: Add comprehensive CSRF protection for all public authentication endpoints
-* Enhancement: Strengthen session security with secure CSRF token management
-* Enhancement: Improve error message consistency across all authentication flows
-
 = 1.2.0 =
 * Compliance: Complete WordPress.org plugin directory compliance overhaul
 * Security: Enhanced nonce verification for all AJAX endpoints to meet WordPress.org standards
@@ -124,6 +117,13 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 * Enhancement: Cleaned up plugin structure removing development files from distribution
 * Documentation: Added comprehensive phpcs ignore comments for legitimate security exceptions
 * Library: Forked and customized WebAuthn library for WordPress.org compliance requirements
+
+= 1.1.2 =
+* Security: Fix username enumeration vulnerability by standardizing authentication error messages
+* Security: Implement constant-time comparison for recovery code verification to prevent timing attacks
+* Security: Add comprehensive CSRF protection for all public authentication endpoints
+* Enhancement: Strengthen session security with secure CSRF token management
+* Enhancement: Improve error message consistency across all authentication flows
 
 = 1.1.1 =
 * Fix: Resolve authentication failure with platform authenticators (Touch ID, Face ID, Windows Hello)
