@@ -227,9 +227,17 @@ class Byebyepw_Admin {
 	public function render_password_login_field() {
 		$options = get_option( 'byebyepw_settings' );
 		$value = isset( $options['password_login_disabled'] ) ? $options['password_login_disabled'] : false;
+		$admins_without_codes = $this->get_admins_without_recovery_codes();
+		$can_disable = empty( $admins_without_codes );
 		?>
-		<input type="checkbox" name="byebyepw_settings[password_login_disabled]" value="1" <?php checked( 1, $value ); ?> />
-		<p class="description"><?php esc_html_e( 'Warning: Only enable this if you have passkeys configured and recovery codes saved!', 'bye-bye-passwords' ); ?></p>
+		<input type="checkbox" name="byebyepw_settings[password_login_disabled]" value="1" <?php checked( 1, $value ); ?> <?php disabled( ! $can_disable ); ?> />
+		<?php if ( $can_disable ) : ?>
+			<p class="description"><?php esc_html_e( 'Warning: Only enable this if you have passkeys configured and recovery codes saved!', 'bye-bye-passwords' ); ?></p>
+		<?php else : ?>
+			<p class="description" style="color: #d63638;">
+				<?php esc_html_e( 'You can disable password login once all administrators have generated recovery codes.', 'bye-bye-passwords' ); ?>
+			</p>
+		<?php endif; ?>
 		<?php
 	}
 
@@ -245,11 +253,49 @@ class Byebyepw_Admin {
 		
 		// Sanitize password_login_disabled checkbox
 		$sanitized['password_login_disabled'] = isset( $input['password_login_disabled'] ) ? (bool) $input['password_login_disabled'] : false;
-		
+
+		// If trying to enable password_login_disabled, verify all admins have recovery codes
+		if ( ! empty( $sanitized['password_login_disabled'] ) ) {
+			$admins_without_codes = $this->get_admins_without_recovery_codes();
+			if ( ! empty( $admins_without_codes ) ) {
+				$names = array_map( function( $user ) {
+					return $user->display_name;
+				}, $admins_without_codes );
+				add_settings_error(
+					'byebyepw_settings',
+					'missing_recovery_codes',
+					sprintf(
+						/* translators: %s: comma-separated list of administrator display names */
+						__( 'Cannot disable password login. The following administrators have not generated recovery codes: %s', 'bye-bye-passwords' ),
+						implode( ', ', $names )
+					),
+					'error'
+				);
+				$sanitized['password_login_disabled'] = false;
+			}
+		}
+
 		// Sanitize require_passkey_for_admins checkbox
 		$sanitized['require_passkey_for_admins'] = isset( $input['require_passkey_for_admins'] ) ? (bool) $input['require_passkey_for_admins'] : false;
-		
+
 		return $sanitized;
+	}
+
+	/**
+	 * Get administrator users who have not generated recovery codes.
+	 *
+	 * @since    1.2.6
+	 * @return   WP_User[]    Array of admin users without recovery codes.
+	 */
+	private function get_admins_without_recovery_codes() {
+		$admins = get_users( array( 'role' => 'administrator' ) );
+		$without_codes = array();
+		foreach ( $admins as $admin ) {
+			if ( ! $this->get_recovery_codes()->has_recovery_codes( $admin->ID ) ) {
+				$without_codes[] = $admin;
+			}
+		}
+		return $without_codes;
 	}
 
 	/**

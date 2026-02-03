@@ -4,7 +4,7 @@ Donate link: https://claytonlz.com/
 Tags: passwordless, webauthn, passkeys, authentication, security
 Requires at least: 5.0
 Tested up to: 6.9
-Stable tag: 1.2.5
+Stable tag: 1.2.6
 Requires PHP: 7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -73,6 +73,10 @@ No, most modern devices have built-in authenticators (Touch ID, Face ID, Windows
 5. Passwordless-only login page with password authentication disabled
 
 == Changelog ==
+
+= 1.2.6 =
+* Security: Gate "Disable Password Login" setting behind recovery codes for all administrators
+* Enhancement: Show admin recovery code status on settings page
 
 = 1.2.5 =
 * Compliance: Removed CLAUDE.md development file from plugin distribution
@@ -154,6 +158,9 @@ No, most modern devices have built-in authenticators (Touch ID, Face ID, Windows
 * GPL v2 licensing for WordPress.org compatibility
 
 == Upgrade Notice ==
+
+= 1.2.6 =
+Password login can no longer be disabled unless all administrators have generated recovery codes. Prevents accidental lockouts.
 
 = 1.2.5 =
 Removes development file flagged during WordPress.org review. Recommended for all users.
