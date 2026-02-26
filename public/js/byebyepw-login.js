@@ -13,8 +13,8 @@
             $('#byebyepw-authenticate-passkey').hide();
             $('#byebyepw-login-section').prepend(
                 '<div class="byebyepw-browser-warning" style="background: #fff3cd; border: 1px solid #ffc107; padding: 10px; margin-bottom: 10px; border-radius: 4px;">' +
-                '<strong>Browser Not Supported:</strong> Your browser does not support passkey authentication. ' +
-                'Please use a modern browser (Chrome, Firefox, Safari, Edge) or use a recovery code to sign in.' +
+                '<strong>' + byebyepw_i18n.browser_not_supported + '</strong> ' +
+                byebyepw_i18n.browser_not_supported_msg +
                 '</div>'
             );
         }
@@ -41,18 +41,18 @@
             const base64 = btoa(binary);
             return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
         };
-        
+
         // Passkey authentication
         $('#byebyepw-authenticate-passkey').on('click', function() {
             const button = this;
             const $button = $(button);
             const originalText = $button.text();
-            
-            $button.prop('disabled', true).text('Initializing...');
-            
+
+            $button.prop('disabled', true).text(byebyepw_i18n.initializing);
+
             // Get username if available
             const username = $('#user_login').val();
-            
+
             $.ajax({
                 url: byebyepw_ajax.ajax_url,
                 method: 'POST',
@@ -63,26 +63,26 @@
                 },
                 success: function(response) {
                     if (!response.success) {
-                        alert('Failed to get authentication challenge');
+                        alert(byebyepw_i18n.failed_get_auth_challenge);
                         $button.prop('disabled', false).text(originalText);
                         return;
                     }
-                    
+
                     // Store security tokens for authentication request
                     const csrfToken = response.data.csrf_token;
                     const nonce = response.data.nonce;
-                    
+
                     let publicKeyOptions = response.data;
                     // Handle nested publicKey structure
                     if (publicKeyOptions.publicKey) {
                         publicKeyOptions = publicKeyOptions.publicKey;
                     }
-                    
+
                     // Convert challenge from base64url to ArrayBuffer
                     if (publicKeyOptions.challenge && typeof publicKeyOptions.challenge === 'string') {
                         publicKeyOptions.challenge = base64urlToBuffer(publicKeyOptions.challenge);
                     }
-                    
+
                     // Convert allowCredentials IDs
                     if (publicKeyOptions.allowCredentials && publicKeyOptions.allowCredentials.length > 0) {
                         publicKeyOptions.allowCredentials = publicKeyOptions.allowCredentials.map(cred => ({
@@ -90,13 +90,13 @@
                             id: typeof cred.id === 'string' ? base64urlToBuffer(cred.id) : cred.id
                         }));
                     }
-                    
-                    $button.text('Follow browser prompts...');
-                    
+
+                    $button.text(byebyepw_i18n.follow_browser_prompts);
+
                     navigator.credentials.get({ publicKey: publicKeyOptions })
                         .then(credential => {
-                            $button.text('Authenticating...');
-                            
+                            $button.text(byebyepw_i18n.authenticating);
+
                             $.ajax({
                                 url: byebyepw_ajax.ajax_url,
                                 method: 'POST',
@@ -115,53 +115,53 @@
                                     if (response.success) {
                                         window.location.href = response.data.redirect;
                                     } else {
-                                        alert('Authentication failed');
+                                        alert(byebyepw_i18n.auth_failed);
                                         $button.prop('disabled', false).text(originalText);
                                     }
                                 },
                                 error: function() {
-                                    alert('Authentication failed');
+                                    alert(byebyepw_i18n.auth_failed);
                                     $button.prop('disabled', false).text(originalText);
                                 }
                             });
                         })
                         .catch(error => {
-                            alert('Authentication failed: ' + error.message);
+                            alert(byebyepw_i18n.auth_failed_detail + error.message);
                             $button.prop('disabled', false).text(originalText);
                         });
                 },
                 error: function() {
-                    alert('Failed to get authentication challenge');
+                    alert(byebyepw_i18n.failed_get_auth_challenge);
                     $button.prop('disabled', false).text(originalText);
                 }
             });
         });
-        
+
         // Recovery code toggle
         $('#byebyepw-use-recovery-code').on('click', function(e) {
             e.preventDefault();
             $('#byebyepw-login-section').hide();
             $('#byebyepw-recovery-form').show();
         });
-        
+
         // Back to passkey button
         $('#byebyepw-back-to-passkey').on('click', function(e) {
             e.preventDefault();
             $('#byebyepw-recovery-form').hide();
             $('#byebyepw-login-section').show();
         });
-        
+
         // Recovery code submission
         $('#byebyepw-submit-recovery').on('click', function() {
             // Get username from either the main form or recovery form
             let username = $('#user_login').val() || $('#byebyepw-recovery-username').val();
             const recovery_code = $('#byebyepw-recovery-code').val();
-            
+
             if (!username || !recovery_code) {
-                alert('Please enter username and recovery code');
+                alert(byebyepw_i18n.enter_username_and_code);
                 return;
             }
-            
+
             // First get a CSRF token by requesting a challenge (but ignore the challenge)
             $.ajax({
                 url: byebyepw_ajax.ajax_url,
@@ -173,14 +173,14 @@
                 },
                 success: function(challengeResponse) {
                     if (!challengeResponse.success) {
-                        alert('Authentication failed');
+                        alert(byebyepw_i18n.auth_failed);
                         return;
                     }
-                    
+
                     // Use security tokens from challenge response
                     const csrfToken = challengeResponse.data.csrf_token;
                     const nonce = challengeResponse.data.nonce;
-                    
+
                     // Now attempt recovery code authentication
                     $.ajax({
                         url: byebyepw_ajax.ajax_url,
@@ -197,16 +197,16 @@
                             if (response.success) {
                                 window.location.href = response.data.redirect;
                             } else {
-                                alert('Authentication failed');
+                                alert(byebyepw_i18n.auth_failed);
                             }
                         },
                         error: function() {
-                            alert('Authentication failed');
+                            alert(byebyepw_i18n.auth_failed);
                         }
                     });
                 },
                 error: function() {
-                    alert('Authentication failed');
+                    alert(byebyepw_i18n.auth_failed);
                 }
             });
         });

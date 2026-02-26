@@ -126,6 +126,28 @@ class Byebyepw_Admin {
 			'ajax_url' => admin_url( 'admin-ajax.php' ),
 			'nonce' => wp_create_nonce( 'byebyepw_ajax' )
 		));
+
+		wp_localize_script( $this->plugin_name, 'byebyepw_i18n', array(
+			'enter_passkey_name'       => __( 'Please enter a name for your passkey', 'bye-bye-passwords' ),
+			'starting_registration'    => __( 'Starting registration...', 'bye-bye-passwords' ),
+			'failed_get_challenge'     => __( 'Failed to get challenge', 'bye-bye-passwords' ),
+			'invalid_challenge'        => __( 'Invalid challenge received from server', 'bye-bye-passwords' ),
+			'follow_browser_prompts'   => __( 'Please follow your browser prompts to create a passkey...', 'bye-bye-passwords' ),
+			'processing_passkey'       => __( 'Processing passkey...', 'bye-bye-passwords' ),
+			'passkey_registered'       => __( 'Passkey registered successfully!', 'bye-bye-passwords' ),
+			'verification_failed'      => __( 'Verification failed', 'bye-bye-passwords' ),
+			'registration_failed'      => __( 'Registration failed: ', 'bye-bye-passwords' ),
+			'confirm_invalidate_codes' => __( 'This will invalidate all existing recovery codes. Continue?', 'bye-bye-passwords' ),
+			'failed_generate_codes'    => __( 'Failed to generate recovery codes', 'bye-bye-passwords' ),
+			'error_generating_codes'   => __( 'Error generating recovery codes', 'bye-bye-passwords' ),
+			'codes_copied'             => __( 'Recovery codes copied to clipboard!', 'bye-bye-passwords' ),
+			'download_header'          => __( 'Bye Bye Passwords - Recovery Codes', 'bye-bye-passwords' ),
+			'download_generated'       => __( 'Generated: ', 'bye-bye-passwords' ),
+			'download_keep_safe'       => __( 'Keep these codes safe!', 'bye-bye-passwords' ),
+			'confirm_delete_passkey'   => __( 'Are you sure you want to delete this passkey?', 'bye-bye-passwords' ),
+			'failed_delete_passkey'    => __( 'Failed to delete passkey', 'bye-bye-passwords' ),
+			'error_deleting_passkey'   => __( 'Error deleting passkey', 'bye-bye-passwords' ),
+		));
 	}
 
 	/**

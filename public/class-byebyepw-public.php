@@ -153,6 +153,18 @@ class Byebyepw_Public {
 			'redirect_to' => $redirect_to,
 			'nonce' => wp_create_nonce( 'byebyepw_security' ) // Provide nonce for AJAX requests
 		));
+
+		wp_localize_script( $this->plugin_name . '-login', 'byebyepw_i18n', array(
+			'browser_not_supported'     => __( 'Browser Not Supported:', 'bye-bye-passwords' ),
+			'browser_not_supported_msg' => __( 'Your browser does not support passkey authentication. Please use a modern browser (Chrome, Firefox, Safari, Edge) or use a recovery code to sign in.', 'bye-bye-passwords' ),
+			'initializing'              => __( 'Initializing...', 'bye-bye-passwords' ),
+			'failed_get_auth_challenge' => __( 'Failed to get authentication challenge', 'bye-bye-passwords' ),
+			'follow_browser_prompts'    => __( 'Follow browser prompts...', 'bye-bye-passwords' ),
+			'authenticating'            => __( 'Authenticating...', 'bye-bye-passwords' ),
+			'auth_failed'               => __( 'Authentication failed', 'bye-bye-passwords' ),
+			'auth_failed_detail'        => __( 'Authentication failed: ', 'bye-bye-passwords' ),
+			'enter_username_and_code'   => __( 'Please enter username and recovery code', 'bye-bye-passwords' ),
+		));
 	}
 
 	/**

@@ -77,7 +77,7 @@ class Byebyepw_WebAuthn {
 	public function get_registration_challenge( $user_id ) {
 		$user = get_user_by( 'id', $user_id );
 		if ( ! $user ) {
-			return new WP_Error( 'invalid_user', 'Invalid user ID' );
+			return new WP_Error( 'invalid_user', __( 'Invalid user ID', 'bye-bye-passwords' ) );
 		}
 
 		// Get existing credentials to exclude
@@ -160,38 +160,38 @@ class Byebyepw_WebAuthn {
 		$challenge_id = Byebyepw::get_challenge_cookie();
 		if ( ! $challenge_id ) {
 			$this->debug_log( 'ERROR - No challenge ID in cookie' );
-			return new WP_Error( 'no_challenge_id', 'No challenge ID found' );
+			return new WP_Error( 'no_challenge_id', __( 'No challenge ID found', 'bye-bye-passwords' ) );
 		}
-		
+
 		// Retrieve challenge data with validation
 		$transient_key = 'byebyepw_challenge_' . $challenge_id;
 		$challenge_data = get_transient( $transient_key );
-		
+
 		if ( ! $challenge_data || ! is_array( $challenge_data ) ) {
 			$this->debug_log( 'ERROR - No challenge data found for ID: ' . $challenge_id );
-			return new WP_Error( 'no_challenge', 'Challenge not found or expired' );
+			return new WP_Error( 'no_challenge', __( 'Challenge not found or expired', 'bye-bye-passwords' ) );
 		}
-		
+
 		// Validate challenge data
 		if ( $challenge_data['user_id'] !== $user_id ) {
 			$this->debug_log( 'ERROR - Challenge user ID mismatch' );
 			delete_transient( $transient_key );
 			Byebyepw::clear_challenge_cookie();
-			return new WP_Error( 'challenge_user_mismatch', 'Challenge user ID mismatch' );
+			return new WP_Error( 'challenge_user_mismatch', __( 'Challenge user ID mismatch', 'bye-bye-passwords' ) );
 		}
 
 		if ( $challenge_data['type'] !== 'registration' ) {
 			$this->debug_log( 'ERROR - Challenge type mismatch' );
 			delete_transient( $transient_key );
 			Byebyepw::clear_challenge_cookie();
-			return new WP_Error( 'challenge_type_mismatch', 'Invalid challenge type' );
+			return new WP_Error( 'challenge_type_mismatch', __( 'Invalid challenge type', 'bye-bye-passwords' ) );
 		}
 
 		if ( $challenge_data['used'] ) {
 			$this->debug_log( 'ERROR - Challenge already used' );
 			delete_transient( $transient_key );
 			Byebyepw::clear_challenge_cookie();
-			return new WP_Error( 'challenge_already_used', 'Challenge already used' );
+			return new WP_Error( 'challenge_already_used', __( 'Challenge already used', 'bye-bye-passwords' ) );
 		}
 		
 		// Mark challenge as used immediately to prevent replay
@@ -354,31 +354,31 @@ class Byebyepw_WebAuthn {
 		$challenge_id = Byebyepw::get_challenge_cookie();
 		if ( ! $challenge_id ) {
 			$this->debug_log( 'ERROR - No challenge ID in cookie' );
-			return new WP_Error( 'no_challenge_id', 'No challenge ID found' );
+			return new WP_Error( 'no_challenge_id', __( 'No challenge ID found', 'bye-bye-passwords' ) );
 		}
-		
+
 		// Retrieve challenge data with validation
 		$transient_key = 'byebyepw_challenge_' . $challenge_id;
 		$challenge_data = get_transient( $transient_key );
-		
+
 		if ( ! $challenge_data || ! is_array( $challenge_data ) ) {
 			$this->debug_log( 'ERROR - No challenge data found for ID: ' . $challenge_id );
-			return new WP_Error( 'no_challenge', 'Challenge not found or expired' );
+			return new WP_Error( 'no_challenge', __( 'Challenge not found or expired', 'bye-bye-passwords' ) );
 		}
-		
+
 		// Validate challenge data
 		if ( $challenge_data['type'] !== 'authentication' ) {
 			$this->debug_log( 'ERROR - Challenge type mismatch' );
 			delete_transient( $transient_key );
 			Byebyepw::clear_challenge_cookie();
-			return new WP_Error( 'challenge_type_mismatch', 'Invalid challenge type' );
+			return new WP_Error( 'challenge_type_mismatch', __( 'Invalid challenge type', 'bye-bye-passwords' ) );
 		}
 
 		if ( $challenge_data['used'] ) {
 			$this->debug_log( 'ERROR - Challenge already used' );
 			delete_transient( $transient_key );
 			Byebyepw::clear_challenge_cookie();
-			return new WP_Error( 'challenge_already_used', 'Challenge already used' );
+			return new WP_Error( 'challenge_already_used', __( 'Challenge already used', 'bye-bye-passwords' ) );
 		}
 		
 		// Mark challenge as used immediately to prevent replay
@@ -401,7 +401,7 @@ class Byebyepw_WebAuthn {
 		if ( ! $credential ) {
 			$this->debug_log( 'ERROR - Credential not found in database' );
 			$this->debug_log( 'Tried credential_id (base64): ' . base64_encode( $credential_id_decoded ) );
-			return new WP_Error( 'invalid_credential', 'Credential not found' );
+			return new WP_Error( 'invalid_credential', __( 'Credential not found', 'bye-bye-passwords' ) );
 		}
 
 		$this->debug_log( 'Found credential for user ' . $credential->user_id );
@@ -445,7 +445,7 @@ class Byebyepw_WebAuthn {
 				// Only fail if there's a significant regression (possible cloning)
 				if ( $stored_sign_count - $actual_sign_count > 10 ) {
 					$this->debug_log( 'ERROR - Sign count regression too large, possible cloned authenticator' );
-					return new WP_Error( 'sign_count_invalid', 'Sign count validation failed - possible cloned authenticator' );
+					return new WP_Error( 'sign_count_invalid', __( 'Sign count validation failed - possible cloned authenticator', 'bye-bye-passwords' ) );
 				} else {
 					$this->debug_log( 'INFO - Allowing minor sign count inconsistency (common with platform authenticators)' );
 				}

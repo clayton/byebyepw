@@ -199,11 +199,11 @@ class Byebyepw_Ajax {
 	 */
 	public function handle_get_registration_challenge() {
 		if ( ! check_ajax_referer( 'byebyepw_ajax', 'nonce', false ) ) {
-			wp_send_json_error( 'Invalid nonce' );
+			wp_send_json_error( __( 'Invalid nonce', 'bye-bye-passwords' ) );
 		}
 
 		if ( ! is_user_logged_in() ) {
-			wp_send_json_error( 'Not logged in' );
+			wp_send_json_error( __( 'Not logged in', 'bye-bye-passwords' ) );
 		}
 
 		$user_id = get_current_user_id();
@@ -221,11 +221,11 @@ class Byebyepw_Ajax {
 	 */
 	public function handle_register_passkey() {
 		if ( ! check_ajax_referer( 'byebyepw_ajax', 'nonce', false ) ) {
-			wp_send_json_error( 'Invalid nonce' );
+			wp_send_json_error( __( 'Invalid nonce', 'bye-bye-passwords' ) );
 		}
 
 		if ( ! is_user_logged_in() ) {
-			wp_send_json_error( 'Not logged in' );
+			wp_send_json_error( __( 'Not logged in', 'bye-bye-passwords' ) );
 		}
 
 		$user_id = get_current_user_id();
@@ -234,7 +234,7 @@ class Byebyepw_Ajax {
 		$name = sanitize_text_field( wp_unslash( $_POST['name'] ?? 'Unnamed Passkey' ) );
 
 		if ( empty( $client_data_json ) || empty( $attestation_object ) ) {
-			wp_send_json_error( 'Missing required data' );
+			wp_send_json_error( __( 'Missing required data', 'bye-bye-passwords' ) );
 		}
 
 		$this->debug_log( 'AJAX: Processing registration for user ' . $user_id );
@@ -249,7 +249,7 @@ class Byebyepw_Ajax {
 		}
 
 		$this->debug_log( 'AJAX: Registration successful!' );
-		wp_send_json_success( 'Passkey registered successfully' );
+		wp_send_json_success( __( 'Passkey registered successfully', 'bye-bye-passwords' ) );
 	}
 
 	/**
@@ -258,12 +258,12 @@ class Byebyepw_Ajax {
 	public function handle_get_authentication_challenge() {
 		// Rate limiting - 10 challenge requests per 5 minutes
 		if ( $this->is_rate_limited( 'auth_challenge', 10, 300 ) ) {
-			wp_send_json_error( 'Too many requests. Please try again later.' );
+			wp_send_json_error( __( 'Too many requests. Please try again later.', 'bye-bye-passwords' ) );
 		}
 
 		// Verify WordPress nonce (required by WordPress.org)
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'byebyepw_security' ) ) {
-			wp_send_json_error( 'Security validation failed. Please refresh and try again.' );
+			wp_send_json_error( __( 'Security validation failed. Please refresh and try again.', 'bye-bye-passwords' ) );
 		}
 
 		// Check if specific user is requested (for username+passkey flow)
@@ -296,18 +296,18 @@ class Byebyepw_Ajax {
 	public function handle_authenticate_passkey() {
 		// Rate limiting - 5 authentication attempts per 5 minutes
 		if ( $this->is_rate_limited( 'auth_attempt', 5, 300 ) ) {
-			wp_send_json_error( 'Too many authentication attempts. Please try again later.' );
+			wp_send_json_error( __( 'Too many authentication attempts. Please try again later.', 'bye-bye-passwords' ) );
 		}
 		
 		// Verify WordPress nonce first (required by WordPress.org)
 		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), 'byebyepw_security' ) ) {
-			wp_send_json_error( 'Security validation failed. Please refresh and try again.' );
+			wp_send_json_error( __( 'Security validation failed. Please refresh and try again.', 'bye-bye-passwords' ) );
 		}
-		
+
 		// Additional CSRF protection for public endpoint
 		$csrf_token = sanitize_text_field( wp_unslash( $_POST['csrf_token'] ?? '' ) );
 		if ( ! $this->validate_csrf_token( $csrf_token ) ) {
-			wp_send_json_error( 'Security validation failed. Please refresh and try again.' );
+			wp_send_json_error( __( 'Security validation failed. Please refresh and try again.', 'bye-bye-passwords' ) );
 		}
 
 		$credential_id = sanitize_text_field( wp_unslash( $_POST['credential_id'] ?? '' ) );
@@ -317,7 +317,7 @@ class Byebyepw_Ajax {
 		$user_handle = sanitize_text_field( wp_unslash( $_POST['user_handle'] ?? '' ) );
 
 		if ( empty( $credential_id ) || empty( $client_data_json ) || empty( $authenticator_data ) || empty( $signature ) ) {
-			wp_send_json_error( 'Missing required data' );
+			wp_send_json_error( __( 'Missing required data', 'bye-bye-passwords' ) );
 		}
 
 		$user_id = $this->webauthn->process_authentication( 
@@ -353,27 +353,27 @@ class Byebyepw_Ajax {
 	 */
 	public function handle_delete_passkey() {
 		if ( ! check_ajax_referer( 'byebyepw_ajax', 'nonce', false ) ) {
-			wp_send_json_error( 'Invalid nonce' );
+			wp_send_json_error( __( 'Invalid nonce', 'bye-bye-passwords' ) );
 		}
 
 		if ( ! is_user_logged_in() ) {
-			wp_send_json_error( 'Not logged in' );
+			wp_send_json_error( __( 'Not logged in', 'bye-bye-passwords' ) );
 		}
 
 		$user_id = get_current_user_id();
 		$passkey_id = intval( $_POST['passkey_id'] ?? 0 );
 
 		if ( empty( $passkey_id ) ) {
-			wp_send_json_error( 'Missing passkey ID' );
+			wp_send_json_error( __( 'Missing passkey ID', 'bye-bye-passwords' ) );
 		}
 
 		$result = $this->webauthn->delete_credential_by_id( $passkey_id, $user_id );
 
 		if ( ! $result ) {
-			wp_send_json_error( 'Failed to delete passkey' );
+			wp_send_json_error( __( 'Failed to delete passkey', 'bye-bye-passwords' ) );
 		}
 
-		wp_send_json_success( 'Passkey deleted successfully' );
+		wp_send_json_success( __( 'Passkey deleted successfully', 'bye-bye-passwords' ) );
 	}
 
 	/**
@@ -381,18 +381,18 @@ class Byebyepw_Ajax {
 	 */
 	public function handle_generate_recovery_codes() {
 		if ( ! check_ajax_referer( 'byebyepw_ajax', 'nonce', false ) ) {
-			wp_send_json_error( 'Invalid nonce' );
+			wp_send_json_error( __( 'Invalid nonce', 'bye-bye-passwords' ) );
 		}
 
 		if ( ! is_user_logged_in() ) {
-			wp_send_json_error( 'Not logged in' );
+			wp_send_json_error( __( 'Not logged in', 'bye-bye-passwords' ) );
 		}
 
 		$user_id = get_current_user_id();
 		$codes = $this->recovery_codes->generate_recovery_codes( $user_id );
 
 		if ( empty( $codes ) ) {
-			wp_send_json_error( 'Failed to generate recovery codes' );
+			wp_send_json_error( __( 'Failed to generate recovery codes', 'bye-bye-passwords' ) );
 		}
 
 		$html = $this->recovery_codes->format_codes_for_display( $codes );
@@ -409,36 +409,36 @@ class Byebyepw_Ajax {
 	public function handle_authenticate_recovery_code() {
 		// Rate limiting - 3 recovery code attempts per 10 minutes (stricter)
 		if ( $this->is_rate_limited( 'recovery_attempt', 3, 600 ) ) {
-			wp_send_json_error( 'Too many recovery code attempts. Please try again later.' );
+			wp_send_json_error( __( 'Too many recovery code attempts. Please try again later.', 'bye-bye-passwords' ) );
 		}
-		
+
 		// Verify WordPress nonce first (required by WordPress.org)
 		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), 'byebyepw_security' ) ) {
-			wp_send_json_error( 'Security validation failed. Please refresh and try again.' );
+			wp_send_json_error( __( 'Security validation failed. Please refresh and try again.', 'bye-bye-passwords' ) );
 		}
-		
+
 		// Additional CSRF protection for public endpoint
 		$csrf_token = sanitize_text_field( wp_unslash( $_POST['csrf_token'] ?? '' ) );
 		if ( ! $this->validate_csrf_token( $csrf_token ) ) {
-			wp_send_json_error( 'Security validation failed. Please refresh and try again.' );
+			wp_send_json_error( __( 'Security validation failed. Please refresh and try again.', 'bye-bye-passwords' ) );
 		}
-		
+
 		$username = sanitize_text_field( wp_unslash( $_POST['username'] ?? '' ) );
 		$recovery_code = sanitize_text_field( wp_unslash( $_POST['recovery_code'] ?? '' ) );
 
 		if ( empty( $username ) || empty( $recovery_code ) ) {
-			wp_send_json_error( 'Missing required data' );
+			wp_send_json_error( __( 'Missing required data', 'bye-bye-passwords' ) );
 		}
 
 		$user = get_user_by( 'login', $username );
 		if ( ! $user ) {
 			// Use same error message to prevent username enumeration
-			wp_send_json_error( 'Authentication failed' );
+			wp_send_json_error( __( 'Authentication failed', 'bye-bye-passwords' ) );
 		}
 
 		// Verify recovery code
 		if ( ! $this->recovery_codes->verify_recovery_code( $user->ID, $recovery_code ) ) {
-			wp_send_json_error( 'Authentication failed' );
+			wp_send_json_error( __( 'Authentication failed', 'bye-bye-passwords' ) );
 		}
 
 		// Log the user in

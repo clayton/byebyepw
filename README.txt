@@ -4,7 +4,7 @@ Donate link: https://claytonlz.com/
 Tags: passwordless, webauthn, passkeys, authentication, security
 Requires at least: 5.0
 Tested up to: 6.9
-Stable tag: 1.2.6
+Stable tag: 1.2.7
 Requires PHP: 7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -73,6 +73,11 @@ No, most modern devices have built-in authenticators (Touch ID, Face ID, Windows
 5. Passwordless-only login page with password authentication disabled
 
 == Changelog ==
+
+= 1.2.7 =
+* i18n: Full localization of all user-facing strings in PHP and JavaScript
+* i18n: Generated POT template with 100+ translatable strings
+* i18n: Added PO scaffolds for 8 languages (Spanish, French, Italian, German, Dutch, Japanese, Chinese, Korean)
 
 = 1.2.6 =
 * Security: Gate "Disable Password Login" setting behind recovery codes for all administrators
@@ -158,6 +163,9 @@ No, most modern devices have built-in authenticators (Touch ID, Face ID, Windows
 * GPL v2 licensing for WordPress.org compatibility
 
 == Upgrade Notice ==
+
+= 1.2.7 =
+Full internationalization support. All strings are now translatable. Translation scaffolds for 8 languages included.
 
 = 1.2.6 =
 Password login can no longer be disabled unless all administrators have generated recovery codes. Prevents accidental lockouts.
