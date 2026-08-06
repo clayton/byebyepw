@@ -1,6 +1,11 @@
 <?php
 
 namespace lbuchs\WebAuthn;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 use lbuchs\WebAuthn\Binary\ByteBuffer;
 require_once 'WebAuthnException.php';
 require_once 'Binary/ByteBuffer.php';
@@ -683,7 +688,7 @@ class WebAuthn {
      * @throws WebAuthnException
      */
     private function _checkOrigin($origin) {
-        if (str_starts_with($origin, 'android:apk-key-hash:')) {
+        if (strpos($origin, 'android:apk-key-hash:') === 0) {
             return $this->_checkAndroidKeyHashes($origin);
         }
 

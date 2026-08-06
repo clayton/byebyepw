@@ -3,9 +3,9 @@ Contributors: claytonlz
 Donate link: https://claytonlz.com/
 Tags: passwordless, webauthn, passkeys, authentication, security
 Requires at least: 5.0
-Tested up to: 6.9
-Stable tag: 1.2.7
-Requires PHP: 7.2
+Tested up to: 7.0
+Stable tag: 1.3.0
+Requires PHP: 8.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,7 +35,7 @@ Enable passwordless authentication for WordPress using WebAuthn/Passkeys. More s
 
 * SSL/HTTPS enabled website (required for WebAuthn)
 * Modern browser with WebAuthn support
-* PHP 7.2 or higher
+* PHP 8.0 or higher
 * WordPress 5.0 or higher
 
 == Installation ==
@@ -73,6 +73,12 @@ No, most modern devices have built-in authenticators (Touch ID, Face ID, Windows
 5. Passwordless-only login page with password authentication disabled
 
 == Changelog ==
+
+= 1.3.0 =
+* Compatibility: Tested with WordPress 7.0
+* Dependency: Verified the bundled WordPress-compatible WebAuthn fork against the latest stable upstream release, 2.2.0
+* Compliance: Hardened the WebAuthn entry point against direct access and retained compatibility with the declared WordPress baseline
+* Requirements: Corrected the minimum PHP version to 8.0 to match the bundled WebAuthn library
 
 = 1.2.7 =
 * i18n: Full localization of all user-facing strings in PHP and JavaScript
@@ -163,6 +169,9 @@ No, most modern devices have built-in authenticators (Touch ID, Face ID, Windows
 * GPL v2 licensing for WordPress.org compatibility
 
 == Upgrade Notice ==
+
+= 1.3.0 =
+Requires PHP 8.0 or newer and adds compatibility with WordPress 7.0.
 
 = 1.2.7 =
 Full internationalization support. All strings are now translatable. Translation scaffolds for 8 languages included.

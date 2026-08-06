@@ -15,7 +15,7 @@ A WordPress plugin that enables passwordless authentication using WebAuthn/Passk
 ## Requirements
 
 - WordPress 5.0 or higher
-- PHP 7.2 or higher
+- PHP 8.0 or higher
 - SSL/HTTPS enabled (required for WebAuthn)
 - Modern browser with WebAuthn support
 
