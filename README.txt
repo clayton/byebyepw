@@ -3,8 +3,8 @@ Contributors: claytonlz
 Donate link: https://claytonlz.com/
 Tags: passwordless, webauthn, passkeys, authentication, security
 Requires at least: 5.0
-Tested up to: 7.0
-Stable tag: 1.3.0
+Tested up to: 7.1
+Stable tag: 1.3.1
 Requires PHP: 8.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -73,6 +73,9 @@ No, most modern devices have built-in authenticators (Touch ID, Face ID, Windows
 5. Passwordless-only login page with password authentication disabled
 
 == Changelog ==
+
+= 1.3.1 =
+* Compatibility: Tested with WordPress 7.1
 
 = 1.3.0 =
 * Compatibility: Tested with WordPress 7.0
@@ -169,6 +172,9 @@ No, most modern devices have built-in authenticators (Touch ID, Face ID, Windows
 * GPL v2 licensing for WordPress.org compatibility
 
 == Upgrade Notice ==
+
+= 1.3.1 =
+Adds compatibility with WordPress 7.1.
 
 = 1.3.0 =
 Requires PHP 8.0 or newer and adds compatibility with WordPress 7.0.

@@ -16,7 +16,7 @@
  * Plugin Name:       Bye Bye Passwords
  * Plugin URI:        https://github.com/clayton/byebyepw
  * Description:       Passwordless login with WebAuthN and Passkeys for WordPress
- * Version:           1.3.0
+ * Version:           1.3.1
  * Requires at least: 5.0
  * Requires PHP:      8.0
  * Author:            Clayton
@@ -37,7 +37,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'BYEBYEPW_VERSION', '1.3.0' );
+define( 'BYEBYEPW_VERSION', '1.3.1' );
 
 /**
  * The code that runs during plugin activation.
