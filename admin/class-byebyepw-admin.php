@@ -109,7 +109,14 @@ class Byebyepw_Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_styles() {
+	public function enqueue_styles( $hook_suffix = '' ) {
+		$is_plugin_page = isset( $_GET['page'] ) && in_array( sanitize_key( wp_unslash( $_GET['page'] ) ), array( 'byebyepw', 'byebyepw-settings' ), true ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen routing.
+		$is_profile_page = in_array( $hook_suffix, array( 'profile.php', 'user-edit.php' ), true );
+
+		if ( ! $is_plugin_page && ! $is_profile_page ) {
+			return;
+		}
+
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/byebyepw-admin.css', array(), $this->version, 'all' );
 	}
 
@@ -119,6 +126,12 @@ class Byebyepw_Admin {
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts() {
+		$is_passkeys_page = isset( $_GET['page'] ) && 'byebyepw' === sanitize_key( wp_unslash( $_GET['page'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen routing.
+
+		if ( ! $is_passkeys_page ) {
+			return;
+		}
+
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/byebyepw-admin.js', array( 'jquery' ), $this->version, false );
 		
 		// Localize script for AJAX
@@ -128,19 +141,21 @@ class Byebyepw_Admin {
 		));
 
 		wp_localize_script( $this->plugin_name, 'byebyepw_i18n', array(
-			'enter_passkey_name'       => __( 'Please enter a name for your passkey', 'bye-bye-passwords' ),
+			'enter_passkey_name'       => __( 'Name this passkey so you can recognize it later.', 'bye-bye-passwords' ),
 			'starting_registration'    => __( 'Starting registration...', 'bye-bye-passwords' ),
 			'failed_get_challenge'     => __( 'Failed to get challenge', 'bye-bye-passwords' ),
 			'invalid_challenge'        => __( 'Invalid challenge received from server', 'bye-bye-passwords' ),
 			'follow_browser_prompts'   => __( 'Please follow your browser prompts to create a passkey...', 'bye-bye-passwords' ),
 			'processing_passkey'       => __( 'Processing passkey...', 'bye-bye-passwords' ),
-			'passkey_registered'       => __( 'Passkey registered successfully!', 'bye-bye-passwords' ),
+			'passkey_registered'       => __( 'Passkey registered. Reloading your setup…', 'bye-bye-passwords' ),
 			'verification_failed'      => __( 'Verification failed', 'bye-bye-passwords' ),
 			'registration_failed'      => __( 'Registration failed: ', 'bye-bye-passwords' ),
-			'confirm_invalidate_codes' => __( 'This will invalidate all existing recovery codes. Continue?', 'bye-bye-passwords' ),
+			'confirm_invalidate_codes' => __( 'Replace your recovery codes? Your existing codes will stop working.', 'bye-bye-passwords' ),
 			'failed_generate_codes'    => __( 'Failed to generate recovery codes', 'bye-bye-passwords' ),
 			'error_generating_codes'   => __( 'Error generating recovery codes', 'bye-bye-passwords' ),
-			'codes_copied'             => __( 'Recovery codes copied to clipboard!', 'bye-bye-passwords' ),
+			'codes_copied'             => __( 'Recovery codes copied.', 'bye-bye-passwords' ),
+			'copy_codes'               => __( 'Copy codes', 'bye-bye-passwords' ),
+			'copied_codes'             => __( 'Copied', 'bye-bye-passwords' ),
 			'download_header'          => __( 'Bye Bye Passwords - Recovery Codes', 'bye-bye-passwords' ),
 			'download_generated'       => __( 'Generated: ', 'bye-bye-passwords' ),
 			'download_keep_safe'       => __( 'Keep these codes safe!', 'bye-bye-passwords' ),
@@ -159,12 +174,21 @@ class Byebyepw_Admin {
 		// Add main menu item
 		add_menu_page(
 			__( 'Bye Bye Passwords', 'bye-bye-passwords' ),
-			__( 'Bye Bye PW', 'bye-bye-passwords' ),
+			__( 'Passkeys', 'bye-bye-passwords' ),
 			'manage_options',
 			'byebyepw',
 			array( $this, 'display_admin_page' ),
 			'dashicons-shield-alt',
 			100
+		);
+
+		add_submenu_page(
+			'byebyepw',
+			__( 'Passkeys', 'bye-bye-passwords' ),
+			__( 'Passkeys', 'bye-bye-passwords' ),
+			'manage_options',
+			'byebyepw',
+			array( $this, 'display_admin_page' )
 		);
 
 		// Add submenu for settings
@@ -249,17 +273,22 @@ class Byebyepw_Admin {
 	public function render_password_login_field() {
 		$options = get_option( 'byebyepw_settings' );
 		$value = isset( $options['password_login_disabled'] ) ? $options['password_login_disabled'] : false;
-		$admins_without_codes = $this->get_admins_without_recovery_codes();
-		$can_disable = empty( $admins_without_codes );
+		$statuses = $this->get_admin_security_statuses();
+		$can_disable = $this->are_all_admins_ready( $statuses );
 		?>
-		<input type="checkbox" name="byebyepw_settings[password_login_disabled]" value="1" <?php checked( 1, $value ); ?> <?php disabled( ! $can_disable ); ?> />
+		<fieldset class="byebyepw-setting-control">
+			<label for="byebyepw-password-login-disabled">
+				<input id="byebyepw-password-login-disabled" type="checkbox" name="byebyepw_settings[password_login_disabled]" value="1" <?php checked( 1, $value ); ?> <?php disabled( ! $can_disable ); ?> />
+				<?php esc_html_e( 'Require a passkey or recovery code for WordPress sign-in', 'bye-bye-passwords' ); ?>
+			</label>
 		<?php if ( $can_disable ) : ?>
-			<p class="description"><?php esc_html_e( 'Warning: Only enable this if you have passkeys configured and recovery codes saved!', 'bye-bye-passwords' ); ?></p>
+			<p class="description"><?php esc_html_e( 'All administrators have completed the required safety checks.', 'bye-bye-passwords' ); ?></p>
 		<?php else : ?>
-			<p class="description" style="color: #d63638;">
-				<?php esc_html_e( 'You can disable password login once all administrators have generated recovery codes.', 'bye-bye-passwords' ); ?>
+			<p class="description">
+				<?php esc_html_e( 'Complete every administrator’s passkey, recovery-code, and test sign-in checks first.', 'bye-bye-passwords' ); ?>
 			</p>
 		<?php endif; ?>
+		</fieldset>
 		<?php
 	}
 
@@ -276,19 +305,22 @@ class Byebyepw_Admin {
 		// Sanitize password_login_disabled checkbox
 		$sanitized['password_login_disabled'] = isset( $input['password_login_disabled'] ) ? (bool) $input['password_login_disabled'] : false;
 
-		// If trying to enable password_login_disabled, verify all admins have recovery codes
+		// Only disable password sign-in after every administrator completes the safe setup.
 		if ( ! empty( $sanitized['password_login_disabled'] ) ) {
-			$admins_without_codes = $this->get_admins_without_recovery_codes();
-			if ( ! empty( $admins_without_codes ) ) {
-				$names = array_map( function( $user ) {
-					return $user->display_name;
-				}, $admins_without_codes );
+			$statuses = $this->get_admin_security_statuses();
+			if ( ! $this->are_all_admins_ready( $statuses ) ) {
+				$names = array();
+				foreach ( $statuses as $status ) {
+					if ( ! $status['ready'] ) {
+						$names[] = $status['user']->display_name;
+					}
+				}
 				add_settings_error(
 					'byebyepw_settings',
-					'missing_recovery_codes',
+					'incomplete_passkey_setup',
 					sprintf(
 						/* translators: %s: comma-separated list of administrator display names */
-						__( 'Cannot disable password login. The following administrators have not generated recovery codes: %s', 'bye-bye-passwords' ),
+						__( 'Password sign-in remains available. These administrators have not completed passkey setup: %s', 'bye-bye-passwords' ),
 						implode( ', ', $names )
 					),
 					'error'
@@ -304,20 +336,59 @@ class Byebyepw_Admin {
 	}
 
 	/**
-	 * Get administrator users who have not generated recovery codes.
+	 * Get passkey readiness for every administrator.
 	 *
-	 * @since    1.2.6
-	 * @return   WP_User[]    Array of admin users without recovery codes.
+	 * @since    1.3.2
+	 * @return   array[] Administrator readiness records.
 	 */
-	private function get_admins_without_recovery_codes() {
+	public function get_admin_security_statuses() {
 		$admins = get_users( array( 'role' => 'administrator' ) );
-		$without_codes = array();
+		$statuses = array();
+
 		foreach ( $admins as $admin ) {
-			if ( ! $this->get_recovery_codes()->has_recovery_codes( $admin->ID ) ) {
-				$without_codes[] = $admin;
+			$credentials = $this->get_webauthn()->get_user_credentials( $admin->ID );
+			$has_passkey = ! empty( $credentials );
+			$has_tested_passkey = false;
+
+			foreach ( $credentials as $credential ) {
+				if ( ! empty( $credential->last_used ) ) {
+					$has_tested_passkey = true;
+					break;
+				}
+			}
+
+			$has_recovery_codes = $this->get_recovery_codes()->has_recovery_codes( $admin->ID );
+			$statuses[] = array(
+				'user'               => $admin,
+				'has_passkey'        => $has_passkey,
+				'has_recovery_codes' => $has_recovery_codes,
+				'has_tested_passkey' => $has_tested_passkey,
+				'ready'              => $has_passkey && $has_recovery_codes && $has_tested_passkey,
+			);
+		}
+
+		return $statuses;
+	}
+
+	/**
+	 * Check whether every administrator has completed safe passkey setup.
+	 *
+	 * @since  1.3.2
+	 * @param  array[] $statuses Administrator readiness records.
+	 * @return bool
+	 */
+	public function are_all_admins_ready( $statuses ) {
+		if ( empty( $statuses ) ) {
+			return false;
+		}
+
+		foreach ( $statuses as $status ) {
+			if ( empty( $status['ready'] ) ) {
+				return false;
 			}
 		}
-		return $without_codes;
+
+		return true;
 	}
 
 	/**

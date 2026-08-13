@@ -239,6 +239,7 @@ class Byebyepw {
 		$this->loader->add_action( 'login_form', $plugin_public, 'add_passkey_login_button' );
 		$this->loader->add_action( 'login_enqueue_scripts', $plugin_public, 'enqueue_login_scripts' );
 		$this->loader->add_filter( 'login_body_class', $plugin_public, 'maybe_hide_password_field' );
+		$this->loader->add_filter( 'authenticate', $plugin_public, 'reject_password_login', 99, 3 );
 
 	}
 	

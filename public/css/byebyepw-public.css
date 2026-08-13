@@ -1,161 +1,184 @@
 /**
- * Public-facing stylesheet for Bye Bye Passwords
- * Login page styles
+ * Login UI for Bye Bye Passwords.
  */
 
-/* Passkey login button */
-.byebyepw-passkey-button {
-    display: block;
-    width: 100%;
-    margin: 20px 0;
-    padding: 12px;
-    background: #2271b1;
-    color: #fff;
-    border: none;
-    border-radius: 3px;
-    font-size: 14px;
-    cursor: pointer;
-    text-align: center;
-    transition: background 0.2s;
+body.login {
+	--byebyepw-ink: #1d2327;
+	--byebyepw-muted: #50575e;
+	--byebyepw-border: #c3c4c7;
+	--byebyepw-blue: #2271b1;
+	--byebyepw-blue-dark: #135e96;
+	--byebyepw-blue-soft: #f0f6fc;
+	--byebyepw-red: #b32d2e;
+	--byebyepw-red-soft: #fcf0f1;
+	--byebyepw-amber: #996800;
+	--byebyepw-amber-soft: #fcf5df;
 }
 
-.byebyepw-passkey-button:hover {
-    background: #135e96;
+body.login #loginform {
+	border-color: #dcdcde;
+	border-radius: 4px;
+	box-shadow: 0 1px 3px rgb(0 0 0 / 0.08), 0 1px 2px rgb(0 0 0 / 0.04);
 }
 
-.byebyepw-passkey-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* Divider between passkey and password login */
-.byebyepw-login-divider {
-    margin: 20px 0;
-    text-align: center;
-    position: relative;
-}
-
-.byebyepw-login-divider:before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: #dcdcde;
-}
-
-.byebyepw-login-divider span {
-    background: #fff;
-    padding: 0 10px;
-    position: relative;
-    color: #50575e;
-    font-size: 13px;
-}
-
-/* Toggle link for password fields */
-.byebyepw-toggle-password {
-    display: block;
-    margin-top: 10px;
-    color: #2271b1;
-    text-decoration: none;
-    font-size: 13px;
-    cursor: pointer;
-}
-
-.byebyepw-toggle-password:hover {
-    color: #135e96;
-    text-decoration: underline;
-}
-
-/* Error and success messages */
-.byebyepw-message {
-    margin: 10px 0;
-    padding: 10px;
-    border-left: 4px solid;
-    background: #fff;
-}
-
-.byebyepw-message.error {
-    border-color: #d63638;
-    background: #fcf0f1;
-    color: #d63638;
-}
-
-.byebyepw-message.success {
-    border-color: #00a32a;
-    background: #f0f8ff;
-    color: #00a32a;
-}
-
-/* Loading spinner */
-.byebyepw-spinner {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2px solid #f3f3f3;
-    border-top: 2px solid #2271b1;
-    border-radius: 50%;
-    animation: byebyepw-spin 1s linear infinite;
-    margin-left: 8px;
-    vertical-align: middle;
-}
-
-@keyframes byebyepw-spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Hidden elements */
-.byebyepw-hidden {
-    display: none !important;
-}
-
-/* Password fields container */
-#byebyepw-password-fields {
-    transition: opacity 0.3s;
-}
-
-#byebyepw-password-fields.byebyepw-hidden {
-    opacity: 0;
-    height: 0;
-    overflow: hidden;
-}
-
-/* Login page section */
 #byebyepw-login-section {
-    margin: 20px 0;
+	margin: 24px 0 26px;
 }
 
-/* Divider between password and passkey login */
 .byebyepw-divider {
-    text-align: center;
-    margin: 20px 0;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin: 20px 0 16px;
+	color: #646970;
+	font-size: 12px;
+	line-height: 1.4;
+	text-align: center;
+}
+
+.byebyepw-divider::before,
+.byebyepw-divider::after {
+	flex: 1 1 auto;
+	height: 1px;
+	background: #dcdcde;
+	content: "";
 }
 
 .byebyepw-divider span {
-    background: #fff;
-    padding: 0 10px;
+	flex: 0 0 auto;
+	padding: 0;
+	background: transparent;
 }
 
-/* Full-width buttons on login page */
 #byebyepw-authenticate-passkey,
 #byebyepw-submit-recovery {
-    width: 100%;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 9px;
+	width: 100%;
+	min-height: 42px;
+	font-weight: 600;
+	line-height: 1.25;
 }
 
-/* Option text links */
+#byebyepw-authenticate-passkey {
+	background: var(--byebyepw-blue-soft);
+	border-color: #72aee6;
+	color: var(--byebyepw-blue-dark);
+}
+
+#byebyepw-authenticate-passkey:hover,
+#byebyepw-authenticate-passkey:focus {
+	background: #e5f3ff;
+	border-color: var(--byebyepw-blue);
+	color: #0a4b78;
+}
+
+.byebyepw-passkey-mark {
+	display: inline-flex;
+	flex: 0 0 22px;
+	align-items: center;
+	justify-content: center;
+	width: 22px;
+	height: 22px;
+	box-sizing: border-box;
+}
+
+.byebyepw-passkey-mark svg {
+	display: block;
+	width: 22px;
+	height: 22px;
+}
+
+.byebyepw-login-hint,
+.byebyepw-recovery-intro {
+	margin: 8px 0 0;
+	color: var(--byebyepw-muted);
+	font-size: 12px;
+	line-height: 1.5;
+	text-align: left;
+}
+
 .byebyepw-option-text {
-    margin-top: 10px;
-    text-align: center;
+	margin: 18px 0 0;
+	font-size: 13px;
+	line-height: 1.5;
+	text-align: center;
 }
 
-/* Recovery form hidden by default */
+.byebyepw-option-text a {
+	text-underline-offset: 2px;
+}
+
+.byebyepw-message {
+	margin: 16px 0 0;
+	padding: 10px 12px;
+	background: #fff;
+	border-left: 4px solid;
+	color: var(--byebyepw-ink);
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.byebyepw-message[hidden] {
+	display: none;
+}
+
+.byebyepw-message.error {
+	background: var(--byebyepw-red-soft);
+	border-color: var(--byebyepw-red);
+}
+
+.byebyepw-message.warning {
+	background: var(--byebyepw-amber-soft);
+	border-color: #dba617;
+}
+
+.byebyepw-message.success {
+	background: #edfaef;
+	border-color: #008a20;
+}
+
 #byebyepw-recovery-form {
-    display: none;
+	display: none;
+	margin-top: 20px;
 }
 
-/* Styles when password login is disabled */
+#byebyepw-recovery-form h2 {
+	margin: 0;
+	color: var(--byebyepw-ink);
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 1.3;
+}
+
+#byebyepw-recovery-form .byebyepw-recovery-intro {
+	margin-bottom: 18px;
+}
+
+#byebyepw-recovery-code {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+	font-size: 16px;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: 0.03em;
+	text-transform: uppercase;
+}
+
+body.byebyepw-recovery-active #loginform .user-pass-wrap,
+body.byebyepw-recovery-active #loginform .forgetmenot,
+body.byebyepw-recovery-active #loginform > .submit {
+	display: none !important;
+}
+
+body.byebyepw-recovery-active #loginform .user-login-wrap {
+	margin-bottom: 18px;
+}
+
+body.byebyepw-recovery-active #byebyepw-login-message {
+	margin-bottom: 16px;
+}
+
 .byebyepw-password-disabled #loginform #user_login,
 .byebyepw-password-disabled #loginform label[for="user_login"],
 .byebyepw-password-disabled #loginform .user-login-wrap,
@@ -165,9 +188,47 @@
 .byebyepw-password-disabled #loginform .forgetmenot,
 .byebyepw-password-disabled #loginform #wp-submit,
 .byebyepw-password-disabled #nav {
-    display: none !important;
+	display: none !important;
 }
 
 .byebyepw-password-disabled .byebyepw-divider {
-    display: none !important;
+	display: none !important;
+}
+
+body.login #loginform :focus-visible {
+	outline: 2px solid var(--byebyepw-blue);
+	outline-offset: 2px;
+}
+
+#byebyepw-authenticate-passkey[aria-busy="true"] .byebyepw-passkey-mark {
+	border: 2px solid currentColor;
+	border-top-color: transparent;
+	border-radius: 50%;
+	animation: byebyepw-spin 0.8s linear infinite;
+}
+
+#byebyepw-authenticate-passkey[aria-busy="true"] .byebyepw-passkey-mark svg {
+	display: none;
+}
+
+@keyframes byebyepw-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@media (max-width: 480px) {
+	body.login #loginform {
+		padding: 24px;
+	}
+
+	#byebyepw-login-section {
+		margin-bottom: 30px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#byebyepw-authenticate-passkey[aria-busy="true"] .byebyepw-passkey-mark {
+		animation-duration: 1.6s;
+	}
 }

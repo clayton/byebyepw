@@ -5,18 +5,35 @@
     'use strict';
 
     $(document).ready(function() {
+        const $message = $('#byebyepw-login-message');
+        const $passkeyButton = $('#byebyepw-authenticate-passkey');
+        const $recoveryButton = $('#byebyepw-submit-recovery');
+        const passkeyButtonText = $passkeyButton.text().trim();
+        const recoveryButtonText = $recoveryButton.text().trim();
+
+        const showMessage = function(message, type) {
+            $message
+                .removeClass('error warning success')
+                .addClass(type || 'error')
+                .prop('hidden', !message)
+                .text(message || '');
+        };
+
+        const setButtonBusy = function($button, busy, label) {
+            $button.prop('disabled', busy);
+            if (busy) {
+                $button.attr('aria-busy', 'true').find('span:last-child').text(label);
+            } else {
+                $button.removeAttr('aria-busy');
+            }
+        };
+
         // Check WebAuthn support
         const isWebAuthnSupported = window.PublicKeyCredential !== undefined;
 
         if (!isWebAuthnSupported) {
-            // Hide passkey button and show unsupported message
-            $('#byebyepw-authenticate-passkey').hide();
-            $('#byebyepw-login-section').prepend(
-                '<div class="byebyepw-browser-warning" style="background: #fff3cd; border: 1px solid #ffc107; padding: 10px; margin-bottom: 10px; border-radius: 4px;">' +
-                '<strong>' + byebyepw_i18n.browser_not_supported + '</strong> ' +
-                byebyepw_i18n.browser_not_supported_msg +
-                '</div>'
-            );
+            $passkeyButton.hide();
+            showMessage(byebyepw_i18n.browser_not_supported + ' ' + byebyepw_i18n.browser_not_supported_msg, 'warning');
         }
 
         // WebAuthn helper functions
@@ -43,12 +60,11 @@
         };
 
         // Passkey authentication
-        $('#byebyepw-authenticate-passkey').on('click', function() {
+        $passkeyButton.on('click', function() {
             const button = this;
             const $button = $(button);
-            const originalText = $button.text();
-
-            $button.prop('disabled', true).text(byebyepw_i18n.initializing);
+            showMessage('', '');
+            setButtonBusy($button, true, byebyepw_i18n.initializing);
 
             // Get username if available
             const username = $('#user_login').val();
@@ -63,8 +79,9 @@
                 },
                 success: function(response) {
                     if (!response.success) {
-                        alert(byebyepw_i18n.failed_get_auth_challenge);
-                        $button.prop('disabled', false).text(originalText);
+                        showMessage(byebyepw_i18n.failed_get_auth_challenge, 'error');
+                        setButtonBusy($button, false, '');
+                        $button.find('span:last-child').text(passkeyButtonText);
                         return;
                     }
 
@@ -91,11 +108,11 @@
                         }));
                     }
 
-                    $button.text(byebyepw_i18n.follow_browser_prompts);
+                    $button.find('span:last-child').text(byebyepw_i18n.follow_browser_prompts);
 
                     navigator.credentials.get({ publicKey: publicKeyOptions })
                         .then(credential => {
-                            $button.text(byebyepw_i18n.authenticating);
+                            $button.find('span:last-child').text(byebyepw_i18n.authenticating);
 
                             $.ajax({
                                 url: byebyepw_ajax.ajax_url,
@@ -115,24 +132,28 @@
                                     if (response.success) {
                                         window.location.href = response.data.redirect;
                                     } else {
-                                        alert(byebyepw_i18n.auth_failed);
-                                        $button.prop('disabled', false).text(originalText);
+                                        showMessage(byebyepw_i18n.auth_failed, 'error');
+                                        setButtonBusy($button, false, '');
+                                        $button.find('span:last-child').text(passkeyButtonText);
                                     }
                                 },
                                 error: function() {
-                                    alert(byebyepw_i18n.auth_failed);
-                                    $button.prop('disabled', false).text(originalText);
+                                    showMessage(byebyepw_i18n.auth_failed, 'error');
+                                    setButtonBusy($button, false, '');
+                                    $button.find('span:last-child').text(passkeyButtonText);
                                 }
                             });
                         })
-                        .catch(error => {
-                            alert(byebyepw_i18n.auth_failed_detail + error.message);
-                            $button.prop('disabled', false).text(originalText);
+                        .catch(() => {
+                            showMessage(byebyepw_i18n.auth_failed_detail, 'warning');
+                            setButtonBusy($button, false, '');
+                            $button.find('span:last-child').text(passkeyButtonText);
                         });
                 },
                 error: function() {
-                    alert(byebyepw_i18n.failed_get_auth_challenge);
-                    $button.prop('disabled', false).text(originalText);
+                    showMessage(byebyepw_i18n.failed_get_auth_challenge, 'error');
+                    setButtonBusy($button, false, '');
+                    $button.find('span:last-child').text(passkeyButtonText);
                 }
             });
         });
@@ -140,27 +161,45 @@
         // Recovery code toggle
         $('#byebyepw-use-recovery-code').on('click', function(e) {
             e.preventDefault();
+            showMessage('', '');
+            $('body').addClass('byebyepw-recovery-active');
             $('#byebyepw-login-section').hide();
             $('#byebyepw-recovery-form').show();
+            const $firstField = $('#user_login:visible, #byebyepw-recovery-username:visible, #byebyepw-recovery-code:visible').first();
+            $firstField.trigger('focus');
         });
 
         // Back to passkey button
         $('#byebyepw-back-to-passkey').on('click', function(e) {
             e.preventDefault();
+            showMessage('', '');
+            $('body').removeClass('byebyepw-recovery-active');
             $('#byebyepw-recovery-form').hide();
             $('#byebyepw-login-section').show();
+            $passkeyButton.trigger('focus');
         });
 
         // Recovery code submission
-        $('#byebyepw-submit-recovery').on('click', function() {
+        $recoveryButton.on('click', function() {
+            const $button = $(this);
             // Get username from either the main form or recovery form
             let username = $('#user_login').val() || $('#byebyepw-recovery-username').val();
             const recovery_code = $('#byebyepw-recovery-code').val();
 
-            if (!username || !recovery_code) {
-                alert(byebyepw_i18n.enter_username_and_code);
+            if (!username) {
+                showMessage(byebyepw_i18n.enter_username, 'error');
+                $('#user_login:visible, #byebyepw-recovery-username:visible').first().trigger('focus');
                 return;
             }
+
+            if (!recovery_code) {
+                showMessage(byebyepw_i18n.enter_recovery_code, 'error');
+                $('#byebyepw-recovery-code').trigger('focus');
+                return;
+            }
+
+            showMessage('', '');
+            $button.prop('disabled', true).attr('aria-busy', 'true').text(byebyepw_i18n.recovery_authenticating);
 
             // First get a CSRF token by requesting a challenge (but ignore the challenge)
             $.ajax({
@@ -173,7 +212,8 @@
                 },
                 success: function(challengeResponse) {
                     if (!challengeResponse.success) {
-                        alert(byebyepw_i18n.auth_failed);
+                        showMessage(byebyepw_i18n.recovery_failed, 'error');
+                        $button.prop('disabled', false).removeAttr('aria-busy').text(recoveryButtonText);
                         return;
                     }
 
@@ -197,18 +237,28 @@
                             if (response.success) {
                                 window.location.href = response.data.redirect;
                             } else {
-                                alert(byebyepw_i18n.auth_failed);
+                                showMessage(byebyepw_i18n.recovery_failed, 'error');
+                                $button.prop('disabled', false).removeAttr('aria-busy').text(recoveryButtonText);
                             }
                         },
                         error: function() {
-                            alert(byebyepw_i18n.auth_failed);
+                            showMessage(byebyepw_i18n.recovery_failed, 'error');
+                            $button.prop('disabled', false).removeAttr('aria-busy').text(recoveryButtonText);
                         }
                     });
                 },
                 error: function() {
-                    alert(byebyepw_i18n.auth_failed);
+                    showMessage(byebyepw_i18n.recovery_failed, 'error');
+                    $button.prop('disabled', false).removeAttr('aria-busy').text(recoveryButtonText);
                 }
             });
+        });
+
+        $('#byebyepw-recovery-code').on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                $('#byebyepw-submit-recovery').trigger('click');
+            }
         });
     });
 })(jQuery);

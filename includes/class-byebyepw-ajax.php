@@ -367,6 +367,12 @@ class Byebyepw_Ajax {
 			wp_send_json_error( __( 'Missing passkey ID', 'bye-bye-passwords' ) );
 		}
 
+		$options = get_option( 'byebyepw_settings', array() );
+		$credentials = $this->webauthn->get_user_credentials( $user_id );
+		if ( ! empty( $options['password_login_disabled'] ) && count( $credentials ) <= 1 ) {
+			wp_send_json_error( __( 'Add another passkey or turn password sign-in back on before removing your only passkey.', 'bye-bye-passwords' ) );
+		}
+
 		$result = $this->webauthn->delete_credential_by_id( $passkey_id, $user_id );
 
 		if ( ! $result ) {

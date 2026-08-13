@@ -5,22 +5,60 @@
 		// Modal handling
 		const $registerModal = $('#byebyepw-register-modal');
 		const $recoveryModal = $('#byebyepw-recovery-modal');
+		let $lastFocusedElement = null;
+		let recoveryCodesChanged = false;
+
+		const openModal = function($modal) {
+			$lastFocusedElement = $(document.activeElement);
+			$modal.attr('aria-hidden', 'false').fadeIn(120);
+			$('body').addClass('byebyepw-modal-open');
+			setTimeout(function() {
+				$modal.find('input, button').filter(':visible').first().trigger('focus');
+			}, 140);
+		};
+
+		const closeModal = function($modal) {
+			$modal.stop(true, true).fadeOut(100, function() {
+				$modal.attr('aria-hidden', 'true');
+				if (recoveryCodesChanged && $modal[0] === $recoveryModal[0]) {
+					location.reload();
+				}
+			});
+			$('body').removeClass('byebyepw-modal-open');
+			if ($lastFocusedElement && $lastFocusedElement.length) {
+				$lastFocusedElement.trigger('focus');
+			}
+		};
+
+		const showStatus = function($element, message, type) {
+			$element.removeClass('is-error is-success is-loading').addClass(type ? 'is-' + type : '').text(message);
+		};
 
 		// Open register modal
 		$('#byebyepw-register-passkey').on('click', function(e) {
 			e.preventDefault();
-			$registerModal.show();
+			showStatus($('#byebyepw-registration-status'), '', '');
+			openModal($registerModal);
 		});
 
 		// Close modals
 		$('.byebyepw-modal-close').on('click', function() {
-			$(this).closest('.byebyepw-modal').hide();
+			closeModal($(this).closest('.byebyepw-modal'));
 		});
 
 		// Close modal on outside click
 		$('.byebyepw-modal').on('click', function(e) {
 			if (e.target === this) {
-				$(this).hide();
+				closeModal($(this));
+			}
+		});
+
+		$(document).on('keydown', function(e) {
+			if (e.key === 'Escape') {
+				const $openModal = $('.byebyepw-modal:visible').first();
+				if ($openModal.length) {
+					closeModal($openModal);
+				}
 			}
 		});
 
@@ -30,12 +68,15 @@
 
 			const passkeyName = $('#byebyepw-passkey-name').val().trim();
 			if (!passkeyName) {
-				alert(byebyepw_i18n.enter_passkey_name);
+				showStatus($('#byebyepw-registration-status'), byebyepw_i18n.enter_passkey_name, 'error');
+				$('#byebyepw-passkey-name').trigger('focus');
 				return;
 			}
 
 			const $status = $('#byebyepw-registration-status');
-			$status.html('<p>' + byebyepw_i18n.starting_registration + '</p>');
+			const $button = $(this);
+			$button.prop('disabled', true).attr('aria-busy', 'true');
+			showStatus($status, byebyepw_i18n.starting_registration, 'loading');
 
 			try {
 				// Get registration challenge from server
@@ -77,14 +118,14 @@
 					}));
 				}
 
-				$status.html('<p>' + byebyepw_i18n.follow_browser_prompts + '</p>');
+				showStatus($status, byebyepw_i18n.follow_browser_prompts, 'loading');
 
 				// Create credential
 				const credential = await navigator.credentials.create({
 					publicKey: options
 				});
 
-				$status.html('<p>' + byebyepw_i18n.processing_passkey + '</p>');
+				showStatus($status, byebyepw_i18n.processing_passkey, 'loading');
 
 				// Send to server
 				const verifyResponse = await $.ajax({
@@ -101,7 +142,7 @@
 				});
 
 				if (verifyResponse.success) {
-					$status.html('<p class="success">' + byebyepw_i18n.passkey_registered + '</p>');
+					showStatus($status, byebyepw_i18n.passkey_registered, 'success');
 					setTimeout(() => {
 						location.reload();
 					}, 1500);
@@ -111,7 +152,8 @@
 
 			} catch (error) {
 				console.error('Registration error:', error);
-				$status.html('<p class="error">' + byebyepw_i18n.registration_failed + error.message + '</p>');
+				showStatus($status, byebyepw_i18n.registration_failed + error.message, 'error');
+				$button.prop('disabled', false).removeAttr('aria-busy');
 			}
 		});
 
@@ -119,9 +161,12 @@
 		$('#byebyepw-generate-recovery-codes').on('click', async function(e) {
 			e.preventDefault();
 
-			if (!confirm(byebyepw_i18n.confirm_invalidate_codes)) {
+			const $button = $(this);
+			if ($button.data('has-codes') === 1 && !confirm(byebyepw_i18n.confirm_invalidate_codes)) {
 				return;
 			}
+
+			$button.prop('disabled', true).attr('aria-busy', 'true');
 
 			try {
 				const response = await $.ajax({
@@ -134,36 +179,51 @@
 				});
 
 				if (response.success && response.data.codes) {
-					// Display codes in modal
-					const codesHtml = response.data.codes.map(code =>
-						'<div class="recovery-code">' + code + '</div>'
-					).join('');
-
-					$('#byebyepw-recovery-codes-list').html(codesHtml);
-					$recoveryModal.show();
+					recoveryCodesChanged = true;
+					const $codesList = $('#byebyepw-recovery-codes-list').empty();
+					response.data.codes.forEach(function(code, index) {
+						$('<div>', { class: 'recovery-code' })
+							.append($('<span>', { class: 'screen-reader-text', text: (index + 1) + '. ' }))
+							.append(document.createTextNode(code))
+							.appendTo($codesList);
+					});
+					showStatus($('#byebyepw-recovery-action-status'), '', '');
+					openModal($recoveryModal);
 
 					// Store codes for copy/download
 					window.byebyepwRecoveryCodes = response.data.codes;
 				} else {
-					alert(byebyepw_i18n.failed_generate_codes);
+					showStatus($('#byebyepw-recovery-generation-status'), byebyepw_i18n.failed_generate_codes, 'error');
 				}
 			} catch (error) {
 				console.error('Error generating recovery codes:', error);
-				alert(byebyepw_i18n.error_generating_codes);
+				showStatus($('#byebyepw-recovery-generation-status'), byebyepw_i18n.error_generating_codes, 'error');
+			} finally {
+				$button.prop('disabled', false).removeAttr('aria-busy');
 			}
 		});
 
 		// Copy recovery codes
-		$('#byebyepw-copy-codes').on('click', function() {
+		$('#byebyepw-copy-codes').on('click', async function() {
 			if (window.byebyepwRecoveryCodes) {
 				const codesText = window.byebyepwRecoveryCodes.join('\n');
-
-				// Create textarea, copy, and remove
-				const $textarea = $('<textarea>').val(codesText).appendTo('body').select();
-				document.execCommand('copy');
-				$textarea.remove();
-
-				alert(byebyepw_i18n.codes_copied);
+				try {
+					if (navigator.clipboard && window.isSecureContext) {
+						await navigator.clipboard.writeText(codesText);
+					} else {
+						const $textarea = $('<textarea>').val(codesText).appendTo('body').select();
+						document.execCommand('copy');
+						$textarea.remove();
+					}
+					const $button = $(this);
+					$button.text(byebyepw_i18n.copied_codes);
+					showStatus($('#byebyepw-recovery-action-status'), byebyepw_i18n.codes_copied, 'success');
+					setTimeout(function() {
+						$button.text(byebyepw_i18n.copy_codes);
+					}, 1800);
+				} catch (error) {
+					showStatus($('#byebyepw-recovery-action-status'), byebyepw_i18n.error_generating_codes, 'error');
+				}
 			}
 		});
 
@@ -210,11 +270,11 @@
 				if (response.success) {
 					location.reload();
 				} else {
-					alert(byebyepw_i18n.failed_delete_passkey);
+					showStatus($('#byebyepw-passkey-status'), response.data || byebyepw_i18n.failed_delete_passkey, 'error');
 				}
 			} catch (error) {
 				console.error('Error deleting passkey:', error);
-				alert(byebyepw_i18n.error_deleting_passkey);
+				showStatus($('#byebyepw-passkey-status'), byebyepw_i18n.error_deleting_passkey, 'error');
 			}
 		});
 

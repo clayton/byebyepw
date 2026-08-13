@@ -14,43 +14,56 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 
-<h2><?php esc_html_e( 'Passkey Authentication', 'bye-bye-passwords' ); ?></h2>
+<h2><?php esc_html_e( 'Passkey sign-in', 'bye-bye-passwords' ); ?></h2>
 
-<table class="form-table">
+<table class="form-table byebyepw-profile-table">
     <tr>
-        <th><?php esc_html_e( 'Registered Passkeys', 'bye-bye-passwords' ); ?></th>
+        <th><?php esc_html_e( 'Sign-in security', 'bye-bye-passwords' ); ?></th>
         <td>
-            <?php if ( empty( $credentials ) ) : ?>
-                <p><?php esc_html_e( 'No passkeys registered.', 'bye-bye-passwords' ); ?></p>
-            <?php else : ?>
-                <ul>
-                    <?php foreach ( $credentials as $byebyepw_credential ) : ?>
-                        <li>
-                            <?php echo esc_html( $byebyepw_credential->name ?: __( 'Unnamed Passkey', 'bye-bye-passwords' ) ); ?>
-                            - <?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $byebyepw_credential->created_at ) ) ); ?>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            <?php endif; ?>
-        </td>
-    </tr>
-    
-    <tr>
-        <th><?php esc_html_e( 'Recovery Codes', 'bye-bye-passwords' ); ?></th>
-        <td>
-            <?php if ( $has_recovery_codes ) : ?>
-                <p><?php 
-                    // translators: %d is the number of remaining recovery codes
-                    printf( esc_html__( '%d recovery codes remaining.', 'bye-bye-passwords' ), intval( $remaining_codes ) ); ?></p>
-            <?php else : ?>
-                <p><?php esc_html_e( 'No recovery codes generated.', 'bye-bye-passwords' ); ?></p>
-            <?php endif; ?>
+            <div class="byebyepw-profile-summary">
+                <div>
+                    <span class="byebyepw-status <?php echo empty( $credentials ) ? 'is-needed' : 'is-ready'; ?>">
+                        <?php
+                        echo empty( $credentials )
+                            ? esc_html__( 'No passkey', 'bye-bye-passwords' )
+                            : esc_html(
+                                sprintf(
+                                    /* translators: %d: number of registered passkeys. */
+                                    _n( '%d passkey', '%d passkeys', count( $credentials ), 'bye-bye-passwords' ),
+                                    count( $credentials )
+                                )
+                            );
+                        ?>
+                    </span>
+                    <span class="byebyepw-status <?php echo $has_recovery_codes ? 'is-ready' : 'is-needed'; ?>">
+                        <?php
+                        echo $has_recovery_codes
+                            ? esc_html(
+                                sprintf(
+                                    /* translators: %d: number of unused recovery codes. */
+                                    _n( '%d recovery code', '%d recovery codes', intval( $remaining_codes ), 'bye-bye-passwords' ),
+                                    intval( $remaining_codes )
+                                )
+                            )
+                            : esc_html__( 'No recovery codes', 'bye-bye-passwords' );
+                        ?>
+                    </span>
+                </div>
+                <p class="description"><?php esc_html_e( 'Passkeys and recovery codes are managed on their own security screen.', 'bye-bye-passwords' ); ?></p>
+                <?php if ( ! empty( $credentials ) ) : ?>
+                    <ul class="byebyepw-profile-passkeys">
+                        <?php foreach ( $credentials as $byebyepw_credential ) : ?>
+                            <li>
+                                <strong><?php echo esc_html( $byebyepw_credential->name ?: __( 'Unnamed passkey', 'bye-bye-passwords' ) ); ?></strong>
+                                <span><?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $byebyepw_credential->created_at ) ) ); ?></span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
+                <a href="<?php echo esc_url( admin_url( 'admin.php?page=byebyepw' ) ); ?>" class="button">
+                    <?php esc_html_e( 'Manage sign-in security', 'bye-bye-passwords' ); ?>
+                </a>
+            </div>
         </td>
     </tr>
 </table>
-
-<p>
-    <a href="<?php echo esc_url( admin_url( 'admin.php?page=byebyepw' ) ); ?>" class="button">
-        <?php esc_html_e( 'Manage Passkeys', 'bye-bye-passwords' ); ?>
-    </a>
-</p>
