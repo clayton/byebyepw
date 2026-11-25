@@ -4,7 +4,7 @@ Donate link: https://claytonlz.com/
 Tags: passwordless, webauthn, passkeys, authentication, security
 Requires at least: 5.0
 Tested up to: 7.2
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 Requires PHP: 8.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -73,6 +73,13 @@ No, most modern devices have built-in authenticators (Touch ID, Face ID, Windows
 5. Passwordless-only login page with password authentication disabled
 
 == Changelog ==
+
+= 1.4.1 =
+* Compatibility: Tested with WordPress 7.2 and PHP 8.6 (including deprecation cleanup in the bundled WebAuthn library)
+* Compatibility: Prepared admin JavaScript for jQuery 4
+* Fix: Corrected WebAuthn `allowCredentials` and `excludeCredentials` encoding and enabled passkey login using either username or email address
+* Fix: Restored non-administrator access to the Passkeys page so all logged-in users can manage their own passkeys and recovery codes
+* Compliance: Resolved WordPress Plugin Check warnings, hardened direct file access checks, and removed unused boilerplate files
 
 = 1.4.0 =
 * Improved: Redesigned passkey, recovery-code, settings, profile, and login experiences for clearer setup and sign-in
@@ -180,6 +187,9 @@ No, most modern devices have built-in authenticators (Touch ID, Face ID, Windows
 * GPL v2 licensing for WordPress.org compatibility
 
 == Upgrade Notice ==
+
+= 1.4.1 =
+Adds WordPress 7.2 and PHP 8.6 compatibility, fixes passkey credential encoding and email login, restores non-admin passkey management access, and improves Plugin Check compliance.
 
 = 1.4.0 =
 Improves passkey setup and sign-in, enforces passwordless mode server-side, and adds safeguards against administrator lockout.

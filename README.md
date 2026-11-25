@@ -118,6 +118,69 @@ bye-bye-passwords/
 └── bye-bye-passwords.php   # Main plugin file
 ```
 
+## Local Development & Testing (LAMP Devcontainer)
+
+This repository includes a self-contained LAMP devcontainer (Apache, MariaDB, selectable PHP `8.0`/`8.2`/`8.4`/`8.6`, selectable WordPress versions, trusted local HTTPS, WP-CLI, WordPress Plugin Check, and Playwright) for testing real WebAuthn/Passkey flows locally.
+
+### Prerequisites
+
+- Docker with Compose v2 (e.g., Docker Desktop, Colima, OrbStack, or Docker Engine)
+
+### Day-to-Day Commands
+
+```bash
+# Generate local dev TLS certs (if needed) and start LAMP (defaults: PHP 8.6 + WP 7.2-RC3)
+.devcontainer/bin/dev up --build
+
+# Check active PHP/WordPress versions, plugins, URLs, and container health
+.devcontainer/bin/dev status
+
+# Switch PHP version (cached per version)
+.devcontainer/bin/dev switch-php 8.4   # also supports 8.6, 8.2, 8.0
+
+# Switch WordPress core version (preserves DB and plugin mount)
+.devcontainer/bin/dev switch-wp 7.2-RC3   # also supports 7.1.5, latest, rc, nightly
+
+# Run WordPress Plugin Check (automatically excludes .devcontainer and .git)
+.devcontainer/bin/dev plugin-check
+
+# Run Playwright Chromium WebAuthn E2E tests over strictly verified HTTPS
+.devcontainer/bin/dev test-e2e
+
+# Stop containers (keeps DB and WordPress volumes)
+.devcontainer/bin/dev down
+
+# Full reset (stops containers and deletes DB and WordPress volumes)
+.devcontainer/bin/dev down -v
+```
+
+### Trusting the Local Dev Root CA for Browser Passkey Testing
+
+On first startup, `.devcontainer/bin/dev up` generates a local Root CA (`.devcontainer/certs/ca.crt`) and a SAN leaf certificate for `localhost` and `byebyepw.test`. The Playwright container trusts this CA automatically; to test real Passkeys in your host Chromium/Chrome browser at `https://localhost:8443` (or `https://byebyepw.test:8443` with an `/etc/hosts` entry), trust the generated Root CA once:
+
+**macOS (Keychain)** — or run `.devcontainer/bin/dev trust-macos` to print this command:
+
+```bash
+sudo security add-trusted-cert -d -r trustRoot \
+  -k /Library/Keychains/System.keychain \
+  .devcontainer/certs/ca.crt
+```
+
+**Linux (Debian/Ubuntu system trust store + Chromium NSS DB)**:
+
+```bash
+sudo cp .devcontainer/certs/ca.crt /usr/local/share/ca-certificates/byebyepw-local-ca.crt
+sudo update-ca-certificates
+
+# Also add to Chromium's NSS DB (requires libnss3-tools):
+certutil -d "sql:$HOME/.pki/nssdb" -A -t "CT,C,C" \
+  -n "Bye Bye Passwords Local Dev CA" -i .devcontainer/certs/ca.crt
+```
+
+See [`.devcontainer/README.md`](.devcontainer/README.md) for full details, `.env` overrides, `/etc/hosts` setup, and WP-CLI helpers.
+
+> **Security Note:** The default dev accounts (`admin` / `admin123!` and `subscriber` / `subscriber123!`) and database credentials are **local-only container defaults** bound to `127.0.0.1` — never use them in production. All generated TLS keys and certificates (`.devcontainer/certs/`), local `.env` overrides, and Playwright `.devcontainer/test-results/` are generated at runtime, gitignored, and never committed.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit issues and pull requests.

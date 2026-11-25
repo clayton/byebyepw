@@ -33,6 +33,7 @@ composer.lock
 # Environment
 .env
 .env.*
+!.env.example
 
 # Build
 dist/
@@ -41,6 +42,14 @@ build/
 # Testing
 coverage/
 *.test.php
+test-results/
+
+# Local TLS certificates & keys
+.devcontainer/certs/
+*.key
+*.crt
+*.pem
+*.srl
 
 # Local development
 .claude/
