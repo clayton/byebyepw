@@ -1,6 +1,11 @@
 <?php
 
 namespace lbuchs\WebAuthn\Attestation;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 use lbuchs\WebAuthn\WebAuthnException;
 use lbuchs\WebAuthn\CBOR\CborDecoder;
 use lbuchs\WebAuthn\Binary\ByteBuffer;
@@ -334,8 +339,8 @@ class AuthenticatorData {
 
         // COSE key-encoded elliptic curve public key in EC2 format
         $credPKey = new \stdClass();
-        $credPKey->kty = $enc[self::$_COSE_KTY];
-        $credPKey->alg = $enc[self::$_COSE_ALG];
+        $credPKey->kty = $enc[self::$_COSE_KTY] ?? null;
+        $credPKey->alg = $enc[self::$_COSE_ALG] ?? null;
 
         switch ($credPKey->alg) {
             case self::$_EC2_ES256: $this->_readCredentialPublicKeyES256($credPKey, $enc); break;
@@ -353,8 +358,8 @@ class AuthenticatorData {
      * @throws WebAuthnException
      */
     private function _readCredentialPublicKeyEDDSA(&$credPKey, $enc) {
-        $credPKey->crv = $enc[self::$_COSE_CRV];
-        $credPKey->x   = $enc[self::$_COSE_X] instanceof ByteBuffer ? $enc[self::$_COSE_X]->getBinaryString() : null;
+        $credPKey->crv = $enc[self::$_COSE_CRV] ?? null;
+        $credPKey->x   = isset($enc[self::$_COSE_X]) && $enc[self::$_COSE_X] instanceof ByteBuffer ? $enc[self::$_COSE_X]->getBinaryString() : null;
         unset ($enc);
 
         // Validation
@@ -373,7 +378,7 @@ class AuthenticatorData {
             throw new WebAuthnException('curve not Ed25519', WebAuthnException::INVALID_PUBLIC_KEY);
         }
 
-        if (\strlen($credPKey->x) !== 32) {
+        if (!\is_string($credPKey->x) || \strlen($credPKey->x) !== 32) {
             // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
             throw new WebAuthnException('Invalid X-coordinate', WebAuthnException::INVALID_PUBLIC_KEY);
         }
@@ -386,9 +391,9 @@ class AuthenticatorData {
      * @throws WebAuthnException
      */
     private function _readCredentialPublicKeyES256(&$credPKey, $enc) {
-        $credPKey->crv = $enc[self::$_COSE_CRV];
-        $credPKey->x   = $enc[self::$_COSE_X] instanceof ByteBuffer ? $enc[self::$_COSE_X]->getBinaryString() : null;
-        $credPKey->y   = $enc[self::$_COSE_Y] instanceof ByteBuffer ? $enc[self::$_COSE_Y]->getBinaryString() : null;
+        $credPKey->crv = $enc[self::$_COSE_CRV] ?? null;
+        $credPKey->x   = isset($enc[self::$_COSE_X]) && $enc[self::$_COSE_X] instanceof ByteBuffer ? $enc[self::$_COSE_X]->getBinaryString() : null;
+        $credPKey->y   = isset($enc[self::$_COSE_Y]) && $enc[self::$_COSE_Y] instanceof ByteBuffer ? $enc[self::$_COSE_Y]->getBinaryString() : null;
         unset ($enc);
 
         // Validation
@@ -407,12 +412,12 @@ class AuthenticatorData {
             throw new WebAuthnException('curve not P-256', WebAuthnException::INVALID_PUBLIC_KEY);
         }
 
-        if (\strlen($credPKey->x) !== 32) {
+        if (!\is_string($credPKey->x) || \strlen($credPKey->x) !== 32) {
             // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
             throw new WebAuthnException('Invalid X-coordinate', WebAuthnException::INVALID_PUBLIC_KEY);
         }
 
-        if (\strlen($credPKey->y) !== 32) {
+        if (!\is_string($credPKey->y) || \strlen($credPKey->y) !== 32) {
             // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
             throw new WebAuthnException('Invalid Y-coordinate', WebAuthnException::INVALID_PUBLIC_KEY);
         }
@@ -425,8 +430,8 @@ class AuthenticatorData {
      * @throws WebAuthnException
      */
     private function _readCredentialPublicKeyRS256(&$credPKey, $enc) {
-        $credPKey->n = $enc[self::$_COSE_N] instanceof ByteBuffer ? $enc[self::$_COSE_N]->getBinaryString() : null;
-        $credPKey->e = $enc[self::$_COSE_E] instanceof ByteBuffer ? $enc[self::$_COSE_E]->getBinaryString() : null;
+        $credPKey->n = isset($enc[self::$_COSE_N]) && $enc[self::$_COSE_N] instanceof ByteBuffer ? $enc[self::$_COSE_N]->getBinaryString() : null;
+        $credPKey->e = isset($enc[self::$_COSE_E]) && $enc[self::$_COSE_E] instanceof ByteBuffer ? $enc[self::$_COSE_E]->getBinaryString() : null;
         unset ($enc);
 
         // Validation
@@ -440,12 +445,12 @@ class AuthenticatorData {
             throw new WebAuthnException('signature algorithm not ES256', WebAuthnException::INVALID_PUBLIC_KEY);
         }
 
-        if (\strlen($credPKey->n) !== 256) {
+        if (!\is_string($credPKey->n) || \strlen($credPKey->n) !== 256) {
             // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
             throw new WebAuthnException('Invalid RSA modulus', WebAuthnException::INVALID_PUBLIC_KEY);
         }
 
-        if (\strlen($credPKey->e) !== 3) {
+        if (!\is_string($credPKey->e) || \strlen($credPKey->e) !== 3) {
             // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
             throw new WebAuthnException('Invalid RSA public exponent', WebAuthnException::INVALID_PUBLIC_KEY);
         }

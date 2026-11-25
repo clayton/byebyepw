@@ -1,5 +1,10 @@
 <?php
 
+// If this file is called directly, abort.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * The public-facing functionality of the plugin.
  *
@@ -52,24 +57,6 @@ class Byebyepw_Public {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 
-	}
-
-	/**
-	 * Register the stylesheets for the public-facing side of the site.
-	 *
-	 * @since    1.0.0
-	 */
-	public function enqueue_styles() {
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/byebyepw-public.css', array(), $this->version, 'all' );
-	}
-
-	/**
-	 * Register the JavaScript for the public-facing side of the site.
-	 *
-	 * @since    1.0.0
-	 */
-	public function enqueue_scripts() {
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/byebyepw-public.js', array( 'jquery' ), $this->version, false );
 	}
 
 	/**
@@ -145,7 +132,7 @@ class Byebyepw_Public {
 			plugin_dir_url( __FILE__ ) . 'js/byebyepw-login.js',
 			array( 'jquery' ),
 			$this->version,
-			false
+			true
 		);
 		
 		// Prepare redirect URL - this is safe to access without nonce as it's just for determining redirect destination

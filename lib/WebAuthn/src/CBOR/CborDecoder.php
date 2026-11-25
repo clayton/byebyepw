@@ -2,6 +2,11 @@
 
 
 namespace lbuchs\WebAuthn\CBOR;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 use lbuchs\WebAuthn\WebAuthnException;
 use lbuchs\WebAuthn\Binary\ByteBuffer;
 

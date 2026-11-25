@@ -1,6 +1,11 @@
 <?php
 
 namespace lbuchs\WebAuthn\Attestation;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 use lbuchs\WebAuthn\WebAuthnException;
 use lbuchs\WebAuthn\CBOR\CborDecoder;
 use lbuchs\WebAuthn\Binary\ByteBuffer;

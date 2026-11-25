@@ -81,16 +81,6 @@ The plugin works with modern browsers that support WebAuthn:
 
 ## Troubleshooting
 
-### Debug Tools
-
-The plugin includes built-in debug tools accessible from "Bye Bye Passwords > Debug Tools":
-
-- View database status and tables
-- Check session and challenge status
-- View all registered passkeys
-- Clear passkeys and challenges if needed
-- Review debug logs
-
 ### Common Issues
 
 **"WebAuthn not supported" error**
@@ -100,7 +90,7 @@ The plugin includes built-in debug tools accessible from "Bye Bye Passwords > De
 
 **"Invalid challenge" error during registration/authentication**
 - Clear browser cookies and try again
-- Use the debug tools to clear stored challenges
+- Wait a moment and retry from a fresh page load
 
 **Cannot register passkey**
 - Ensure JavaScript is enabled

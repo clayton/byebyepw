@@ -195,6 +195,20 @@ class Byebyepw_Ajax {
 	}
 
 	/**
+	 * Look up a WordPress user by username or email address.
+	 *
+	 * @param string $identifier Username or email address.
+	 * @return WP_User|false User object if found, false otherwise.
+	 */
+	private function get_user_by_login_or_email( $identifier ) {
+		$user = get_user_by( 'login', $identifier );
+		if ( ! $user && is_email( $identifier ) ) {
+			$user = get_user_by( 'email', $identifier );
+		}
+		return $user;
+	}
+
+	/**
 	 * Handle get registration challenge request
 	 */
 	public function handle_get_registration_challenge() {
@@ -202,7 +216,7 @@ class Byebyepw_Ajax {
 			wp_send_json_error( __( 'Invalid nonce', 'bye-bye-passwords' ) );
 		}
 
-		if ( ! is_user_logged_in() ) {
+		if ( ! is_user_logged_in() || ! current_user_can( 'read' ) ) {
 			wp_send_json_error( __( 'Not logged in', 'bye-bye-passwords' ) );
 		}
 
@@ -224,7 +238,7 @@ class Byebyepw_Ajax {
 			wp_send_json_error( __( 'Invalid nonce', 'bye-bye-passwords' ) );
 		}
 
-		if ( ! is_user_logged_in() ) {
+		if ( ! is_user_logged_in() || ! current_user_can( 'read' ) ) {
 			wp_send_json_error( __( 'Not logged in', 'bye-bye-passwords' ) );
 		}
 
@@ -266,11 +280,11 @@ class Byebyepw_Ajax {
 			wp_send_json_error( __( 'Security validation failed. Please refresh and try again.', 'bye-bye-passwords' ) );
 		}
 
-		// Check if specific user is requested (for username+passkey flow)
+		// Check if specific user is requested (for username or email + passkey flow)
 		$user_id = null;
 		$username = sanitize_text_field( wp_unslash( $_POST['username'] ?? '' ) );
 		if ( ! empty( $username ) ) {
-			$user = get_user_by( 'login', $username );
+			$user = $this->get_user_by_login_or_email( $username );
 			if ( $user ) {
 				$user_id = $user->ID;
 			}
@@ -356,7 +370,7 @@ class Byebyepw_Ajax {
 			wp_send_json_error( __( 'Invalid nonce', 'bye-bye-passwords' ) );
 		}
 
-		if ( ! is_user_logged_in() ) {
+		if ( ! is_user_logged_in() || ! current_user_can( 'read' ) ) {
 			wp_send_json_error( __( 'Not logged in', 'bye-bye-passwords' ) );
 		}
 
@@ -390,7 +404,7 @@ class Byebyepw_Ajax {
 			wp_send_json_error( __( 'Invalid nonce', 'bye-bye-passwords' ) );
 		}
 
-		if ( ! is_user_logged_in() ) {
+		if ( ! is_user_logged_in() || ! current_user_can( 'read' ) ) {
 			wp_send_json_error( __( 'Not logged in', 'bye-bye-passwords' ) );
 		}
 
@@ -436,7 +450,7 @@ class Byebyepw_Ajax {
 			wp_send_json_error( __( 'Missing required data', 'bye-bye-passwords' ) );
 		}
 
-		$user = get_user_by( 'login', $username );
+		$user = $this->get_user_by_login_or_email( $username );
 		if ( ! $user ) {
 			// Use same error message to prevent username enumeration
 			wp_send_json_error( __( 'Authentication failed', 'bye-bye-passwords' ) );

@@ -211,7 +211,8 @@
 					if (navigator.clipboard && window.isSecureContext) {
 						await navigator.clipboard.writeText(codesText);
 					} else {
-						const $textarea = $('<textarea>').val(codesText).appendTo('body').select();
+						const $textarea = $('<textarea>').val(codesText).appendTo('body');
+						$textarea[0].select();
 						document.execCommand('copy');
 						$textarea.remove();
 					}

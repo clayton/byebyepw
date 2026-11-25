@@ -93,9 +93,12 @@ class WebAuthn {
         }
         $path = \rtrim(\trim($path), '\\/');
         if (\is_dir($path)) {
-            foreach (\scandir($path) as $ca) {
-                if (\is_file($path . DIRECTORY_SEPARATOR . $ca) && \in_array(\strtolower(\pathinfo($ca, PATHINFO_EXTENSION)), $certFileExtensions)) {
-                    $this->addRootCertificates($path . DIRECTORY_SEPARATOR . $ca);
+            $entries = \scandir($path);
+            if (\is_array($entries)) {
+                foreach ($entries as $ca) {
+                    if (\is_file($path . DIRECTORY_SEPARATOR . $ca) && \in_array(\strtolower(\pathinfo($ca, PATHINFO_EXTENSION)), $certFileExtensions)) {
+                        $this->addRootCertificates($path . DIRECTORY_SEPARATOR . $ca);
+                    }
                 }
             }
         } else if (\is_file($path) && !\in_array(\realpath($path), $this->_caFiles)) {
@@ -197,8 +200,10 @@ class WebAuthn {
 
         // supported algorithms
         $args->publicKey->pubKeyCredParams = [];
+        $curveNames = \openssl_get_curve_names();
+        $curveNames = \is_array($curveNames) ? $curveNames : [];
 
-        if (function_exists('sodium_crypto_sign_verify_detached') || \in_array('ed25519', \openssl_get_curve_names(), true)) {
+        if (function_exists('sodium_crypto_sign_verify_detached') || \in_array('ed25519', $curveNames, true)) {
             $tmp = new \stdClass();
             $tmp->type = 'public-key';
             $tmp->alg = -8; // EdDSA
@@ -206,7 +211,7 @@ class WebAuthn {
             unset ($tmp);
         }
 
-        if (\in_array('prime256v1', \openssl_get_curve_names(), true)) {
+        if (\in_array('prime256v1', $curveNames, true)) {
             $tmp = new \stdClass();
             $tmp->type = 'public-key';
             $tmp->alg = -7; // ES256
@@ -599,15 +604,14 @@ class WebAuthn {
         }
         // Note: This library version is WordPress-specific for compliance
 
-        $certFolder = \rtrim(\realpath($certFolder), '\\/');
-        if (!is_dir($certFolder)) {
-            // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+        $realCertFolder = \realpath($certFolder);
+        $certFolder = \is_string($realCertFolder) ? \rtrim($realCertFolder, '\\/') : '';
+        if ($certFolder === '' || !is_dir($certFolder)) {
             // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
             throw new WebAuthnException('Invalid folder path for query FIDO Alliance Metadata Service');
         }
 
         if (!\is_string($raw)) {
-            // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
             // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
             throw new WebAuthnException('Unable to query FIDO Alliance Metadata Service');
         }
@@ -615,24 +619,34 @@ class WebAuthn {
         $jwt = \explode('.', $raw);
         if (\count($jwt) !== 3) {
             // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
-            // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
             throw new WebAuthnException('Invalid JWT from FIDO Alliance Metadata Service');
         }
 
         if ($deleteCerts) {
-            foreach (\scandir($certFolder) as $ca) {
-                if (\substr($ca, -4) === '.pem') {
-                    $certFile = $certFolder . DIRECTORY_SEPARATOR . $ca;
-                    // WordPress-only version for WordPress.org compliance
-                    if (function_exists('wp_delete_file')) {
-                        if (wp_delete_file($certFile) === false) {
-                            // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
-            // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
-            throw new WebAuthnException('Cannot delete certs in folder for FIDO Alliance Metadata Service');
+            $entries = \scandir($certFolder);
+            if (\is_array($entries)) {
+                foreach ($entries as $ca) {
+                    if (\substr($ca, -4) === '.pem') {
+                        $certFile = $certFolder . DIRECTORY_SEPARATOR . $ca;
+                        // WordPress-only version for WordPress.org compliance
+                        if (function_exists('wp_delete_file')) {
+                            wp_delete_file($certFile);
+                            if (\file_exists($certFile)) {
+                                // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+                                throw new WebAuthnException('Cannot delete certs in folder for FIDO Alliance Metadata Service');
+                            }
                         }
                     }
                 }
             }
+        }
+
+        global $wp_filesystem;
+        if (!function_exists('WP_Filesystem') && \file_exists(ABSPATH . 'wp-admin/includes/file.php')) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
+        if (empty($wp_filesystem) && function_exists('WP_Filesystem')) {
+            WP_Filesystem();
         }
 
         list($header, $payload, $hash) = $jwt;
@@ -664,10 +678,10 @@ class WebAuthn {
                             $certContent .= "-----END CERTIFICATE-----\n";
                         }
 
-                        if (\file_put_contents($certFolder . DIRECTORY_SEPARATOR . $certFilename, $certContent) === false) {
+                        $chmod = defined('FS_CHMOD_FILE') ? FS_CHMOD_FILE : 0644;
+                        if (empty($wp_filesystem) || !$wp_filesystem->put_contents($certFolder . DIRECTORY_SEPARATOR . $certFilename, $certContent, $chmod)) {
                             // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
-            // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
-            throw new WebAuthnException('unable to save certificate from FIDO Alliance Metadata Service');
+                            throw new WebAuthnException('unable to save certificate from FIDO Alliance Metadata Service');
                         }
                     }
                 }
@@ -688,6 +702,10 @@ class WebAuthn {
      * @throws WebAuthnException
      */
     private function _checkOrigin($origin) {
+        if (!\is_string($origin) || $origin === '') {
+            return false;
+        }
+
         if (strpos($origin, 'android:apk-key-hash:') === 0) {
             return $this->_checkAndroidKeyHashes($origin);
         }
@@ -704,11 +722,19 @@ class WebAuthn {
         // extract host from origin
         // WordPress-only version for WordPress.org compliance
         $host = function_exists('wp_parse_url') ? wp_parse_url($origin, PHP_URL_HOST) : '';
+        if (!\is_string($host) || $host === '') {
+            return false;
+        }
         $host = \trim($host, '.');
 
         // The RP ID must be equal to the origin's effective domain, or a registrable
         // domain suffix of the origin's effective domain.
-        return \preg_match('/' . \preg_quote($this->_rpId) . '$/i', $host) === 1;
+        $rpId = \trim((string) $this->_rpId, '.');
+        if ($rpId === '') {
+            return false;
+        }
+
+        return \preg_match('/(?:^|\.)' . \preg_quote($rpId, '/') . '$/i', $host) === 1;
     }
 
     /**
@@ -717,6 +743,9 @@ class WebAuthn {
      * @return boolean
      */
     private function _checkAndroidKeyHashes($origin) {
+        if (!\is_array($this->_androidKeyHashes)) {
+            return false;
+        }
         $parts = explode('android:apk-key-hash:', $origin);
         if (count($parts) !== 2) {
             return false;
@@ -747,7 +776,9 @@ class WebAuthn {
     private function _verifySignature($dataToVerify, $signature, $credentialPublicKey) {
 
         // Use Sodium to verify EdDSA 25519 as its not yet supported by openssl
-        if (\function_exists('sodium_crypto_sign_verify_detached') && !\in_array('ed25519', \openssl_get_curve_names(), true)) {
+        $curveNames = \openssl_get_curve_names();
+        $curveNames = \is_array($curveNames) ? $curveNames : [];
+        if (\function_exists('sodium_crypto_sign_verify_detached') && !\in_array('ed25519', $curveNames, true)) {
             $pkParts = [];
             if (\preg_match('/BEGIN PUBLIC KEY\-+(?:\s|\n|\r)+([^\-]+)(?:\s|\n|\r)*\-+END PUBLIC KEY/i', $credentialPublicKey, $pkParts)) {
                 $rawPk = \base64_decode($pkParts[1]);

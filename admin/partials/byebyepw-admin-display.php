@@ -106,9 +106,11 @@ foreach ( $byebyepw_setup_steps as $byebyepw_step_index => $byebyepw_setup_step 
 			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
 			<p><?php esc_html_e( 'Set up a phishing-resistant way to sign in, with recovery codes as your safety net.', 'bye-bye-passwords' ); ?></p>
 		</div>
-		<a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=byebyepw-settings' ) ); ?>">
-			<?php esc_html_e( 'Login settings', 'bye-bye-passwords' ); ?>
-		</a>
+		<?php if ( current_user_can( 'manage_options' ) ) : ?>
+			<a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=byebyepw-settings' ) ); ?>">
+				<?php esc_html_e( 'Login settings', 'bye-bye-passwords' ); ?>
+			</a>
+		<?php endif; ?>
 	</div>
 
 	<section class="byebyepw-setup" aria-labelledby="byebyepw-setup-title">

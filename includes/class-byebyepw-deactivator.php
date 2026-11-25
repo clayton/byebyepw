@@ -1,5 +1,10 @@
 <?php
 
+// If this file is called directly, abort.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Fired during plugin deactivation
  *
@@ -34,9 +39,15 @@ class Byebyepw_Deactivator {
 		global $wpdb;
 
 		// Delete all plugin transients (rate limiting, challenge data, etc.)
+		$transient_like         = $wpdb->esc_like( '_transient_byebyepw_' ) . '%';
+		$transient_timeout_like = $wpdb->esc_like( '_transient_timeout_byebyepw_' ) . '%';
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk transient cleanup on deactivation
 		$wpdb->query(
-			"DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_byebyepw_%' OR option_name LIKE '_transient_timeout_byebyepw_%'"
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s",
+				$transient_like,
+				$transient_timeout_like
+			)
 		);
 
 		// Clear object cache for plugin data

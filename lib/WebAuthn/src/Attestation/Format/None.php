@@ -2,6 +2,11 @@
 
 
 namespace lbuchs\WebAuthn\Attestation\Format;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 use lbuchs\WebAuthn\Attestation\AuthenticatorData;
 use lbuchs\WebAuthn\WebAuthnException;
 

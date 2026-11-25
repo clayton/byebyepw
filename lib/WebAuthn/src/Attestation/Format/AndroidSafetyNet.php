@@ -2,6 +2,11 @@
 
 
 namespace lbuchs\WebAuthn\Attestation\Format;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 use lbuchs\WebAuthn\Attestation\AuthenticatorData;
 use lbuchs\WebAuthn\WebAuthnException;
 use lbuchs\WebAuthn\Binary\ByteBuffer;
@@ -104,6 +109,10 @@ class AndroidSafetyNet extends FormatBase {
      */
     public function validateAttestation($clientDataHash) {
         $publicKey = \openssl_pkey_get_public($this->getCertificatePem());
+        if ($publicKey === false) {
+            // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+            throw new WebAuthnException('invalid public key', WebAuthnException::INVALID_PUBLIC_KEY);
+        }
 
         // Verify that the nonce in the response is identical to the Base64 encoding
         // of the SHA-256 hash of the concatenation of authenticatorData and clientDataHash.

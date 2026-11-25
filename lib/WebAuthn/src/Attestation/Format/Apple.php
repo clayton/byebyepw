@@ -2,6 +2,11 @@
 
 
 namespace lbuchs\WebAuthn\Attestation\Format;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 use lbuchs\WebAuthn\Attestation\AuthenticatorData;
 use lbuchs\WebAuthn\WebAuthnException;
 use lbuchs\WebAuthn\Binary\ByteBuffer;
@@ -104,7 +109,12 @@ class Apple extends FormatBase {
             throw new WebAuthnException('invalid x5c certificate', WebAuthnException::INVALID_DATA);
         }
 
-        $keyData = openssl_pkey_get_details(openssl_pkey_get_public($credCert));
+        $credPubKey = \openssl_pkey_get_public($credCert);
+        if ($credPubKey === false) {
+            // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+            throw new WebAuthnException('invalid public key', WebAuthnException::INVALID_PUBLIC_KEY);
+        }
+        $keyData = \openssl_pkey_get_details($credPubKey);
         $key = is_array($keyData) && array_key_exists('key', $keyData) ? $keyData['key'] : null;
 
 
@@ -131,7 +141,12 @@ class Apple extends FormatBase {
         }
 
         // Verify that the credential public key equals the Subject Public Key of credCert.
-        $authKeyData = openssl_pkey_get_details(openssl_pkey_get_public($this->_authenticatorData->getPublicKeyPem()));
+        $authPubKey = \openssl_pkey_get_public($this->_authenticatorData->getPublicKeyPem());
+        if ($authPubKey === false) {
+            // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+            throw new WebAuthnException('invalid public key', WebAuthnException::INVALID_PUBLIC_KEY);
+        }
+        $authKeyData = \openssl_pkey_get_details($authPubKey);
         $authKey = is_array($authKeyData) && array_key_exists('key', $authKeyData) ? $authKeyData['key'] : null;
 
         if ($key === null || $key !== $authKey) {

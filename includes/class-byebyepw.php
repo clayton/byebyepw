@@ -205,9 +205,9 @@ class Byebyepw {
 			return;
 		}
 
-		// Check if we're on a plugin page or the login page
-		$screen = get_current_screen();
-		$is_plugin_page = $screen && ( strpos( $screen->id, 'bye-bye-passwords' ) !== false || strpos( $screen->id, 'bye-bye-passwords' ) !== false );
+		// Check if we're on a plugin page
+		$screen         = get_current_screen();
+		$is_plugin_page = $screen && strpos( $screen->id, 'byebyepw' ) !== false;
 
 		if ( ! $is_plugin_page ) {
 			return;
@@ -234,8 +234,6 @@ class Byebyepw {
 
 		$plugin_public = new Byebyepw_Public( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 		$this->loader->add_action( 'login_form', $plugin_public, 'add_passkey_login_button' );
 		$this->loader->add_action( 'login_enqueue_scripts', $plugin_public, 'enqueue_login_scripts' );
 		$this->loader->add_filter( 'login_body_class', $plugin_public, 'maybe_hide_password_field' );

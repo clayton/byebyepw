@@ -1,5 +1,10 @@
 <?php
 
+// If this file is called directly, abort.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Recovery codes functionality
  *
@@ -171,7 +176,7 @@ class Byebyepw_Recovery_Codes {
 	 */
 	public function format_codes_for_display( $codes ) {
 		$html = '<div class="byebyepw-recovery-codes">';
-		$html .= '<p><strong>' . __( 'Save these recovery codes in a safe place:', 'bye-bye-passwords' ) . '</strong></p>';
+		$html .= '<p><strong>' . esc_html__( 'Save these recovery codes in a safe place:', 'bye-bye-passwords' ) . '</strong></p>';
 		$html .= '<ul class="recovery-codes-list">';
 		
 		foreach ( $codes as $index => $code ) {
@@ -179,7 +184,7 @@ class Byebyepw_Recovery_Codes {
 		}
 		
 		$html .= '</ul>';
-		$html .= '<p class="description">' . __( 'Each code can only be used once. Store them securely.', 'bye-bye-passwords' ) . '</p>';
+		$html .= '<p class="description">' . esc_html__( 'Each code can only be used once. Store them securely.', 'bye-bye-passwords' ) . '</p>';
 		$html .= '</div>';
 		
 		return $html;

@@ -2,6 +2,11 @@
 
 
 namespace lbuchs\WebAuthn\Attestation\Format;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 use lbuchs\WebAuthn\WebAuthnException;
 use lbuchs\WebAuthn\Attestation\AuthenticatorData;
 
@@ -10,6 +15,7 @@ abstract class FormatBase {
     protected $_attestationObject = null;
     protected $_authenticatorData = null;
     protected $_x5c_chain = array();
+    protected $_x5c_chain_pem = null;
     protected $_x5c_tempFile = null;
 
     /**
@@ -41,10 +47,7 @@ abstract class FormatBase {
      * @return string|null
      */
     public function getCertificateChain() {
-        if ($this->_x5c_tempFile && \is_file($this->_x5c_tempFile)) {
-            return \file_get_contents($this->_x5c_tempFile);
-        }
-        return null;
+        return $this->_x5c_chain_pem;
     }
 
     /**
@@ -127,9 +130,20 @@ abstract class FormatBase {
         }
 
         if ($content) {
+            $this->_x5c_chain_pem = $content;
             $this->_x5c_tempFile = \tempnam(\sys_get_temp_dir(), 'x5c_');
-            if (\file_put_contents($this->_x5c_tempFile, $content) !== false) {
-                return $this->_x5c_tempFile;
+            if (\is_string($this->_x5c_tempFile)) {
+                global $wp_filesystem;
+                if (!function_exists('WP_Filesystem') && \file_exists(ABSPATH . 'wp-admin/includes/file.php')) {
+                    require_once ABSPATH . 'wp-admin/includes/file.php';
+                }
+                if (empty($wp_filesystem) && function_exists('WP_Filesystem')) {
+                    WP_Filesystem();
+                }
+                $chmod = defined('FS_CHMOD_FILE') ? FS_CHMOD_FILE : 0644;
+                if (!empty($wp_filesystem) && $wp_filesystem->put_contents($this->_x5c_tempFile, $content, $chmod)) {
+                    return $this->_x5c_tempFile;
+                }
             }
         }
 

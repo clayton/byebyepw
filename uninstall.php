@@ -33,25 +33,42 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 global $wpdb;
 
 // Delete plugin database tables
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Required for uninstall cleanup
-$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}byebyepw_passkeys" );
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Required for uninstall cleanup
-$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}byebyepw_recovery_codes" );
+if ( version_compare( get_bloginfo( 'version' ), '6.2', '>=' ) ) {
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Required for uninstall cleanup
+	$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $wpdb->prefix . 'byebyepw_passkeys' ) );
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Required for uninstall cleanup
+	$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $wpdb->prefix . 'byebyepw_recovery_codes' ) );
+} else {
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Required for uninstall cleanup on WordPress < 6.2 (before %i placeholder)
+	$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}byebyepw_passkeys" );
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Required for uninstall cleanup on WordPress < 6.2 (before %i placeholder)
+	$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}byebyepw_recovery_codes" );
+}
 
 // Delete plugin options
 delete_option( 'byebyepw_db_version' );
 delete_option( 'byebyepw_settings' );
 
 // Delete all plugin transients
+$byebyepw_transient_like         = $wpdb->esc_like( '_transient_byebyepw_' ) . '%';
+$byebyepw_transient_timeout_like = $wpdb->esc_like( '_transient_timeout_byebyepw_' ) . '%';
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk transient cleanup on uninstall
 $wpdb->query(
-	"DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_byebyepw_%' OR option_name LIKE '_transient_timeout_byebyepw_%'"
+	$wpdb->prepare(
+		"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s",
+		$byebyepw_transient_like,
+		$byebyepw_transient_timeout_like
+	)
 );
 
 // Clean up user meta if any exists
+$byebyepw_usermeta_like = $wpdb->esc_like( 'byebyepw_' ) . '%';
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk user meta cleanup on uninstall
 $wpdb->query(
-	"DELETE FROM {$wpdb->usermeta} WHERE meta_key LIKE 'byebyepw_%'"
+	$wpdb->prepare(
+		"DELETE FROM {$wpdb->usermeta} WHERE meta_key LIKE %s",
+		$byebyepw_usermeta_like
+	)
 );
 
 // Clear any cached data

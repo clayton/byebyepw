@@ -1,5 +1,10 @@
 <?php
 
+// If this file is called directly, abort.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -117,7 +122,7 @@ class Byebyepw_Admin {
 			return;
 		}
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/byebyepw-admin.css', array(), $this->version, 'all' );
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/byebyepw-admin.css', array( 'dashicons' ), $this->version, 'all' );
 	}
 
 	/**
@@ -132,7 +137,7 @@ class Byebyepw_Admin {
 			return;
 		}
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/byebyepw-admin.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/byebyepw-admin.js', array( 'jquery' ), $this->version, true );
 		
 		// Localize script for AJAX
 		wp_localize_script( $this->plugin_name, 'byebyepw_ajax', array(
@@ -171,11 +176,11 @@ class Byebyepw_Admin {
 	 * @since    1.0.0
 	 */
 	public function add_admin_menu() {
-		// Add main menu item
+		// Add main menu item (any logged-in user can manage their own passkeys and recovery codes)
 		add_menu_page(
 			__( 'Bye Bye Passwords', 'bye-bye-passwords' ),
 			__( 'Passkeys', 'bye-bye-passwords' ),
-			'manage_options',
+			'read',
 			'byebyepw',
 			array( $this, 'display_admin_page' ),
 			'dashicons-shield-alt',
@@ -186,12 +191,12 @@ class Byebyepw_Admin {
 			'byebyepw',
 			__( 'Passkeys', 'bye-bye-passwords' ),
 			__( 'Passkeys', 'bye-bye-passwords' ),
-			'manage_options',
+			'read',
 			'byebyepw',
 			array( $this, 'display_admin_page' )
 		);
 
-		// Add submenu for settings
+		// Add submenu for site-wide settings (administrators only)
 		add_submenu_page(
 			'byebyepw',
 			__( 'Settings', 'bye-bye-passwords' ),
@@ -218,6 +223,10 @@ class Byebyepw_Admin {
 	 * @since    1.0.0
 	 */
 	public function display_admin_page() {
+		if ( ! current_user_can( 'read' ) ) {
+			wp_die( esc_html__( 'Sorry, you are not allowed to access this page.', 'bye-bye-passwords' ) );
+		}
+
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/byebyepw-admin-display.php';
 	}
 
@@ -227,6 +236,10 @@ class Byebyepw_Admin {
 	 * @since    1.0.0
 	 */
 	public function display_settings_page() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Sorry, you are not allowed to access this page.', 'bye-bye-passwords' ) );
+		}
+
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/byebyepw-settings-display.php';
 	}
 	

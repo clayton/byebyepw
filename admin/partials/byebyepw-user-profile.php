@@ -60,9 +60,11 @@ if ( ! defined( 'ABSPATH' ) ) {
                         <?php endforeach; ?>
                     </ul>
                 <?php endif; ?>
+                <?php if ( (int) $user->ID === get_current_user_id() ) : ?>
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=byebyepw' ) ); ?>" class="button">
                     <?php esc_html_e( 'Manage sign-in security', 'bye-bye-passwords' ); ?>
                 </a>
+                <?php endif; ?>
             </div>
         </td>
     </tr>

@@ -2,6 +2,11 @@
 
 
 namespace lbuchs\WebAuthn\Binary;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 use lbuchs\WebAuthn\WebAuthnException;
 
 /**
@@ -10,7 +15,7 @@ use lbuchs\WebAuthn\WebAuthnException;
  * Modified by Lukas Buchs
  * Thanks Thomas for your work!
  */
-class ByteBuffer implements \JsonSerializable, \Serializable {
+class ByteBuffer implements \JsonSerializable {
     /**
      * @var bool
      */
@@ -28,7 +33,7 @@ class ByteBuffer implements \JsonSerializable, \Serializable {
 
     public function __construct($binaryData) {
         $this->_data = (string)$binaryData;
-        $this->_length = \strlen($binaryData);
+        $this->_length = \strlen($this->_data);
     }
 
 
@@ -244,29 +249,12 @@ class ByteBuffer implements \JsonSerializable, \Serializable {
     }
 
     /**
-     * Serializable-Interface
-     * @return string
-     */
-    public function serialize(): string {
-        return \serialize($this->_data);
-    }
-
-    /**
-     * Serializable-Interface
-     * @param string $serialized
-     */
-    public function unserialize($serialized) {
-        $this->_data = \unserialize($serialized);
-        $this->_length = \strlen($this->_data);
-    }
-
-    /**
-     * (PHP 8 deprecates Serializable-Interface)
+     * PHP 8+ serialization
      * @return array
      */
     public function __serialize(): array {
         return [
-            'data' => \serialize($this->_data)
+            'data' => $this->_data,
         ];
     }
 
@@ -279,14 +267,17 @@ class ByteBuffer implements \JsonSerializable, \Serializable {
     }
 
     /**
-     * (PHP 8 deprecates Serializable-Interface)
+     * PHP 8+ unserialization
      * @param array $data
      * @return void
      */
-    public function __unserialize($data) {
-        if ($data && isset($data['data'])) {
-            $this->_data = \unserialize($data['data']);
+    public function __unserialize(array $data): void {
+        if (isset($data['data']) && \is_string($data['data'])) {
+            $this->_data = $data['data'];
             $this->_length = \strlen($this->_data);
+        } else {
+            $this->_data = '';
+            $this->_length = 0;
         }
     }
 

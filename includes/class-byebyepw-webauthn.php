@@ -94,23 +94,25 @@ class Byebyepw_WebAuthn {
 
 		// Generate challenge
 		$create_args = $this->webauthn->getCreateArgs(
-			$user->ID,
+			(string) $user->ID,
 			$user->user_login,
 			$user->display_name,
 			20, // timeout in seconds
 			true, // require resident key for passkeys
 			'preferred', // user verification
-			null, // attestation conveyance preference
-			$exclude_credentials,
-			true // cross-platform
+			null, // authenticator attachment (null allows both platform and cross-platform)
+			$exclude_credentials
 		);
 
-		// Get challenge from WebAuthn library
+		// Get challenge from WebAuthn library as raw binary
 		$challenge = $this->webauthn->getChallenge();
+		if ( $challenge instanceof \lbuchs\WebAuthn\Binary\ByteBuffer ) {
+			$challenge = $challenge->getBinaryString();
+		}
 		
 		// Generate secure challenge identifier to prevent predictable keys
 		$challenge_id = wp_generate_uuid4();
-		$user_id = get_current_user_id();
+		$user_id      = (int) $user->ID;
 		
 		// Store challenge with secure binding
 		$challenge_data = [
@@ -145,6 +147,7 @@ class Byebyepw_WebAuthn {
 					$cred->id = $this->base64url_encode( $cred->id );
 				}
 			}
+			unset( $cred );
 		}
 
 		return $create_args;
@@ -230,7 +233,8 @@ class Byebyepw_WebAuthn {
 				$attestation_object_decoded,
 				$challenge,
 				false, // user verification not required
-				true  // fail if root mismatch
+				true,  // require user present
+				true   // fail if root mismatch
 			);
 			
 			$this->debug_log( 'processCreate succeeded!' );
@@ -289,7 +293,11 @@ class Byebyepw_WebAuthn {
 		$get_args = $this->webauthn->getGetArgs(
 			$credential_ids,
 			20, // timeout
-			true, // allow cross-platform
+			true, // allow USB
+			true, // allow NFC
+			true, // allow BLE
+			true, // allow hybrid
+			true, // allow internal
 			'preferred' // user verification
 		);
 		
@@ -322,12 +330,7 @@ class Byebyepw_WebAuthn {
 		
 		// Convert binary fields to base64url for JSON transmission
 		if ( isset( $get_args->publicKey->challenge ) ) {
-			// If challenge is a ByteBuffer, get the binary string first
-			if ( $get_args->publicKey->challenge instanceof \lbuchs\WebAuthn\Binary\ByteBuffer ) {
-				$get_args->publicKey->challenge = $this->base64url_encode( $get_args->publicKey->challenge->getBinaryString() );
-			} else {
-				$get_args->publicKey->challenge = $this->base64url_encode( $get_args->publicKey->challenge );
-			}
+			$get_args->publicKey->challenge = $this->base64url_encode( $get_args->publicKey->challenge );
 		}
 		
 		// Convert allow credentials
@@ -337,6 +340,7 @@ class Byebyepw_WebAuthn {
 					$cred->id = $this->base64url_encode( $cred->id );
 				}
 			}
+			unset( $cred );
 		}
 
 		$this->debug_log( 'Returning authentication options with ' . count( $credential_ids ) . ' allowed credentials' );
@@ -466,7 +470,7 @@ class Byebyepw_WebAuthn {
 			$this->debug_log( 'processGet succeeded!' );
 
 			// Update sign count and last used
-			$this->update_credential_usage( $credential->credential_id, $actual_sign_count );
+			$this->update_credential_usage( $credential->credential_id, $actual_sign_count, $credential->user_id );
 
 			// Clear challenge data
 			Byebyepw::clear_challenge_cookie();
@@ -493,14 +497,16 @@ class Byebyepw_WebAuthn {
 		// Log the data structure for debugging (disabled for production)
 		// $this->debug_log( 'Saving credential data structure: ' . wp_json_encode( $data ) );
 
-		// Handle sign_count - it might be null or not set
+		// Handle sign_count - processCreate() sets signatureCounter
 		$sign_count = 0;
-		if ( isset( $data->signCount ) ) {
+		if ( isset( $data->signatureCounter ) ) {
+			$sign_count = intval( $data->signatureCounter );
+		} elseif ( isset( $data->signCount ) ) {
 			$sign_count = intval( $data->signCount );
 		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table insert for passkey storage
-		return $wpdb->insert(
+		$result = $wpdb->insert(
 			$table,
 			array(
 				'user_id' => $user_id,
@@ -513,6 +519,10 @@ class Byebyepw_WebAuthn {
 				'created_at' => current_time( 'mysql' ),
 			)
 		);
+
+		wp_cache_delete( 'byebyepw_passkeys_' . $user_id );
+
+		return $result;
 	}
 
 	/**
@@ -546,14 +556,14 @@ class Byebyepw_WebAuthn {
 	/**
 	 * Update credential usage with actual sign count from authenticator
 	 */
-	private function update_credential_usage( $credential_id, $actual_sign_count = null ) {
+	private function update_credential_usage( $credential_id, $actual_sign_count = null, $user_id = null ) {
 		global $wpdb;
 		$table = $wpdb->prefix . 'byebyepw_passkeys';
 
 		// If we have actual sign count from authenticator, use it
 		if ( $actual_sign_count !== null ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table update
-			return $wpdb->update(
+			$result = $wpdb->update(
 				$table,
 				array(
 					'last_used' => current_time( 'mysql' ),
@@ -561,12 +571,18 @@ class Byebyepw_WebAuthn {
 				),
 				array( 'credential_id' => $credential_id )
 			);
+
+			if ( $user_id ) {
+				wp_cache_delete( 'byebyepw_passkeys_' . $user_id );
+			}
+
+			return $result;
 		}
 
 		// Fallback: increment stored count by 1 (legacy behavior)
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table query
 		$current = $wpdb->get_row( $wpdb->prepare(
-			"SELECT sign_count FROM {$wpdb->prefix}byebyepw_passkeys WHERE credential_id = %s",
+			"SELECT user_id, sign_count FROM {$wpdb->prefix}byebyepw_passkeys WHERE credential_id = %s",
 			$credential_id
 		) );
 		
@@ -575,7 +591,7 @@ class Byebyepw_WebAuthn {
 		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table update
-		return $wpdb->update(
+		$result = $wpdb->update(
 			$table,
 			array(
 				'last_used' => current_time( 'mysql' ),
@@ -583,6 +599,13 @@ class Byebyepw_WebAuthn {
 			),
 			array( 'credential_id' => $credential_id )
 		);
+
+		$cache_user_id = $user_id ? $user_id : ( $current->user_id ?? null );
+		if ( $cache_user_id ) {
+			wp_cache_delete( 'byebyepw_passkeys_' . $cache_user_id );
+		}
+
+		return $result;
 	}
 
 	/**
@@ -593,13 +616,17 @@ class Byebyepw_WebAuthn {
 		$table = $wpdb->prefix . 'byebyepw_passkeys';
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table delete
-		return $wpdb->delete(
+		$result = $wpdb->delete(
 			$table,
 			array(
 				'credential_id' => $credential_id,
 				'user_id' => $user_id,
 			)
 		);
+
+		wp_cache_delete( 'byebyepw_passkeys_' . $user_id );
+
+		return $result;
 	}
 	
 	/**
@@ -610,33 +637,45 @@ class Byebyepw_WebAuthn {
 		$table = $wpdb->prefix . 'byebyepw_passkeys';
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table delete
-		return $wpdb->delete(
+		$result = $wpdb->delete(
 			$table,
 			array(
 				'id' => $id,
 				'user_id' => $user_id,
 			)
 		);
+
+		wp_cache_delete( 'byebyepw_passkeys_' . $user_id );
+
+		return $result;
 	}
 	
 	/**
-	 * Encode binary data to base64url
+	 * Encode binary data (or ByteBuffer) to base64url
+	 *
+	 * @param string|\lbuchs\WebAuthn\Binary\ByteBuffer $data Raw binary data or ByteBuffer.
+	 * @return string Base64url-encoded string.
 	 */
 	private function base64url_encode( $data ) {
-		// If data is already a string that looks like base64, return it
-		if ( is_string( $data ) && preg_match( '/^[A-Za-z0-9_\-=]+$/', $data ) ) {
-			return $data;
+		if ( $data instanceof \lbuchs\WebAuthn\Binary\ByteBuffer ) {
+			$data = $data->getBinaryString();
 		}
-		
-		// Otherwise encode it
-		$base64 = base64_encode( $data );
+
+		$base64 = base64_encode( (string) $data );
 		return rtrim( strtr( $base64, '+/', '-_' ), '=' );
 	}
 	
 	/**
 	 * Decode base64url to binary data
+	 *
+	 * @param string $data Base64url-encoded string.
+	 * @return string|false Decoded binary data.
 	 */
 	private function base64url_decode( $data ) {
+		$remainder = strlen( $data ) % 4;
+		if ( $remainder ) {
+			$data .= str_repeat( '=', 4 - $remainder );
+		}
 		return base64_decode( strtr( $data, '-_', '+/' ) );
 	}
 }

@@ -1,6 +1,10 @@
 <?php
 namespace lbuchs\WebAuthn;
 
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 /**
  * @author Lukas Buchs
  * @license https://github.com/lbuchs/WebAuthn/blob/master/LICENSE MIT
