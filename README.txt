@@ -3,7 +3,7 @@ Contributors: claytonlz
 Donate link: https://claytonlz.com/
 Tags: passwordless, webauthn, passkeys, authentication, security
 Requires at least: 5.0
-Tested up to: 7.1
+Tested up to: 7.2
 Stable tag: 1.4.0
 Requires PHP: 8.0
 License: GPLv2 or later
