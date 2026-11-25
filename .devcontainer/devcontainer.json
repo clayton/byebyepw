@@ -1,0 +1,26 @@
+{
+  "name": "Bye Bye Passwords (LAMP + WP + Trusted HTTPS)",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "web",
+  "workspaceFolder": "/var/www/html/wp-content/plugins/bye-bye-passwords",
+  "shutdownAction": "stopCompose",
+  "initializeCommand": "bash .devcontainer/scripts/generate-certs.sh",
+  "postStartCommand": "/usr/local/bin/bootstrap-wp.sh",
+  "forwardPorts": [8080, 8443],
+  "portsAttributes": {
+    "8080": {
+      "label": "WordPress HTTP (redirects to HTTPS)"
+    },
+    "8443": {
+      "label": "WordPress HTTPS (WebAuthn)"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bmewburn.vscode-intelephense-client",
+        "xdebug.php-debug"
+      ]
+    }
+  }
+}

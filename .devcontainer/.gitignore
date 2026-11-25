@@ -1,0 +1,5 @@
+# Local overrides & generated runtime artifacts (never commit)
+.env
+!.env.example
+certs/
+test-results/

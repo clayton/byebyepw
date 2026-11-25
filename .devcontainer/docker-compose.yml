@@ -1,0 +1,98 @@
+name: byebyepw-dev
+
+services:
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${MYSQL_DATABASE:-wordpress}
+      MARIADB_USER: ${MYSQL_USER:-wordpress}
+      MARIADB_PASSWORD: ${MYSQL_PASSWORD:-wordpress}
+      MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpass}
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    networks:
+      - lamp
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PHP_VERSION: ${PHP_VERSION:-8.6}
+    image: byebyepw-lamp:php-${PHP_VERSION:-8.6}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${HTTP_PORT:-8080}:80"
+      - "127.0.0.1:${HTTPS_PORT:-8443}:8443"
+    environment:
+      PHP_VERSION: ${PHP_VERSION:-8.6}
+      WP_VERSION: ${WP_VERSION:-7.2-RC3}
+      WP_SITE_HOST: ${WP_SITE_HOST:-byebyepw.test}
+      WP_SITE_URL: ${WP_SITE_URL:-https://byebyepw.test:8443}
+      HTTPS_PORT: ${HTTPS_PORT:-8443}
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE:-wordpress}
+      WORDPRESS_DB_USER: ${MYSQL_USER:-wordpress}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD:-wordpress}
+      WP_ADMIN_USER: ${WP_ADMIN_USER:-admin}
+      WP_ADMIN_PASS: ${WP_ADMIN_PASS:-admin123!}
+      WP_ADMIN_EMAIL: ${WP_ADMIN_EMAIL:-admin@byebyepw.test}
+      WP_SUBSCRIBER_USER: ${WP_SUBSCRIBER_USER:-subscriber}
+      WP_SUBSCRIBER_PASS: ${WP_SUBSCRIBER_PASS:-subscriber123!}
+      WP_SUBSCRIBER_EMAIL: ${WP_SUBSCRIBER_EMAIL:-subscriber@byebyepw.test}
+    volumes:
+      - wp_html:/var/www/html
+      - ..:/var/www/html/wp-content/plugins/bye-bye-passwords:cached
+      - ./certs:/etc/apache2/ssl
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS --cacert /etc/apache2/ssl/ca.crt https://localhost:8443/wp-login.php >/dev/null || curl -fsS --cacert /etc/apache2/ssl/ca.crt https://localhost:8443/ >/dev/null"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    networks:
+      lamp:
+        aliases:
+          - byebyepw.test
+          - web
+
+  playwright:
+    profiles: ["test"]
+    build:
+      context: ./playwright
+      dockerfile: Dockerfile
+    image: byebyepw-playwright:latest
+    depends_on:
+      web:
+        condition: service_started
+    environment:
+      BASE_URL: ${WP_SITE_URL:-https://byebyepw.test:8443}
+      WP_ADMIN_USER: ${WP_ADMIN_USER:-admin}
+      WP_ADMIN_PASS: ${WP_ADMIN_PASS:-admin123!}
+      WP_SUBSCRIBER_USER: ${WP_SUBSCRIBER_USER:-subscriber}
+      WP_SUBSCRIBER_PASS: ${WP_SUBSCRIBER_PASS:-subscriber123!}
+      RESULTS_DIR: /results
+    volumes:
+      - ./certs:/certs:ro
+      - ./playwright:/tests
+      - ./test-results:/results
+    networks:
+      - lamp
+
+volumes:
+  db_data:
+  wp_html:
+
+networks:
+  lamp:
+    driver: bridge

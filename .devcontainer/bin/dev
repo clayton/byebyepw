@@ -1,0 +1,156 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DEVCONTAINER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+COMPOSE_FILE="$DEVCONTAINER_DIR/docker-compose.yml"
+ENV_FILE="$DEVCONTAINER_DIR/.env"
+CA_CRT="$DEVCONTAINER_DIR/certs/ca.crt"
+
+# Load local .env if present (without overriding explicit caller env vars)
+if [ -f "$ENV_FILE" ]; then
+  while IFS='=' read -r k v; do
+    [[ -z "$k" || "$k" =~ ^[[:space:]]*# ]] && continue
+    if [ -z "${!k+x}" ]; then
+      export "$k=$v"
+    fi
+  done < "$ENV_FILE"
+fi
+
+dc() {
+  docker compose -f "$COMPOSE_FILE" "$@"
+}
+
+ensure_certs() {
+  bash "$DEVCONTAINER_DIR/scripts/generate-certs.sh" "$DEVCONTAINER_DIR/certs"
+}
+
+usage() {
+  cat <<'EOF'
+Usage: .devcontainer/bin/dev <command> [args]
+
+Commands:
+  up [--build]          Generate trusted local CA/certs (if needed) and start LAMP stack
+  down [-v]             Stop LAMP stack (pass -v to reset DB + WP volumes)
+  switch-php <ver>      Rebuild & switch PHP version (e.g. 8.0, 8.2, 8.4, 8.6)
+  switch-wp <ver>       Switch WordPress core version (7.2-RC3, rc, nightly, latest, 7.1.5)
+  wp <args...>          Run WP-CLI inside the web container
+  plugin-check [args]   Run WordPress Plugin Check on bye-bye-passwords
+  test-e2e [script]     Run Playwright Chromium WebAuthn test (default: smoke-webauthn.mjs)
+  debug-log             Show /var/www/html/wp-content/debug.log
+  status                Show active PHP version, WordPress version, URLs, and containers
+  trust-macos           Print exact command to trust the local Root CA in macOS Keychain
+  logs [service]        Tail container logs
+EOF
+}
+
+cmd="${1:-help}"
+shift || true
+
+case "$cmd" in
+  up)
+    ensure_certs
+    dc up -d "$@"
+    echo "[dev] Waiting for web container to finish bootstrap & become healthy ..."
+    for i in $(seq 1 40); do
+      status="$(docker inspect -f '{{.State.Health.Status}}' "$(dc ps -q web)" 2>/dev/null || echo starting)"
+      if [ "$status" = "healthy" ]; then
+        break
+      fi
+      sleep 2
+    done
+    "$0" status
+    ;;
+
+  down)
+    dc --profile test down "$@"
+    ;;
+
+  switch-php)
+    ver="${1:-}"
+    if [ -z "$ver" ]; then
+      echo "Usage: $0 switch-php <8.0|8.2|8.4|8.6>" >&2
+      exit 1
+    fi
+    ensure_certs
+    echo "[dev] Switching PHP to $ver ..."
+    PHP_VERSION="$ver" dc build web
+    PHP_VERSION="$ver" dc up -d --force-recreate web
+    for i in $(seq 1 30); do
+      status="$(docker inspect -f '{{.State.Health.Status}}' "$(dc ps -q web)" 2>/dev/null || echo starting)"
+      [ "$status" = "healthy" ] && break
+      sleep 2
+    done
+    dc exec -T web php -v | head -n1
+    ;;
+
+  switch-wp)
+    ver="${1:-}"
+    if [ -z "$ver" ]; then
+      echo "Usage: $0 switch-wp <7.2-RC3|rc|nightly|latest|7.1.5>" >&2
+      exit 1
+    fi
+    dc exec -T web /usr/local/bin/switch-wp.sh "$ver"
+    ;;
+
+  wp)
+    dc exec -T web wp "$@"
+    ;;
+
+  plugin-check)
+    dc exec -T web wp plugin check bye-bye-passwords --exclude-directories=.devcontainer,.git --exclude-files=.git "$@"
+    ;;
+
+  test-e2e)
+    ensure_certs
+    script="${1:-/tests/smoke-webauthn.mjs}"
+    shift || true
+    dc --profile test build playwright
+    dc --profile test run --rm playwright node "$script" "$@"
+    ;;
+
+  debug-log)
+    dc exec -T web cat /var/www/html/wp-content/debug.log
+    ;;
+
+  status)
+    dc ps
+    if [ -n "$(dc ps -q web 2>/dev/null || true)" ]; then
+      echo "--- Stack Info ---"
+      dc exec -T web bash -lc 'echo "PHP:       $(php -r "echo PHP_VERSION;")"; echo "WordPress: $(wp core version 2>/dev/null || echo installing)"; echo "Plugins:   $(wp plugin list --status=active --field=name 2>/dev/null | paste -sd, -)"'
+      echo "HTTPS URL: https://localhost:${HTTPS_PORT:-8443}  (or https://byebyepw.test:${HTTPS_PORT:-8443})"
+      echo "CA cert:   $CA_CRT"
+    fi
+    ;;
+
+  trust-macos)
+    ensure_certs
+    cat <<'EOF'
+Run this on macOS to trust the local Dev Root CA in Keychain (for Chromium/Chrome/Safari):
+
+ca=".devcontainer/certs/ca.crt"
+sudo security add-trusted-cert \
+  -d -r trustRoot \
+  -k /Library/Keychains/System.keychain \
+  "$ca"
+
+Optional: map byebyepw.test in /etc/hosts (or use https://localhost:8443 directly):
+
+echo "127.0.0.1 byebyepw.test" \
+  | sudo tee -a /etc/hosts
+EOF
+    ;;
+
+  logs)
+    dc logs -f "$@"
+    ;;
+
+  help|-h|--help)
+    usage
+    ;;
+
+  *)
+    echo "Unknown command: $cmd" >&2
+    usage
+    exit 1
+    ;;
+esac
